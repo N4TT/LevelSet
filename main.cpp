@@ -1,3 +1,5 @@
+//#include "SIPL/Core.hpp"
+//#include <gtk/gtk.h>
 #include <iostream>
 #include <stdio.h>
 #include <vector>
@@ -8,7 +10,7 @@
 #include "update.h"
 using namespace std;
 
-double image[HEIGHT][WIDTH] = { {0.1,0.2,0.1,0.3,0.4},{0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}  };
+double image[HEIGHT][WIDTH] = {0};//{ {0.1,0.2,0.1,0.3,0.4},{0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}  };
 double phi[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
 int init[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
 int label[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
@@ -171,7 +173,7 @@ void readbmp(char* filename){
     fread(&height, 4, 1, fp);
     fseek(fp, 10, SEEK_SET);
     fread(&offset, 4, 1, fp);
-
+	printf("the height is: %i", height);//////////////////// 
     unsigned char* data = (unsigned char*)malloc(sizeof(unsigned char)*height*width);
 
     fseek(fp, offset, SEEK_SET);
@@ -180,9 +182,9 @@ void readbmp(char* filename){
 
     fclose(fp);
 
-	for (int i =0; i<512; i++){
-		for (int j = 0; j<512; j++){
-		image[i][j] = (double)data[i*512+j]; //må kanskje forandres hvis bildet er opp ned
+	for (int i =0; i<height; i++){
+		for (int j = 0; j<width; j++){
+		image[i][j] = (double)data[i*height+j]; //må kanskje forandres hvis bildet er opp ned
 		
 		}
 	}
@@ -191,11 +193,11 @@ void readbmp(char* filename){
 
 int main(){
 	
-
-	
+	readbmp("img.bmp");
+	printf("reading done\n");
 	try{
 		fillInit(2, 2, 3, 3);
-	
+		printf("filling done\n");
 	}catch(int e){
 		if(e == -1){
 			printf("minX er større enn maxX eller minY er større enn maxY\n");
@@ -203,14 +205,19 @@ int main(){
 
 		}
 		else if(e == 1){
-				printf("masken kan ikke være utenfor eller større enn bildet\n");
-				system("pause");
+			printf("masken kan ikke være utenfor eller større enn bildet\n");
+			system("pause");
 		}
 	}
 	initialization();
-
-	prepareUpdates();
-	updateLevelSets();
+	printf("starting main loop\n");
+	for(int i = 0; i<100; i++){
+		prepareUpdates();
+		//printf("prep done\n");
+		updateLevelSets();
+		//printf("update done\n");
+	}
+	printf("finished\n");
 	system("pause");
 
 }
