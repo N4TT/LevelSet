@@ -11,7 +11,7 @@
 #include "bmp.h"
 using namespace std;
 
-double image[HEIGHT][WIDTH] = {0};//{ {0.1,0.2,0.1,0.3,0.4},{0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}  };
+double image[HEIGHT][WIDTH] = { 0 };//{ {0.1,0.2,0.1,0.3,0.4},{0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}  };
 double phi[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
 int init[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
 int label[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
@@ -120,6 +120,7 @@ void setLevels(int i, int j, int level){
 	if(label[i][j-1] == -3){
 		pushAndStuff(i, j-1, -level);
 	}
+
 }	
 
 void initialization(){
@@ -146,21 +147,38 @@ void initialization(){
 
 		}
 	}
+	
 	for (int i = 0; i<lz.size(); i+=2){
 		setLevels(lz[i], lz[i+1], 1);	//second levelSet (level 1)
 	}
 	for (int i = 0; i<lp1.size(); i+=2){
 		setLevels(lp1[i], lp1[i+1], 2);	
 	}
+	for (int i = 0; i<lp1.size(); i++){
+		if (lp1[i] > 513)
+			printf(" lp1: %d ", lp1[i]);
+	}
+	for (int i = 0; i<lp2.size(); i++){
+		if (lp2[i] > 513)
+			printf(" lp2: %d ", lp2[i]);
+	}
+	for (int i = 0; i<ln1.size(); i++){
+		if (ln1[i] > 513)
+			printf(" ln1: %d", ln1[i]);
+	}
+	for (int i = 0; i<ln2.size(); i++){
+		if (ln2[i] > 513)
+			printf(" ln2: %d ", ln2[i]);
+	}
+	for (int i = 0; i<lz.size(); i++){
+		if (lz[i] > 513)
+			printf(" lz: %d ", lz[i]);
+	}
 	for (int i = 0; i<ln1.size(); i+=2){
 		setLevels(ln1[i], ln1[i+1], 2);	
 	}
+
 }
-
-
-
-
-
 
 void readbmp(char* filename){
 
@@ -182,10 +200,10 @@ void readbmp(char* filename){
     fread(data, sizeof(unsigned char), height*width, fp);
 
     fclose(fp);
-	printf("dara: %c", data[0];
+	//printf("dara: %c", data[0]);
 	for (int i =0; i<height; i++){
 		for (int j = 0; j<width; j++){
-		image[i][j] = (double)data[i*height+j]; //må kanskje forandres hvis bildet er opp ned
+		image[i*height][j] = (double)data[i*height+j]; //må kanskje forandres hvis bildet er opp ned
 		
 		}
 	}
@@ -238,10 +256,11 @@ void write_bmp(unsigned char* data, int width, int height){
 
 int main(){
 	
-	readbmp("img.bmp");
-	printf("reading done\n");
+	//readbmp("img.bmp");
+	//printf("reading done\n");
+	
 	try{
-		fillInit(2, 2, 3, 3);
+		fillInit(250, 250, 350, 350);
 		printf("filling done\n");
 	}catch(int e){
 		if(e == -1){
@@ -256,26 +275,55 @@ int main(){
 	}
 	initialization();
 	printf("starting main loop\n");
+	/*
 	for(int i = 0; i<5; i++){
 		prepareUpdates();
 		printf("prep done\n");
 		updateLevelSets();
 		printf("update done\n");
 	}
+	*/
+	/*for (int i = 0; i<lp1.size(); i++){
+		if (lp1[i] > 513)
+			printf(" lp1: %d ", lp1[i]);
+	}
+	for (int i = 0; i<lp2.size(); i++){
+		if (lp2[i] > 513)
+			printf(" lp2: %d ", lp2[i]);
+	}
+	for (int i = 0; i<ln1.size(); i++){
+		if (ln1[i] > 513)
+			printf(" ln1: %d", ln1[i]);
+	}
+	for (int i = 0; i<ln2.size(); i++){
+		if (ln2[i] > 513)
+			printf(" ln2: %d ", ln2[i]);
+	}
+	for (int i = 0; i<lz.size(); i++){
+		if (lz[i] > 513)
+			printf(" lz: %d ", lz[i]);
+	}
+	*/
 	printf("finished\n");
 	
-	unsigned char* data1[64*64];
-	printf("size %i", data1.size());
-	printf("assigned");
-	for (int i =0; i<64; i++){
-		for (int j = 0; j<64; j++){
-			printf("for 1 strta");
-			data1[i*64+j] = (char)image[i][j]; //må kanskje forandres hvis bildet er opp ned
-			printf("for 1 done");
+	//unsigned char data1[64*64];
+	//printf("size %d", data1);
+	//printf("assigned");
+	//for (int i =0; i<64; i++){
+		//for (int j = 0; j<64; j++){
+			//printf("for 1 strta\n");
+			//data1[i*64+j] = (char)image[i][j]; //må kanskje forandres hvis bildet er opp ned
+			//printf("for 1 done\n");
+		//}
+//	}
+	//printf("WRITE done");
+	/*for (int i = 1; i<=HEIGHT; i++){
+		for (int j = 1; j<=WIDTH; j++){
+			printf(" %f ", phi[i][j]);
 		}
-	}
-	printf("WRITE done");
-	write_bmp(data1, 64, 64);
+		printf("\n");
+	}*/
+	//write_bmp(phi, 512, 512);
 	
 	
 	system("pause");

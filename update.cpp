@@ -141,14 +141,20 @@ void prepareUpdates(){
 }
 
 void updateLevelSets(){				//Procedure 3
-
+	printf(" 0\n");
 	for (int i = 0; i<sz.size(); i+=2){
+			printf(" 12\n");
 		int j = i+1;
+			printf(" 123:::: %i\n", sz[i]);
 		label[sz[i]][sz[j]] = 0;
+			printf(" 1234\n");
 		lz.push_back(sz[i]);
+			printf(" 12345\n");
 		lz.push_back(sz[j]);
+			printf(" 123456\n");
 		sz.erase(sz.begin() +i, sz.begin() +j);
 	}
+	printf(" 1\n");
 	for (int i = 0; i<sn1.size(); i+=2){
 		int j = i+1;
 		label[sn1[i]][sn1[j]] = -1;
@@ -176,6 +182,7 @@ void updateLevelSets(){				//Procedure 3
 			sn2.push_back(sn1[j]-1);
 		}
 	}
+	printf(" 2\n");
 	for (int i = 0; i<sp1.size(); i+=2){
 		int j = i+1;
 		label[sp1[i]][sp1[j]] = 1;
@@ -203,6 +210,7 @@ void updateLevelSets(){				//Procedure 3
 			sp2.push_back(sp1[j]-1);
 		}
 	}
+	printf(" 3\n");
 	for (int i = 0; i<sn2.size(); i+=2){
 		int j = i+1;
 		label[sn2[i]][sn2[j]] = -2;
@@ -210,6 +218,7 @@ void updateLevelSets(){				//Procedure 3
 		ln2.push_back(sn2[j]);
 		sn2.erase(sn2.begin()+i, sn2.begin()+j);
 	}
+	printf(" 4\n");
 	for (int i = 0; i<sp2.size(); i+=2){
 		int j = i+1;
 		label[sp2[i]][sp2[j]] = 2;
