@@ -8,6 +8,7 @@
 #include <string.h>
 #include "main.h"
 #include "update.h"
+#include "bmp.h"
 using namespace std;
 
 double image[HEIGHT][WIDTH] = {0};//{ {0.1,0.2,0.1,0.3,0.4},{0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}  };
@@ -181,7 +182,7 @@ void readbmp(char* filename){
     fread(data, sizeof(unsigned char), height*width, fp);
 
     fclose(fp);
-
+	printf("dara: %c", data[0];
 	for (int i =0; i<height; i++){
 		for (int j = 0; j<width; j++){
 		image[i][j] = (double)data[i*height+j]; //må kanskje forandres hvis bildet er opp ned
@@ -190,6 +191,50 @@ void readbmp(char* filename){
 	}
     //return data;
 }
+
+void write_bmp(unsigned char* data, int width, int height){
+    struct bmp_id id;
+    id.magic1 = 0x42;
+    id.magic2 = 0x4D;
+
+    struct bmp_header header;
+    header.file_size = width*height+54 + 2;
+    header.pixel_offset = 1078;
+
+    struct bmp_dib_header dib_header;
+    dib_header.header_size = 40;
+    dib_header.width = width;
+    dib_header.height = height;
+    dib_header.num_planes = 1;
+    dib_header.bit_pr_pixel = 8;
+    dib_header.compress_type = 0;
+    dib_header.data_size = width*height;
+    dib_header.hres = 0;
+    dib_header.vres = 0;
+    dib_header.num_colors = 256;
+    dib_header.num_imp_colors = 0;
+
+    char padding[2];
+
+    unsigned char* color_table = (unsigned char*)malloc(1024);
+    for(int c= 0; c < 256; c++){
+        color_table[c*4] = (unsigned char) c;
+        color_table[c*4+1] = (unsigned char) c;
+        color_table[c*4+2] = (unsigned char) c;
+        color_table[c*4+3] = 0;
+    }
+
+
+    FILE* fp = fopen("out.bmp", "w+");
+    fwrite((void*)&id, 1, 2, fp);
+    fwrite((void*)&header, 1, 12, fp);
+    fwrite((void*)&dib_header, 1, 40, fp);
+    fwrite((void*)color_table, 1, 1024, fp);
+    fwrite((void*)data, 1, width*height, fp);
+    fwrite((void*)&padding,1,2,fp);
+    fclose(fp);
+}
+
 
 int main(){
 	
@@ -211,13 +256,28 @@ int main(){
 	}
 	initialization();
 	printf("starting main loop\n");
-	for(int i = 0; i<100; i++){
+	for(int i = 0; i<5; i++){
 		prepareUpdates();
-		//printf("prep done\n");
+		printf("prep done\n");
 		updateLevelSets();
-		//printf("update done\n");
+		printf("update done\n");
 	}
 	printf("finished\n");
+	
+	unsigned char* data1[64*64];
+	printf("size %i", data1.size());
+	printf("assigned");
+	for (int i =0; i<64; i++){
+		for (int j = 0; j<64; j++){
+			printf("for 1 strta");
+			data1[i*64+j] = (char)image[i][j]; //må kanskje forandres hvis bildet er opp ned
+			printf("for 1 done");
+		}
+	}
+	printf("WRITE done");
+	write_bmp(data1, 64, 64);
+	
+	
 	system("pause");
 
 }
