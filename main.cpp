@@ -17,17 +17,21 @@ int init[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
 int label[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
 double F[HEIGHT][WIDTH] = { 0 };
 
-vector<int> lz;
-vector<int> lp1;
-vector<int> ln1;
-vector<int> lp2;
-vector<int> ln2;
 
-vector<int> sz;
-vector<int> sp1;
-vector<int> sn1;
-vector<int> sp2;
-vector<int> sn2;
+
+vector<Pixel> lz;
+vector<Pixel> lp1;
+vector<Pixel> ln1;
+vector<Pixel> lp2;
+vector<Pixel> ln2;
+
+vector<Pixel> sz;
+vector<Pixel> sp1;
+vector<Pixel> sn1;
+vector<Pixel> sp2;
+vector<Pixel> sn2;
+
+
 
 void fillInit(int minX, int minY, int maxX, int maxY){
 	if(maxX - minX <= 0){
@@ -46,7 +50,7 @@ void fillInit(int minX, int minY, int maxX, int maxY){
 	}
 }
 
-bool checkMaskNeighbours(int i, int j, int id, int res){
+bool checkMaskNeighbours(int i, int j, int id, int res){ //res er verdien som vi sjekker opp mot, kriteriet for success
 	if(id == 1){ //id == 1 -> init
 		if(init[i+1][j] == res)
 			return true;
@@ -70,60 +74,59 @@ bool checkMaskNeighbours(int i, int j, int id, int res){
 	return false;
 }
 
-void pushAndStuff(int i, int j, int level){
+void pushAndStuff(Pixel p, int level){//støtter Pixel struct
 	switch(level){
 	case 1:
-		lp1.push_back(i);
-		lp1.push_back(j);
-		label[i][j] = level;
-		phi[i][j] = level;
+		lp1.push_back(p);
+		label[p.x][p.y] = level;
+		phi[p.x][p.y] = level;
 	case 2:
-		lp2.push_back(i);
-		lp2.push_back(j);
-		label[i][j] = level;
-		phi[i][j] = level;
+		lp2.push_back(p);
+		label[p.x][p.y] = level;
+		phi[p.x][p.y] = level;
 	case -1:
-		ln1.push_back(i);
-		ln1.push_back(j);
-		label[i][j] = level;
-		phi[i][j] = level;
+		ln1.push_back(p);
+		label[p.x][p.y] = level;
+		phi[p.x][p.y] = level;
 	case -2:
-		ln2.push_back(i);
-		ln2.push_back(j);
-		label[i][j] = level;
-		phi[i][j] = level;	
+		ln2.push_back(p);
+		label[p.x][p.y] = level;
+		phi[p.x][p.y] = level;	
 	}
 }
 
-void setLevels(int i, int j, int level){
-	if(label[i+1][j] == 3){
-		pushAndStuff(i+1, j, level);
+void setLevels(Pixel p, int level){//støtter Pixel Struct
+
+	if(label[p.x+1][p.y] == 3){
+		pushAndStuff(Pixel(p.x+1, p.y), level);
 	}
-	if(label[i][j+1] == 3){
-		pushAndStuff(i, j+1, level);
+	if(label[p.x][p.y+1] == 3){
+		pushAndStuff(Pixel(p.x, p.y+1), level);
 	}
-	if(label[i-1][j] == 3){
-		pushAndStuff(i-1, j, level);
+	if(label[p.x-1][p.y] == 3){
+		pushAndStuff(Pixel(p.x-1, p.y), level);
 	}
-	if(label[i][j-1] == 3){
-		pushAndStuff(i, j-1, level);
+	if(label[p.x][p.y-1] == 3){
+		pushAndStuff(Pixel(p.x, p.y-1), level);
 	}
-	if(label[i+1][j] == -3){
-		pushAndStuff(i+1, j, -level);
+	if(label[p.x+1][p.y] == -3){
+		pushAndStuff(Pixel(p.x+1, p.y), -level);
 	}
-	if(label[i][j+1] == -3){
-		pushAndStuff(i, j+1, -level);
+	if(label[p.x][p.y+1] == -3){
+		pushAndStuff(Pixel(p.x, p.y+1), -level);
 	}
-	if(label[i-1][j] == -3){
-		pushAndStuff(i-1, j, -level);
+	if(label[p.x-1][p.y] == -3){
+		pushAndStuff(Pixel(p.x-1, p.y), -level);
 	}
-	if(label[i][j-1] == -3){
-		pushAndStuff(i, j-1, -level);
+	if(label[p.x][p.y-1] == -3){
+		pushAndStuff(Pixel(p.x, p.y-1), -level);
 	}
 
 }	
 
-void initialization(){
+void initialization(){//støtter Pixel struct, men se comment under dersom du feilsøker
+
+	vector<Pixel>::iterator it;
 
 	for (int i = 0; i<HEIGHT+BORDER; i++){
 		for (int j = 0; j<WIDTH+BORDER; j++){
@@ -139,45 +142,23 @@ void initialization(){
 	}
 	for (int i = 1; i<HEIGHT+1; i++){
 		for (int j = 1; j<WIDTH+1; j++){
-			if(init[i][j] == 1 && checkMaskNeighbours(i, j, 1, 0) == true)
-				lz.push_back(i);		//adder i til vektoren som representerer zero level set
-				lz.push_back(j);		//adder j på samme måte som i. i ligger på partall indekser mens j sitter på oddetall
+			if(init[i][j] == 1 && checkMaskNeighbours(i, j, 1, 0) == true){
+				lz.push_back(Pixel(i,j));
 				label[i][j] = 0;
 				phi[i][j] = 0;
-
+			}
 		}
 	}
 	
-	for (int i = 0; i<lz.size(); i+=2){
-		setLevels(lz[i], lz[i+1], 1);	//second levelSet (level 1)
+	for (it = lz.begin(); it < lz.end(); it++){
+		setLevels(*it, 1);//second levelSet (level 1)			må sjekke om *it gir den faktiske structen eller bare indexen før denne kan antas å være rett
 	}
-	for (int i = 0; i<lp1.size(); i+=2){
-		setLevels(lp1[i], lp1[i+1], 2);	
+	for (it = lp1.begin(); it < lp1.end(); it++){
+		setLevels(*it, 2);									//samme gjelder for denne, og den under
+	}	
+	for (it = ln1.begin(); it < ln1.end(); it++){
+		setLevels(*it, 2);
 	}
-	for (int i = 0; i<lp1.size(); i++){
-		if (lp1[i] > 513)
-			printf(" lp1: %d ", lp1[i]);
-	}
-	for (int i = 0; i<lp2.size(); i++){
-		if (lp2[i] > 513)
-			printf(" lp2: %d ", lp2[i]);
-	}
-	for (int i = 0; i<ln1.size(); i++){
-		if (ln1[i] > 513)
-			printf(" ln1: %d", ln1[i]);
-	}
-	for (int i = 0; i<ln2.size(); i++){
-		if (ln2[i] > 513)
-			printf(" ln2: %d ", ln2[i]);
-	}
-	for (int i = 0; i<lz.size(); i++){
-		if (lz[i] > 513)
-			printf(" lz: %d ", lz[i]);
-	}
-	for (int i = 0; i<ln1.size(); i+=2){
-		setLevels(ln1[i], ln1[i+1], 2);	
-	}
-
 }
 
 void readbmp(char* filename){
@@ -254,7 +235,7 @@ void write_bmp(unsigned char* data, int width, int height){
 }
 
 
-int main(){
+int main(){//Ikke rørt etter Pixel struct ble opprettet
 	
 	//readbmp("img.bmp");
 	//printf("reading done\n");

@@ -12,18 +12,18 @@ extern double phi[HEIGHT+BORDER][WIDTH+BORDER]; //representation of the zero lev
 extern int label[HEIGHT+BORDER][WIDTH+BORDER];//contains only integer values between -3 and 3
 extern double F[HEIGHT][WIDTH];
 
-extern vector<int> lz; // zero level set
-extern vector<int> lp1;
-extern vector<int> ln1;
-extern vector<int> lp2;
-extern vector<int> ln2;
+extern vector<Pixel> lz; // zero level set
+extern vector<Pixel> lp1;
+extern vector<Pixel> ln1;
+extern vector<Pixel> lp2;
+extern vector<Pixel> ln2;
 
 //temp values
-extern vector<int> sz; //values in sz are to be moved to lz
-extern vector<int> sp1;
-extern vector<int> sn1;
-extern vector<int> sp2;
-extern vector<int> sn2;
+extern vector<Pixel> sz; //values in sz are to be moved to lz
+extern vector<Pixel> sp1;
+extern vector<Pixel> sn1;
+extern vector<Pixel> sp2;
+extern vector<Pixel> sn2;
 
 int minMax(int i, int j, int mm){ //mm==1 -> max, mm ==0 -> min
 	if(mm==1){
@@ -35,7 +35,7 @@ int minMax(int i, int j, int mm){ //mm==1 -> max, mm ==0 -> min
 	
 }
 
-void prepareUpdates(){
+void prepareUpdates(){//har ikke forandret på denne så den støtter Pixel structs ennå
 	for(int i =0; i<lz.size(); i+=2){//find pixels that are moving out of lz
 		int j = i+1;
 		phi[lz[i]][lz[j]] += F[lz[i]][lz[j]];
@@ -140,21 +140,18 @@ void prepareUpdates(){
 	}
 }
 
-void updateLevelSets(){				//Procedure 3
-	printf(" 0\n");
-	for (int i = 0; i<sz.size(); i+=2){
-			printf(" 12\n");
-		int j = i+1;
-			printf(" 123:::: %i\n", sz[i]);
-		label[sz[i]][sz[j]] = 0;
-			printf(" 1234\n");
-		lz.push_back(sz[i]);
-			printf(" 12345\n");
-		lz.push_back(sz[j]);
-			printf(" 123456\n");
-		sz.erase(sz.begin() +i, sz.begin() +j);
+void updateLevelSets(){				//Procedure 3 Delvis påbegynt for å støtte Pixel struct, se kommentarer
+	
+	vector<Pixel>::iterator it;
+	
+
+	for (it = lz.begin(); it < sz.end(); it++){
+		label[it->x][it->y] = 0;					//IKKE SIKKER PÅ OM JEG ACCESSER RETT VALUE HER, usikker på om it->x/it->y gir meg rett value
+		lz.push_back(*it);						//skal sjekke denne også
+		it = sz.erase(it);						//her må vi kanskje bruke en while loop som skipper increment hvis den deleter noe istede for en for loop
 	}
-	printf(" 1\n");
+
+	//HAR IKKE FIKSET FOR PIXEL STRUCT NEDENFOR YET
 	for (int i = 0; i<sn1.size(); i+=2){
 		int j = i+1;
 		label[sn1[i]][sn1[j]] = -1;
