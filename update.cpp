@@ -36,6 +36,9 @@ int minMax(int i, int j, int mm){ //mm==1 -> max, mm ==0 -> min
 }
 
 void prepareUpdates(){//har ikke forandret på denne så den støtter Pixel structs ennå
+		
+	vector<Pixel>::iterator it;
+	
 	for(int i =0; i<lz.size(); i+=2){//find pixels that are moving out of lz
 		int j = i+1;
 		phi[lz[i]][lz[j]] += F[lz[i]][lz[j]];
@@ -94,47 +97,49 @@ void prepareUpdates(){//har ikke forandret på denne så den støtter Pixel structs
 			}
 		}
 	}
-	for(int i =0; i<ln2.size(); i+=2){
-		int j = i+1;
-		if(checkMaskNeighbours(ln2[i],ln2[j], 2, -1) == false){
-			label[ln2[i]][ln2[j]] = -3;
-			phi[ln2[i]][ln2[j]] = -3;
-			ln2.erase(ln2.begin() +i, ln2.begin() +j);
+	for(it = ln2.begin(); it < ln2.end();){
+		if(checkMaskNeighbours(it->x,it->y, 2, -1) == false){
+			label[it->x][it->y] = -3;
+			phi[it->x][it->y] = -3;
+			it = ln2.erase(it);
 		}
 		else{
-			int M = minMax(ln2[i], ln2[j], 1);
-			phi[ln2[i]][ln2[j]] = M-1;
-			if(phi[ln2[i]][ln2[j]] >= -1.5){ 
-				sn1.push_back(ln2[i]);
-				sn1.push_back(ln2[j]);
-				ln2.erase(ln2.begin() +i, ln2.begin() +j);
+			int M = minMax(it->x, it->y, 1);
+			phi[it->x][it->y] = M-1;
+			if(phi[it->x][it->y] >= -1.5){ 
+				sn1.push_back(*it);
+				it = ln2.erase(it);
 			}
-			else if(phi[ln2[i]][ln2[j]] < -2.5){
-				label[ln2[i]][ln2[j]] = -3;
-				phi[ln2[i]][ln2[j]] = -3;
-				ln2.erase(ln2.begin() + i, ln2.begin() + j);
+			else if(phi[it->x][it->y] < -2.5){
+				label[it->x][it->y] = -3;
+				phi[it->x][it->y] = -3;
+				it = ln2.erase(it);
+			}
+			else{
+				it++;
 			}
 		}
 	}
-	for(int i =0; i<lp2.size(); i+=2){
-		int j = i+1;
-		if(checkMaskNeighbours(lp2[i],lp2[j], 2, 1) == false){
-			label[lp2[i]][lp2[j]] = 3;
-			phi[lp2[i]][lp2[j]] = 3;
-			lp2.erase(lp2.begin() +i, lp2.begin() +j);
+	for(it = lp2.begin(); it < lp2.end();){
+		if(checkMaskNeighbours(it->x,it->y, 2, 1) == false){
+			label[it->x][it->y] = 3;
+			phi[it->x][it->y] = 3;
+			it = lp2.erase(it);
 		}
 		else{
-			int M = minMax(lp2[i], lp2[j], 0);
-			phi[lp2[i]][lp2[j]] = M+1;
-			if(phi[lp2[i]][lp2[j]] <= 1.5){
-				sp1.push_back(lp2[i]);
-				sp1.push_back(lp2[j]);
-				lp2.erase(lp2.begin() +i, lp2.begin() +j);
+			int M = minMax(it->x, it->y, 0);
+			phi[it->x][it->y] = M+1;
+			if(phi[it->x][it->y] <= 1.5){
+				sp1.push_back(*it);
+				it = lp2.erase(it);
 			}
-			else if(phi[lp2[i]][lp2[j]] > 2.5){
-				label[lp2[i]][lp2[j]] = 3;
-				phi[lp2[i]][lp2[j]] = 3;
-				lp2.erase(lp2.begin() +i, lp2.begin() +j);
+			else if(phi[it->x][it->y] > 2.5){
+				label[it->x][it->y] = 3;
+				phi[it->x][it->y] = 3;
+				it = lp2.erase(it);
+			}
+			else{
+				it++;
 			}
 		}
 	}
@@ -181,7 +186,6 @@ void updateLevelSets(){				//Procedure 3 Delvis påbegynt for å støtte Pixel stru
 		}
 	}
 	sn1.clear();
-	
 	for (it = sp1.begin(); it < sp1.end(); it++){
 		label[it->x][it->y] = 1;
 		lp1.push_back(*it);
@@ -211,20 +215,15 @@ void updateLevelSets(){				//Procedure 3 Delvis påbegynt for å støtte Pixel stru
 		}
 	}
 	sp1.clear();
-
 	for (it = sn2.begin(); it < sn2.end(); it++){
-		int j = i+1;
-		label[sn2[i]][sn2[j]] = -2;
-		ln2.push_back(sn2[i]);
-		ln2.push_back(sn2[j]);
-		sn2.erase(sn2.begin()+i, sn2.begin()+j);
+		label[it->x][it->y] = -2;
+		ln2.push_back(*it);
 	}
-	printf(" 4\n");
-	for (int i = 0; i<sp2.size(); i+=2){
-		int j = i+1;
-		label[sp2[i]][sp2[j]] = 2;
-		lp2.push_back(sp2[i]);
-		lp2.push_back(sp2[j]);
-		sp2.erase(sp2.begin()+i, sp2.begin()+j);
+	sn2.clear();
+
+	for (it = sp2.begin(); it < sp2.end(); it++){
+		label[it->x][it->y] = 2;
+		lp2.push_back(*it);
 	}
+	sp2.clear();
 }
