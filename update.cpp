@@ -146,10 +146,11 @@ void updateLevelSets(){				//Procedure 3 Delvis påbegynt for å støtte Pixel stru
 	
 
 	for (it = lz.begin(); it < sz.end(); it++){
-		label[it->x][it->y] = 0;					//IKKE SIKKER PÅ OM JEG ACCESSER RETT VALUE HER, usikker på om it->x/it->y gir meg rett value
-		lz.push_back(*it);						//skal sjekke denne også
-		it = sz.erase(it);						//her må vi kanskje bruke en while loop som skipper increment hvis den deleter noe istede for en for loop
+		label[it->x][it->y] = 0;					
+		lz.push_back(*it);		
+		sz.erase(it);						
 	}
+
 
 	//HAR IKKE FIKSET FOR PIXEL STRUCT NEDENFOR YET
 	for (int i = 0; i<sn1.size(); i+=2){

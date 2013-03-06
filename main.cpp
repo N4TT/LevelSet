@@ -151,10 +151,10 @@ void initialization(){//støtter Pixel struct, men se comment under dersom du fei
 	}
 	
 	for (it = lz.begin(); it < lz.end(); it++){
-		setLevels(*it, 1);//second levelSet (level 1)			må sjekke om *it gir den faktiske structen eller bare indexen før denne kan antas å være rett
+		setLevels(*it, 1);//second levelSet (level 1)			
 	}
 	for (it = lp1.begin(); it < lp1.end(); it++){
-		setLevels(*it, 2);									//samme gjelder for denne, og den under
+		setLevels(*it, 2);
 	}	
 	for (it = ln1.begin(); it < ln1.end(); it++){
 		setLevels(*it, 2);
@@ -173,7 +173,7 @@ void readbmp(char* filename){
     fread(&height, 4, 1, fp);
     fseek(fp, 10, SEEK_SET);
     fread(&offset, 4, 1, fp);
-	printf("the height is: %i", height);//////////////////// 
+	printf("the height is: %i", height);
     unsigned char* data = (unsigned char*)malloc(sizeof(unsigned char)*height*width);
 
     fseek(fp, offset, SEEK_SET);
