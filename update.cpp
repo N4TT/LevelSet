@@ -39,61 +39,60 @@ void prepareUpdates(){//har ikke forandret på denne så den støtter Pixel structs
 		
 	vector<Pixel>::iterator it;
 	
-	for(int i =0; i<lz.size(); i+=2){//find pixels that are moving out of lz
-		int j = i+1;
-		phi[lz[i]][lz[j]] += F[lz[i]][lz[j]];
-		if(phi[lz[i]][lz[j]] > 0.5){
-			sp1.push_back(lz[i]);
-			sp1.push_back(lz[j]);
-			lz.erase(lz.begin() +i, lz.begin() +j);		//erases elements at index i and j
+	for(it = lz.begin(); it<lz.end();){//find pixels that are moving out of lz
+		phi[it->x][it->y] += F[it->x][it->y];
+		if(phi[it->x][it->y] > 0.5){
+			sp1.push_back(*it);
+			it = lz.erase(it);		//erases elements at index i and j
 		}
-		else if(phi[lz[i]][lz[j]] <= -0.5){
-			sn1.push_back(lz[i]);
-			sn1.push_back(lz[j]);
-			lz.erase(lz.begin() +i, lz.begin() +j);
-		}
-	}
-	for(int i =0; i<ln1.size(); i+=2){//find pixels that are moving out of ln1
-		int j = i+1;
-		if(checkMaskNeighbours(lz[i],lz[j],2, 0) == false){//if Ln1[i][j] has no neighbors q with label(q) == 0
-			sn2.push_back(lz[i]);
-			sn2.push_back(lz[j]);
-			ln1.erase(ln1.begin() +i, ln1.begin() +j);
+		else if(phi[it->x][it->y] <= -0.5){
+			sn1.push_back(*it);
+			it = lz.erase(it);
 		}
 		else{
-			int M = minMax(ln1[i], ln1[j], 1);
-			phi[ln1[i]][ln1[j]] = M-1;
-			if(phi[ln1[i]][ln1[j]] >= -0.5){ //moving from ln1 to sz
-				sz.push_back(ln1[i]);
-				sz.push_back(ln1[j]);
-				ln1.erase(ln1.begin() +i, ln1.begin() +j);
+			it++;
+		}
+	}
+	
+	for(it = ln1.begin(); it<ln1.end();){//find pixels that are moving out of ln1
+		if(checkMaskNeighbours(it->x,it->y, 2, 0) == false){//if Ln1[i][j] has no neighbors q with label(q) == 0
+			sn2.push_back(*it);
+			it = ln1.erase(it);
+		}
+		else{
+			int M = minMax(it->x, it->y, 1);
+			phi[it->x][it->y] = M-1;
+			if(phi[it->x][it->y] >= -0.5){ //moving from ln1 to sz
+				sz.push_back(*it);
+				it = ln1.erase(it);
 			}
-			else if(phi[ln1[i]][ln1[j]] < -1.5){
-				sn2.push_back(ln1[i]);
-				sn2.push_back(ln1[j]);
-				ln1.erase(ln1.begin() + i, ln1.begin() + j);
+			else if(phi[it->x][it->y] < -1.5){
+				sn2.push_back(*it);
+				it = ln1.erase(it);
+			}
+			else{
+				it++;
 			}
 		}
 	}
-	for(int i =0; i<lp1.size(); i+=2){//find pixels that are moving out of lp1
-		int j = i+1;
-		if(checkMaskNeighbours(lp1[i],lp1[j], 2, 0) == false){
-			sp2.push_back(lp1[i]);
-			sp2.push_back(lp1[j]);
-			lp1.erase(lp1.begin() +i, lp1.begin() +j);
+	for(it = lp1.begin(); it<lp1.end();){//find pixels that are moving out of lp1
+		if(checkMaskNeighbours(it->x,it->y, 2, 0) == false){
+			sp2.push_back(*it);
+			it = lp1.erase(it);
 		}
 		else{
 			int M = minMax(lp1[i], lp1[j], 0);
-			phi[lp1[i]][lp1[j]] = M+1;
-			if(phi[lp1[i]][lp1[j]] <= 0.5){ 
-				sz.push_back(lp1[i]);
-				sz.push_back(lp1[j]);
-				lp1.erase(lp1.begin() +i, lp1.begin() +j);
+			phi[it->x][it->y] = M+1;
+			if(phi[it->x][it->y] <= 0.5){ 
+				sz.push_back(*it);
+				it = lp1.erase(it);
 			}
-			else if(phi[lp1[i]][lp1[j]] > 1.5){
-				sp2.push_back(lp1[i]);
-				sp2.push_back(lp1[j]);
-				lp1.erase(lp1.begin() + i, lp1.begin() + j);
+			else if(phi[it->x][it->y] > 1.5){
+				sp2.push_back(*it);
+				it = lp1.erase(it);
+			}
+			else{
+				it++;
 			}
 		}
 	}
