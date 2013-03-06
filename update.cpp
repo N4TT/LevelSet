@@ -145,71 +145,74 @@ void updateLevelSets(){				//Procedure 3 Delvis påbegynt for å støtte Pixel stru
 	vector<Pixel>::iterator it;
 	
 
-	for (it = lz.begin(); it < sz.end(); it++){
+	for (it = sz.begin(); it < sz.end(); it++){
 		label[it->x][it->y] = 0;					
 		lz.push_back(*it);		
-		sz.erase(it);						
 	}
+	sz.clear();
 
 
-	//HAR IKKE FIKSET FOR PIXEL STRUCT NEDENFOR YET
-	for (int i = 0; i<sn1.size(); i+=2){
-		int j = i+1;
-		label[sn1[i]][sn1[j]] = -1;
-		ln1.push_back(sn1[i]);
-		ln1.push_back(sn1[j]);
-		sn1.erase(sn1.begin() +i, sn1.begin() +j);
-		if (phi[sn1[i]+1][sn1[j]] == -3){			//denne kan muligens legges sammen med if setningene under i en metode
-			phi[sn1[i]+1][sn1[j]] = phi[sn1[i]][sn1[j]]-1;
-			sn2.push_back(sn1[i]+1);
-			sn2.push_back(sn1[j]);
+	for (it = sn1.begin(); it < sn1.end(); it++){
+		label[it->x][it->y] = -1;
+		ln1.push_back(*it);
+		if (phi[it->x+1][it->y] == -3){	
+			phi[it->x+1][it->y] = phi[it->x][it->y]-1;
+			it->x++;								//[x+1,y]
+			sn2.push_back(*it);
+			it->x--;								//Siden vi bruker if, og ikke if else setninger må verdien settes tilbake til x
 		}
-		if (phi[sn1[i]][sn1[j]+1] == -3){			
-			phi[sn1[i]][sn1[j]+1] = phi[sn1[i]][sn1[j]]-1;
-			sn2.push_back(sn1[i]);
-			sn2.push_back(sn1[j]+1);
+		if (phi[it->x][it->y+1] == -3){		
+			phi[it->x][it->y+1] = phi[it->x][it->y]-1;
+			it->y++;								//[x,y+1]
+			sn2.push_back(*it);
+			it->y--;
 		}
-		if (phi[sn1[i]-1][sn1[j]] == -3){			
-			phi[sn1[i]-1][sn1[j]] = phi[sn1[i]][sn1[j]]-1;
-			sn2.push_back(sn1[i]-1);
-			sn2.push_back(sn1[j]);
+		if (phi[it->x-1][it->y] == -3){			
+			phi[it->x-1][it->y] = phi[it->x][it->y]-1;
+			it->x--;								//[x-1,y]
+			sn2.push_back(*it);
+			it->x++;
 		}
-		if (phi[sn1[i]][sn1[j]-1] == -3){			
-			phi[sn1[i]][sn1[j]-1] = phi[sn1[i]][sn1[j]]-1;
-			sn2.push_back(sn1[i]);
-			sn2.push_back(sn1[j]-1);
-		}
-	}
-	printf(" 2\n");
-	for (int i = 0; i<sp1.size(); i+=2){
-		int j = i+1;
-		label[sp1[i]][sp1[j]] = 1;
-		lp1.push_back(sp1[i]);
-		lp1.push_back(sp1[j]);
-		sp1.erase(sp1.begin() +i, sp1.begin() +j);
-		if (phi[sp1[i]+1][sp1[j]] == 3){			//denne kan muligens legges sammen med if setningene under i en metode
-			phi[sp1[i]+1][sp1[j]] = phi[sp1[i]][sp1[j]]+1;
-			sp2.push_back(sp1[i]+1);
-			sp2.push_back(sp1[j]);
-		}
-		if (phi[sp1[i]][sp1[j]+1] == 3){	
-			phi[sp1[i]][sp1[j]+1] = phi[sp1[i]][sp1[j]]+1;
-			sp2.push_back(sp1[i]);
-			sp2.push_back(sp1[j]+1);
-		}
-		if (phi[sp1[i]-1][sp1[j]] == 3){			
-			phi[sp1[i]-1][sp1[j]] = phi[sp1[i]][sp1[j]]+1;
-			sp2.push_back(sp1[i]-1);
-			sp2.push_back(sp1[j]);
-		}
-		if (phi[sp1[i]][sp1[j]-1] == 3){			
-			phi[sp1[i]][sp1[j]-1] = phi[sp1[i]][sp1[j]]+1;
-			sp2.push_back(sp1[i]);
-			sp2.push_back(sp1[j]-1);
+		if (phi[it->x][it->y-1] == -3){			
+			phi[it->x][it->y-1] = phi[it->x][it->y-1];
+			it->y--;								//[x,y-1]
+			sn2.push_back(*it);
+			it->y++;
 		}
 	}
-	printf(" 3\n");
-	for (int i = 0; i<sn2.size(); i+=2){
+	sn1.clear();
+	
+	for (it = sp1.begin(); it < sp1.end(); it++){
+		label[it->x][it->y] = 1;
+		lp1.push_back(*it);
+		if (phi[it->x+1][it->y] == 3){			
+			phi[it->x+1][it->y] = phi[it->x][it->y]+1;
+			it->x++;									//[x+1,y]
+			sp2.push_back(*it);
+			it->x--;
+		}
+		if (phi[it->x][it->y+1] == 3){	
+			phi[it->x][it->y+1] = phi[it->x][it->y]+1;
+			it->y++;									//[x,y+1]
+			sp2.push_back(*it);
+			it->y--;
+		}
+		if (phi[it->x-1][it->y] == 3){			
+			phi[it->x-1][it->y] = phi[it->x][it->y]+1;
+			it->x--;
+			sp2.push_back(*it);
+			it->x++;
+		}
+		if (phi[it->x][it->y-1] == 3){			
+			phi[it->x][it->y-1] = phi[it->x][it->y]+1;
+			it->y--;
+			sp2.push_back(*it);
+			it->y++;
+		}
+	}
+	sp1.clear();
+
+	for (it = sn2.begin(); it < sn2.end(); it++){
 		int j = i+1;
 		label[sn2[i]][sn2[j]] = -2;
 		ln2.push_back(sn2[i]);
