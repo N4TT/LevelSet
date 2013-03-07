@@ -35,12 +35,19 @@ int minMax(int i, int j, int mm){ //mm==1 -> max, mm ==0 -> min
 	
 }
 
+
+double speedFunction(int x, int y){
+
+
+
+}
+
 void prepareUpdates(){//har ikke forandret på denne så den støtter Pixel structs ennå
 		
 	vector<Pixel>::iterator it;
 	
 	for(it = lz.begin(); it<lz.end();){//find pixels that are moving out of lz
-		phi[it->x][it->y] += F[it->x][it->y];
+		phi[it->x][it->y] += speedFunction(it->x,it->y);
 		if(phi[it->x][it->y] > 0.5){
 			sp1.push_back(*it);
 			it = lz.erase(it);		//erases elements at index i and j
@@ -81,7 +88,7 @@ void prepareUpdates(){//har ikke forandret på denne så den støtter Pixel structs
 			it = lp1.erase(it);
 		}
 		else{
-			int M = minMax(lp1[i], lp1[j], 0);
+			int M = minMax(it->x, it->y, 0);
 			phi[it->x][it->y] = M+1;
 			if(phi[it->x][it->y] <= 0.5){ 
 				sz.push_back(*it);

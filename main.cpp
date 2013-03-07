@@ -80,18 +80,22 @@ void pushAndStuff(Pixel p, int level){//støtter Pixel struct
 		lp1.push_back(p);
 		label[p.x][p.y] = level;
 		phi[p.x][p.y] = level;
+		break;
 	case 2:
 		lp2.push_back(p);
 		label[p.x][p.y] = level;
 		phi[p.x][p.y] = level;
+		break;
 	case -1:
 		ln1.push_back(p);
 		label[p.x][p.y] = level;
 		phi[p.x][p.y] = level;
+		break;
 	case -2:
 		ln2.push_back(p);
 		label[p.x][p.y] = level;
-		phi[p.x][p.y] = level;	
+		phi[p.x][p.y] = level;
+		break;
 	}
 }
 
@@ -175,16 +179,15 @@ void readbmp(char* filename){
     fread(&offset, 4, 1, fp);
 	printf("the height is: %i", height);
     unsigned char* data = (unsigned char*)malloc(sizeof(unsigned char)*height*width);
-
     fseek(fp, offset, SEEK_SET);
     //We just ignore the padding :)
     fread(data, sizeof(unsigned char), height*width, fp);
 
     fclose(fp);
-	//printf("dara: %c", data[0]);
+	//printf("data: %c", data[0]);
 	for (int i =0; i<height; i++){
 		for (int j = 0; j<width; j++){
-		image[i*height][j] = (double)data[i*height+j]; //må kanskje forandres hvis bildet er opp ned
+		image[i][j] = (double)data[i*height+j]; //må kanskje forandres hvis bildet er opp ned
 		
 		}
 	}
@@ -237,8 +240,8 @@ void write_bmp(unsigned char* data, int width, int height){
 
 int main(){//Ikke rørt etter Pixel struct ble opprettet
 	
-	//readbmp("img.bmp");
-	//printf("reading done\n");
+	readbmp("img.bmp");
+	printf("reading done\n");
 	
 	try{
 		fillInit(250, 250, 350, 350);
@@ -256,56 +259,25 @@ int main(){//Ikke rørt etter Pixel struct ble opprettet
 	}
 	initialization();
 	printf("starting main loop\n");
-	/*
-	for(int i = 0; i<5; i++){
+	
+	for(int i = 0; i<50; i++){
 		prepareUpdates();
-		printf("prep done\n");
 		updateLevelSets();
-		printf("update done\n");
 	}
-	*/
-	/*for (int i = 0; i<lp1.size(); i++){
-		if (lp1[i] > 513)
-			printf(" lp1: %d ", lp1[i]);
-	}
-	for (int i = 0; i<lp2.size(); i++){
-		if (lp2[i] > 513)
-			printf(" lp2: %d ", lp2[i]);
-	}
-	for (int i = 0; i<ln1.size(); i++){
-		if (ln1[i] > 513)
-			printf(" ln1: %d", ln1[i]);
-	}
-	for (int i = 0; i<ln2.size(); i++){
-		if (ln2[i] > 513)
-			printf(" ln2: %d ", ln2[i]);
-	}
-	for (int i = 0; i<lz.size(); i++){
-		if (lz[i] > 513)
-			printf(" lz: %d ", lz[i]);
-	}
-	*/
+	
+
 	printf("finished\n");
 	
-	//unsigned char data1[64*64];
+	unsigned char data1[512*512];
 	//printf("size %d", data1);
 	//printf("assigned");
-	//for (int i =0; i<64; i++){
-		//for (int j = 0; j<64; j++){
-			//printf("for 1 strta\n");
-			//data1[i*64+j] = (char)image[i][j]; //må kanskje forandres hvis bildet er opp ned
-			//printf("for 1 done\n");
-		//}
-//	}
-	//printf("WRITE done");
-	/*for (int i = 1; i<=HEIGHT; i++){
-		for (int j = 1; j<=WIDTH; j++){
-			printf(" %f ", phi[i][j]);
+	for (int i =0; i<512; i++){
+		for (int j = 0; j<512; j++){
+			data1[i*512+j] = (char)image[i][j]; //må kanskje forandres hvis bildet er opp ned
 		}
-		printf("\n");
-	}*/
-	//write_bmp(phi, 512, 512);
-	
+	}
+
+	write_bmp(data1, 512, 512);
 	
 	system("pause");
 
