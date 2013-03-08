@@ -25,6 +25,9 @@ extern vector<Pixel> sn1;
 extern vector<Pixel> sp2;
 extern vector<Pixel> sn2;
 
+double muOutside;
+double muInside;
+
 int minMax(int i, int j, int mm){ //mm==1 -> max, mm ==0 -> min
 	if(mm==1){
 		return max(max(max(phi[i+1][j], phi[i-1][j]) , phi[i][j+1]) ,phi[i][j-1]);
@@ -35,6 +38,38 @@ int minMax(int i, int j, int mm){ //mm==1 -> max, mm ==0 -> min
 	
 }
 
+<<<<<<< HEAD
+void calculateMu(){
+	double muTempInside = 0;
+	int numInside = 0;
+	double muTempOutside = 0;
+	int numOutside = 0;
+	double threshold = 0.5;
+	for(int i = 0; i<HEIGHT; i++){
+		for(int j = 0; j<WIDTH; j++){
+			if(image[i][j] > threshold){
+				muTempInside += image[i][j];
+				numInside++;
+			}
+			else if(image[i][j] < threshold){
+				//printf("%f \n", image[i][j]);
+				muTempOutside += image[i][j];
+				numOutside++;
+			}
+		}
+	}
+	muOutside = muTempOutside / numOutside;
+	muInside = muTempInside / numInside;
+	printf("%f %f", muInside, muOutside); 
+}
+
+double speedFunction(int x, int y){
+	printf("%f \n", (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2);
+	return (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2; 
+}
+
+||||||| merged common ancestors
+=======
 
 double speedFunction(int x, int y){
 
@@ -42,12 +77,19 @@ double speedFunction(int x, int y){
 
 }
 
+>>>>>>> 9b7eba49e98b682b563e4791a8f80de09ecbe371
 void prepareUpdates(){//har ikke forandret på denne så den støtter Pixel structs ennå
 		
 	vector<Pixel>::iterator it;
 	
 	for(it = lz.begin(); it<lz.end();){//find pixels that are moving out of lz
+<<<<<<< HEAD
+		phi[it->x][it->y] += speedFunction(it->x, it->y);
+||||||| merged common ancestors
+		phi[it->x][it->y] += F[it->x][it->y];
+=======
 		phi[it->x][it->y] += speedFunction(it->x,it->y);
+>>>>>>> 9b7eba49e98b682b563e4791a8f80de09ecbe371
 		if(phi[it->x][it->y] > 0.5){
 			sp1.push_back(*it);
 			it = lz.erase(it);		//erases elements at index i and j

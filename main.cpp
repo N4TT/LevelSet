@@ -94,8 +94,15 @@ void pushAndStuff(Pixel p, int level){//støtter Pixel struct
 	case -2:
 		ln2.push_back(p);
 		label[p.x][p.y] = level;
+<<<<<<< HEAD
+		phi[p.x][p.y] = level;	
+		break;
+||||||| merged common ancestors
+		phi[p.x][p.y] = level;	
+=======
 		phi[p.x][p.y] = level;
 		break;
+>>>>>>> 9b7eba49e98b682b563e4791a8f80de09ecbe371
 	}
 }
 
@@ -157,9 +164,10 @@ void initialization(){//støtter Pixel struct, men se comment under dersom du fei
 	for (it = lz.begin(); it < lz.end(); it++){
 		setLevels(*it, 1);//second levelSet (level 1)			
 	}
+	
 	for (it = lp1.begin(); it < lp1.end(); it++){
 		setLevels(*it, 2);
-	}	
+	}
 	for (it = ln1.begin(); it < ln1.end(); it++){
 		setLevels(*it, 2);
 	}
@@ -177,21 +185,39 @@ void readbmp(char* filename){
     fread(&height, 4, 1, fp);
     fseek(fp, 10, SEEK_SET);
     fread(&offset, 4, 1, fp);
-	printf("the height is: %i", height);
+	printf("the height is: %i\n", height);
     unsigned char* data = (unsigned char*)malloc(sizeof(unsigned char)*height*width);
+<<<<<<< HEAD
+	
+	
+||||||| merged common ancestors
+
+=======
+>>>>>>> 9b7eba49e98b682b563e4791a8f80de09ecbe371
     fseek(fp, offset, SEEK_SET);
     //We just ignore the padding :)
     fread(data, sizeof(unsigned char), height*width, fp);
 
     fclose(fp);
+<<<<<<< HEAD
+||||||| merged common ancestors
+	//printf("dara: %c", data[0]);
+=======
 	//printf("data: %c", data[0]);
+>>>>>>> 9b7eba49e98b682b563e4791a8f80de09ecbe371
 	for (int i =0; i<height; i++){
 		for (int j = 0; j<width; j++){
+<<<<<<< HEAD
+			image[i][j] = ((double)data[i*height+j])/255; //må kanskje forandres hvis bildet er opp ned
+||||||| merged common ancestors
+		image[i*height][j] = (double)data[i*height+j]; //må kanskje forandres hvis bildet er opp ned
+		
+=======
 		image[i][j] = (double)data[i*height+j]; //må kanskje forandres hvis bildet er opp ned
 		
+>>>>>>> 9b7eba49e98b682b563e4791a8f80de09ecbe371
 		}
 	}
-    //return data;
 }
 
 void write_bmp(unsigned char* data, int width, int height){
@@ -220,12 +246,11 @@ void write_bmp(unsigned char* data, int width, int height){
 
     unsigned char* color_table = (unsigned char*)malloc(1024);
     for(int c= 0; c < 256; c++){
-        color_table[c*4] = (unsigned char) c;
-        color_table[c*4+1] = (unsigned char) c;
-        color_table[c*4+2] = (unsigned char) c;
-        color_table[c*4+3] = 0;
+		color_table[c*4] = (unsigned char) (c*33.3+140); //green
+        color_table[c*4+1] = (unsigned char) (c*33.3+140); //red
+        color_table[c*4+2] = 0; //opacity?
+        color_table[c*4+3] = (unsigned char) (c*33.3+140); //blue
     }
-
 
     FILE* fp = fopen("out.bmp", "w+");
     fwrite((void*)&id, 1, 2, fp);
@@ -240,11 +265,19 @@ void write_bmp(unsigned char* data, int width, int height){
 
 int main(){//Ikke rørt etter Pixel struct ble opprettet
 	
+<<<<<<< HEAD
+	readbmp("img.bmp");
+||||||| merged common ancestors
+	//readbmp("img.bmp");
+	//printf("reading done\n");
+=======
 	readbmp("img.bmp");
 	printf("reading done\n");
+>>>>>>> 9b7eba49e98b682b563e4791a8f80de09ecbe371
 	
+
 	try{
-		fillInit(250, 250, 350, 350);
+		fillInit(225, 225, 300, 300);
 		printf("filling done\n");
 	}catch(int e){
 		if(e == -1){
@@ -259,25 +292,109 @@ int main(){//Ikke rørt etter Pixel struct ble opprettet
 	}
 	initialization();
 	printf("starting main loop\n");
+<<<<<<< HEAD
+	
+	calculateMu();
+	for(int i = 0; i<3; i++){
+||||||| merged common ancestors
+	/*
+	for(int i = 0; i<5; i++){
+=======
 	
 	for(int i = 0; i<50; i++){
+>>>>>>> 9b7eba49e98b682b563e4791a8f80de09ecbe371
 		prepareUpdates();
 		updateLevelSets();
+<<<<<<< HEAD
+	}
+	printf("looping done");
+||||||| merged common ancestors
+		printf("update done\n");
+	}
+	*/
+	/*for (int i = 0; i<lp1.size(); i++){
+		if (lp1[i] > 513)
+			printf(" lp1: %d ", lp1[i]);
+	}
+	for (int i = 0; i<lp2.size(); i++){
+		if (lp2[i] > 513)
+			printf(" lp2: %d ", lp2[i]);
+	}
+	for (int i = 0; i<ln1.size(); i++){
+		if (ln1[i] > 513)
+			printf(" ln1: %d", ln1[i]);
+	}
+	for (int i = 0; i<ln2.size(); i++){
+		if (ln2[i] > 513)
+			printf(" ln2: %d ", ln2[i]);
+	}
+	for (int i = 0; i<lz.size(); i++){
+		if (lz[i] > 513)
+			printf(" lz: %d ", lz[i]);
+	}
+	*/
+	printf("finished\n");
+=======
 	}
 	
 
 	printf("finished\n");
+>>>>>>> 9b7eba49e98b682b563e4791a8f80de09ecbe371
 	
+<<<<<<< HEAD
+	unsigned char zeroLevelSet[HEIGHT*WIDTH] = {0};
+	unsigned char data1[HEIGHT*WIDTH];
+	
+	vector<Pixel>::iterator it;
+	for(it = lz.begin(); it<lz.end(); it++){
+		zeroLevelSet[it->x*HEIGHT+it->y] = 255;
+	}
+	/*
+	for (int i =0; i<HEIGHT; i++){
+		for (int j = 0; j<WIDTH; j++){
+			//printf("for 1 strta\n");
+			
+			data1[i*HEIGHT+j] = (char)phi[i][j]; //må kanskje forandres hvis bildet er opp ned
+			//printf("%d  %f \n", data1[i*HEIGHT+j], phi[i][j]);
+			//printf("for 1 done\n");
+||||||| merged common ancestors
+	//unsigned char data1[64*64];
+	//printf("size %d", data1);
+	//printf("assigned");
+	//for (int i =0; i<64; i++){
+		//for (int j = 0; j<64; j++){
+			//printf("for 1 strta\n");
+			//data1[i*64+j] = (char)image[i][j]; //må kanskje forandres hvis bildet er opp ned
+			//printf("for 1 done\n");
+		//}
+//	}
+	//printf("WRITE done");
+	/*for (int i = 1; i<=HEIGHT; i++){
+		for (int j = 1; j<=WIDTH; j++){
+			printf(" %f ", phi[i][j]);
+=======
 	unsigned char data1[512*512];
 	//printf("size %d", data1);
 	//printf("assigned");
 	for (int i =0; i<512; i++){
 		for (int j = 0; j<512; j++){
 			data1[i*512+j] = (char)image[i][j]; //må kanskje forandres hvis bildet er opp ned
+>>>>>>> 9b7eba49e98b682b563e4791a8f80de09ecbe371
 		}
+<<<<<<< HEAD
+	}*/
+	
+	write_bmp(zeroLevelSet, 512, 512);
+||||||| merged common ancestors
+		printf("\n");
+	}*/
+	//write_bmp(phi, 512, 512);
+	
+=======
 	}
 
 	write_bmp(data1, 512, 512);
+>>>>>>> 9b7eba49e98b682b563e4791a8f80de09ecbe371
 	
 	system("pause");
 
