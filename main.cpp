@@ -124,7 +124,7 @@ void setLevels(Pixel p, int level){//støtter Pixel Struct
 
 }	
 
-void initialization(){//støtter Pixel struct, men se comment under dersom du feilsøker
+void initialization(){
 
 	vector<Pixel>::iterator it;
 
@@ -254,7 +254,7 @@ int main(){
 	printf("starting main loop\n");
 	for(int i = 0; i<3; i++){
 		prepareUpdates();
-		updateLevelsets();
+		updateLevelSets();
 	}
 	printf("finished\n");
 
