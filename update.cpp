@@ -38,7 +38,6 @@ int minMax(int i, int j, int mm){ //mm==1 -> max, mm ==0 -> min
 	
 }
 
-<<<<<<< HEAD
 void calculateMu(){
 	double muTempInside = 0;
 	int numInside = 0;
@@ -68,28 +67,12 @@ double speedFunction(int x, int y){
 	return (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2; 
 }
 
-||||||| merged common ancestors
-=======
-
-double speedFunction(int x, int y){
-
-
-
-}
-
->>>>>>> 9b7eba49e98b682b563e4791a8f80de09ecbe371
 void prepareUpdates(){//har ikke forandret på denne så den støtter Pixel structs ennå
 		
 	vector<Pixel>::iterator it;
 	
 	for(it = lz.begin(); it<lz.end();){//find pixels that are moving out of lz
-<<<<<<< HEAD
 		phi[it->x][it->y] += speedFunction(it->x, it->y);
-||||||| merged common ancestors
-		phi[it->x][it->y] += F[it->x][it->y];
-=======
-		phi[it->x][it->y] += speedFunction(it->x,it->y);
->>>>>>> 9b7eba49e98b682b563e4791a8f80de09ecbe371
 		if(phi[it->x][it->y] > 0.5){
 			sp1.push_back(*it);
 			it = lz.erase(it);		//erases elements at index i and j
