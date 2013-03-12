@@ -1,14 +1,15 @@
 //#include "SIPL/Core.hpp"
 //#include <gtk/gtk.h>
+#include "EasyBMP.h"
 #include <iostream>
 #include <stdio.h>
 #include <vector>
 #include <exception>
 #include <stdlib.h>
-#include <string.h>
+//#include <string.h>
 #include "main.h"
 #include "update.h"
-#include "bmp.h"
+
 using namespace std;
 
 double image[HEIGHT][WIDTH] = { 0 };//{ {0.1,0.2,0.1,0.3,0.4},{0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}  };
@@ -16,6 +17,7 @@ double phi[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
 int init[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
 int label[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
 double F[HEIGHT][WIDTH] = { 0 };
+int zeroLevelSet[HEIGHT][WIDTH] = { 0 }; //output
 
 vector<Pixel> lz;
 vector<Pixel> lp1;
@@ -162,82 +164,46 @@ void initialization(){
 	}
 }
 
-void readbmp(char* filename){
-
-    FILE* fp = fopen(filename, "rb");
-
-    int width, height, offset;
-
-    fseek(fp, 18, SEEK_SET);
-    fread(&width, 4, 1, fp);
-    fseek(fp, 22, SEEK_SET);
-    fread(&height, 4, 1, fp);
-    fseek(fp, 10, SEEK_SET);
-    fread(&offset, 4, 1, fp);
-	printf("the height is: %i\n", height);
-    unsigned char* data = (unsigned char*)malloc(sizeof(unsigned char)*height*width);
-
-    fseek(fp, offset, SEEK_SET);
-    //We just ignore the padding :)
-    fread(data, sizeof(unsigned char), height*width, fp);
-
-    fclose(fp);
-
-	for (int i =0; i<height; i++){
-		for (int j = 0; j<width; j++){
-			image[i][j] = ((double)data[i*height+j])/255; //må kanskje forandres hvis bildet er opp ned
+void readFile(BMP img){
+	//copy input data (img) to image[][] and normalize to [0, 1]
+	for (int i =0; i<HEIGHT; i++){
+		for (int j = 0; j<WIDTH; j++){
+			image[i][j] = img(i,j)->Red;
+			image[i][j] /= 255;
 		}
 	}
+	printf("image filled \n");
 }
 
-void write_bmp(unsigned char* data, int width, int height){
-    struct bmp_id id;
-    id.magic1 = 0x42;
-    id.magic2 = 0x4D;
+void writeFile(BMP img){
+	/*for (int i =0; i<HEIGHT; i++){
+		for (int j = 0; j<WIDTH; j++){
+			img(i,j)->Red = (label[i][j] +3)*42; //normalize to [0, 255]
+			img(i,j)->Green = (label[i][j] +3)*42;
+			img(i,j)->Blue = (label[i][j] +3)*42;
+		}
+	}*/
+	
+	for (int i =0; i<HEIGHT; i++){
+		for (int j = 0; j<WIDTH; j++){
+			img(i,j)->Red = zeroLevelSet[i][j]; 
+			img(i,j)->Green = zeroLevelSet[i][j]; 
+			img(i,j)->Blue = zeroLevelSet[i][j]; 
+		}
+	}
 
-    struct bmp_header header;
-    header.file_size = width*height+54 + 2;
-    header.pixel_offset = 1078;
-
-    struct bmp_dib_header dib_header;
-    dib_header.header_size = 40;
-    dib_header.width = width;
-    dib_header.height = height;
-    dib_header.num_planes = 1;
-    dib_header.bit_pr_pixel = 8;
-    dib_header.compress_type = 0;
-    dib_header.data_size = width*height;
-    dib_header.hres = 0;
-    dib_header.vres = 0;
-    dib_header.num_colors = 256;
-    dib_header.num_imp_colors = 0;
-
-    char padding[2];
-
-    unsigned char* color_table = (unsigned char*)malloc(1024);
-    for(int c= 0; c < 256; c++){
-		color_table[c*4] = (unsigned char) (c*33.3+140); //green
-        color_table[c*4+1] = (unsigned char) (c*33.3+140); //red
-        color_table[c*4+2] = 0; //opacity?
-        color_table[c*4+3] = (unsigned char) (c*33.3+140); //blue
-    }
-
-    FILE* fp = fopen("out.bmp", "w+");
-    fwrite((void*)&id, 1, 2, fp);
-    fwrite((void*)&header, 1, 12, fp);
-    fwrite((void*)&dib_header, 1, 40, fp);
-    fwrite((void*)color_table, 1, 1024, fp);
-    fwrite((void*)data, 1, width*height, fp);
-    fwrite((void*)&padding,1,2,fp);
-    fclose(fp);
+	img.WriteToFile("output.bmp");
 }
-
 
 int main(){
-	readbmp("img.bmp");
+	//read file
+	BMP img;
+	img.ReadFromFile("1img.bmp");
+	readFile(img);
+	
 	try{
 		fillInit(225, 225, 300, 300);
-		printf("filling done\n");
+		printf("init filled\n");
 	}catch(int e){
 		if(e == -1){
 			printf("minX er større enn maxX eller minY er større enn maxY\n");
@@ -249,33 +215,30 @@ int main(){
 			system("pause");
 		}
 	}
+	
 	initialization();
 	calculateMu();
+	
+	
+	
+	vector<Pixel>::iterator itt;
 	printf("starting main loop\n");
-	for(int i = 0; i<3; i++){
+	for(int i = 0; i<100; i++){
 		prepareUpdates();
 		updateLevelSets();
-	}
-	printf("finished\n");
-
-	unsigned char zeroLevelSet[HEIGHT*WIDTH] = {0};
-	unsigned char data1[HEIGHT*WIDTH];
-	
-	vector<Pixel>::iterator it;
-	for(it = lz.begin(); it<lz.end(); it++){
-		zeroLevelSet[it->x*HEIGHT+it->y] = 255;
-	}
-	/*
-	for (int i =0; i<HEIGHT; i++){
-		for (int j = 0; j<WIDTH; j++){
-			//printf("for 1 strta\n");
-			
-			data1[i*HEIGHT+j] = (char)phi[i][j]; //må kanskje forandres hvis bildet er opp ned
-			//printf("%d  %f \n", data1[i*HEIGHT+j], phi[i][j]);
-			//printf("for 1 done\n");
+		if(i == 99){ //copy the zero level set pixels to zeroLevelSet
+			for(itt = lz.begin(); itt<lz.end(); itt++){
+				zeroLevelSet[itt->x][itt->y] = 255;
+			}
+			//printf("lz.size(): %i \n", lz.size());
 		}
-	} */
-	write_bmp(zeroLevelSet, 512, 512);
+		
+	}
+	printf("main loop finished\n");
+	
+	writeFile(img);
+	printf("output successfully stored");
+	
 	system("pause");
-
+	
 }

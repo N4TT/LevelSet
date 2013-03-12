@@ -59,11 +59,11 @@ void calculateMu(){
 	}
 	muOutside = muTempOutside / numOutside;
 	muInside = muTempInside / numInside;
-	printf("%f %f", muInside, muOutside); 
+	printf("muInside: %f, muOutside: %f \n", muInside, muOutside); 
 }
 
 double speedFunction(int x, int y){
-	printf("%f \n", (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2);
+	//printf("sp %f \n", (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2);
 	return (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2; 
 }
 
