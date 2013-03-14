@@ -175,30 +175,41 @@ void readFile(BMP img){
 	printf("image filled \n");
 }
 
-void writeFile(BMP img){
-	/*for (int i =0; i<HEIGHT; i++){
-		for (int j = 0; j<WIDTH; j++){
-			img(i,j)->Red = (label[i][j] +3)*42; //normalize to [0, 255]
-			img(i,j)->Green = (label[i][j] +3)*42;
-			img(i,j)->Blue = (label[i][j] +3)*42;
-		}
-	}*/
-	
-	for (int i =0; i<HEIGHT; i++){
-		for (int j = 0; j<WIDTH; j++){
-			img(i,j)->Red = zeroLevelSet[i][j]; 
-			img(i,j)->Green = zeroLevelSet[i][j]; 
-			img(i,j)->Blue = zeroLevelSet[i][j]; 
+void writeFile(BMP img, int id){
+	if(id == 1){ //label
+		for (int i =0; i<HEIGHT; i++){
+			for (int j = 0; j<WIDTH; j++){
+				img(i,j)->Red = (label[i][j] +3)*42; //normalize to [0, 255]
+				img(i,j)->Green = (label[i][j] +3)*42;
+				img(i,j)->Blue = (label[i][j] +3)*42;
+			}
 		}
 	}
-
+	else if(id == 2){ //phi
+		for (int i =0; i<HEIGHT; i++){
+			for (int j = 0; j<WIDTH; j++){
+				img(i,j)->Red = (phi[i][j] +3)*42; //normalize to [0, 255]
+				img(i,j)->Green = (phi[i][j] +3)*42;
+				img(i,j)->Blue = (phi[i][j] +3)*42;
+			}
+		}
+	}
+	else{ //zeroLevelSet
+		for (int i =0; i<HEIGHT; i++){
+			for (int j = 0; j<WIDTH; j++){
+				img(i,j)->Red = zeroLevelSet[i][j]; 
+				img(i,j)->Green = zeroLevelSet[i][j]; 
+				img(i,j)->Blue = zeroLevelSet[i][j]; 
+			}
+		}
+	}
 	img.WriteToFile("output.bmp");
 }
 
 int main(){
 	//read file
 	BMP img;
-	img.ReadFromFile("1img.bmp");
+	img.ReadFromFile("qt.bmp");
 	readFile(img);
 	
 	try{
@@ -223,10 +234,10 @@ int main(){
 	
 	vector<Pixel>::iterator itt;
 	printf("starting main loop\n");
-	for(int i = 0; i<100; i++){
+	for(int i = 0; i<1000; i++){
 		prepareUpdates();
 		updateLevelSets();
-		if(i == 99){ //copy the zero level set pixels to zeroLevelSet
+		if(i == 1999){ //copy the zero level set pixels to zeroLevelSet
 			for(itt = lz.begin(); itt<lz.end(); itt++){
 				zeroLevelSet[itt->x][itt->y] = 255;
 			}
@@ -236,7 +247,7 @@ int main(){
 	}
 	printf("main loop finished\n");
 	
-	writeFile(img);
+	writeFile(img, 1);
 	printf("output successfully stored");
 	
 	system("pause");

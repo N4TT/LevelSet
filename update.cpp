@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <vector>
 #include <exception>
+#include <algorithm>
 #include "main.h"
 #include "update.h"
 using namespace std;
@@ -28,13 +29,49 @@ extern vector<Pixel> sn2;
 double muOutside;
 double muInside;
 
-int minMax(int i, int j, int mm){ //mm==1 -> max, mm ==0 -> min
-	if(mm==1){
-		return max(max(max(phi[i+1][j], phi[i-1][j]) , phi[i][j+1]) ,phi[i][j-1]);
+vector<double> minMaxList;
+
+double minMax(Pixel p, int greaterOrLess, int checkAgainst){//returns max if greaterOrLess =">=", 
+	double result;
+	if(greaterOrLess == 1){
+		if(label[p.x+1][p.y] >= checkAgainst){
+			minMaxList.push_back(phi[p.x+1][p.y]);
+		}
+		if(label[p.x][p.y+1] >= checkAgainst){
+			minMaxList.push_back(phi[p.x][p.y+1]);
+		}
+		if(label[p.x-1][p.y] >= checkAgainst){
+			minMaxList.push_back(phi[p.x-1][p.y]);
+		}
+		if(label[p.x][p.y-1] >= checkAgainst){
+			minMaxList.push_back(phi[p.x][p.y-1]);
+		}
+		if(minMaxList.size() == 0){
+			printf("minMaxList is empty");
+		}
+		result = *max_element(minMaxList.begin(), minMaxList.end());
 	}
-	else{
-		return min(min(min(phi[i+1][j], phi[i-1][j]) , phi[i][j+1]) ,phi[i][j-1]);
+	else if(greaterOrLess == -1){
+		if(label[p.x+1][p.y] <= checkAgainst){
+			minMaxList.push_back(phi[p.x+1][p.y]);
+		}
+		if(label[p.x][p.y+1] <= checkAgainst){
+			minMaxList.push_back(phi[p.x][p.y+1]);
+		}
+		if(label[p.x-1][p.y] <= checkAgainst){
+			minMaxList.push_back(phi[p.x-1][p.y]);
+		}
+		if(label[p.x][p.y-1] <= checkAgainst){
+			minMaxList.push_back(phi[p.x][p.y-1]);
+		}
+		if(minMaxList.size() == 0){
+			printf("minMaxList is empty");
+		}
+		result = *min_element(minMaxList.begin(), minMaxList.end());
 	}
+	//printf("%f, %i, %i \n", result, greaterOrLess, checkAgainst);
+	minMaxList.clear();
+	return result;
 	
 }
 
@@ -67,8 +104,7 @@ double speedFunction(int x, int y){
 	return (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2; 
 }
 
-void prepareUpdates(){//har ikke forandret på denne så den støtter Pixel structs ennå
-		
+void prepareUpdates(){
 	vector<Pixel>::iterator it;
 	
 	for(it = lz.begin(); it<lz.end();){//find pixels that are moving out of lz
@@ -77,7 +113,7 @@ void prepareUpdates(){//har ikke forandret på denne så den støtter Pixel structs
 			sp1.push_back(*it);
 			it = lz.erase(it);		//erases elements at index i and j
 		}
-		else if(phi[it->x][it->y] <= -0.5){
+		else if(phi[it->x][it->y] < -0.5){
 			sn1.push_back(*it);
 			it = lz.erase(it);
 		}
@@ -92,7 +128,7 @@ void prepareUpdates(){//har ikke forandret på denne så den støtter Pixel structs
 			it = ln1.erase(it);
 		}
 		else{
-			int M = minMax(it->x, it->y, 1);
+			int M = minMax(*it, 1, 0);
 			phi[it->x][it->y] = M-1;
 			if(phi[it->x][it->y] >= -0.5){ //moving from ln1 to sz
 				sz.push_back(*it);
@@ -113,7 +149,7 @@ void prepareUpdates(){//har ikke forandret på denne så den støtter Pixel structs
 			it = lp1.erase(it);
 		}
 		else{
-			int M = minMax(it->x, it->y, 0);
+			int M = minMax(*it, -1, 0);
 			phi[it->x][it->y] = M+1;
 			if(phi[it->x][it->y] <= 0.5){ 
 				sz.push_back(*it);
@@ -135,7 +171,7 @@ void prepareUpdates(){//har ikke forandret på denne så den støtter Pixel structs
 			it = ln2.erase(it);
 		}
 		else{
-			int M = minMax(it->x, it->y, 1);
+			int M = minMax(*it, 1, -1);
 			phi[it->x][it->y] = M-1;
 			if(phi[it->x][it->y] >= -1.5){ 
 				sn1.push_back(*it);
@@ -158,7 +194,7 @@ void prepareUpdates(){//har ikke forandret på denne så den støtter Pixel structs
 			it = lp2.erase(it);
 		}
 		else{
-			int M = minMax(it->x, it->y, 0);
+			int M = minMax(*it, -1, 1);
 			phi[it->x][it->y] = M+1;
 			if(phi[it->x][it->y] <= 1.5){
 				sp1.push_back(*it);
@@ -176,8 +212,7 @@ void prepareUpdates(){//har ikke forandret på denne så den støtter Pixel structs
 	}
 }
 
-void updateLevelSets(){				//Procedure 3 Delvis påbegynt for å støtte Pixel struct, se kommentarer
-	
+void updateLevelSets(){	
 	vector<Pixel>::iterator it;
 	
 
