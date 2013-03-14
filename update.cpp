@@ -80,7 +80,7 @@ void calculateMu(){
 	int numInside = 0;
 	double muTempOutside = 0;
 	int numOutside = 0;
-	double threshold = 0.5;
+	double threshold = 0.4;
 	for(int i = 0; i<HEIGHT; i++){
 		for(int j = 0; j<WIDTH; j++){
 			if(image[i][j] > threshold){
@@ -96,6 +96,8 @@ void calculateMu(){
 	}
 	muOutside = muTempOutside / numOutside;
 	muInside = muTempInside / numInside;
+	//muOutside = 0.29;
+	//muInside = 0.52;
 	printf("muInside: %f, muOutside: %f \n", muInside, muOutside); 
 }
 
@@ -106,7 +108,6 @@ double speedFunction(int x, int y){
 
 void prepareUpdates(){
 	vector<Pixel>::iterator it;
-	
 	for(it = lz.begin(); it<lz.end();){//find pixels that are moving out of lz
 		phi[it->x][it->y] += speedFunction(it->x, it->y);
 		if(phi[it->x][it->y] > 0.5){
@@ -121,14 +122,13 @@ void prepareUpdates(){
 			it++;
 		}
 	}
-	
 	for(it = ln1.begin(); it<ln1.end();){//find pixels that are moving out of ln1
 		if(checkMaskNeighbours(it->x,it->y, 2, 0) == false){//if Ln1[i][j] has no neighbors q with label(q) == 0
 			sn2.push_back(*it);
 			it = ln1.erase(it);
 		}
 		else{
-			int M = minMax(*it, 1, 0);
+			double M = minMax(*it, 1, 0);
 			phi[it->x][it->y] = M-1;
 			if(phi[it->x][it->y] >= -0.5){ //moving from ln1 to sz
 				sz.push_back(*it);
@@ -149,7 +149,7 @@ void prepareUpdates(){
 			it = lp1.erase(it);
 		}
 		else{
-			int M = minMax(*it, -1, 0);
+			double M = minMax(*it, -1, 0);
 			phi[it->x][it->y] = M+1;
 			if(phi[it->x][it->y] <= 0.5){ 
 				sz.push_back(*it);
@@ -171,7 +171,7 @@ void prepareUpdates(){
 			it = ln2.erase(it);
 		}
 		else{
-			int M = minMax(*it, 1, -1);
+			double M = minMax(*it, 1, -1);
 			phi[it->x][it->y] = M-1;
 			if(phi[it->x][it->y] >= -1.5){ 
 				sn1.push_back(*it);
@@ -194,7 +194,7 @@ void prepareUpdates(){
 			it = lp2.erase(it);
 		}
 		else{
-			int M = minMax(*it, -1, 1);
+			double M = minMax(*it, -1, 1);
 			phi[it->x][it->y] = M+1;
 			if(phi[it->x][it->y] <= 1.5){
 				sp1.push_back(*it);
@@ -215,13 +215,11 @@ void prepareUpdates(){
 void updateLevelSets(){	
 	vector<Pixel>::iterator it;
 	
-
 	for (it = sz.begin(); it < sz.end(); it++){
 		label[it->x][it->y] = 0;					
 		lz.push_back(*it);		
 	}
 	sz.clear();
-
 
 	for (it = sn1.begin(); it < sn1.end(); it++){
 		label[it->x][it->y] = -1;
@@ -252,6 +250,7 @@ void updateLevelSets(){
 		}
 	}
 	sn1.clear();
+	
 	for (it = sp1.begin(); it < sp1.end(); it++){
 		label[it->x][it->y] = 1;
 		lp1.push_back(*it);
@@ -281,6 +280,7 @@ void updateLevelSets(){
 		}
 	}
 	sp1.clear();
+	
 	for (it = sn2.begin(); it < sn2.end(); it++){
 		label[it->x][it->y] = -2;
 		ln2.push_back(*it);

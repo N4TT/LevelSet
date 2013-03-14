@@ -162,6 +162,7 @@ void initialization(){
 	for (it = ln1.begin(); it < ln1.end(); it++){
 		setLevels(*it, 2);
 	}
+	
 }
 
 void readFile(BMP img){
@@ -209,11 +210,11 @@ void writeFile(BMP img, int id){
 int main(){
 	//read file
 	BMP img;
-	img.ReadFromFile("qt.bmp");
+	img.ReadFromFile("1img.bmp");
 	readFile(img);
 	
 	try{
-		fillInit(225, 225, 300, 300);
+		fillInit(359, 268, 381, 296);
 		printf("init filled\n");
 	}catch(int e){
 		if(e == -1){
@@ -226,28 +227,25 @@ int main(){
 			system("pause");
 		}
 	}
-	
 	initialization();
 	calculateMu();
 	
-	
-	
 	vector<Pixel>::iterator itt;
+
 	printf("starting main loop\n");
-	for(int i = 0; i<1000; i++){
+	int iterations = 1000;
+	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		updateLevelSets();
-		if(i == 1999){ //copy the zero level set pixels to zeroLevelSet
+		if(i == (iterations-1)){ //copy the zero level set pixels to zeroLevelSet
 			for(itt = lz.begin(); itt<lz.end(); itt++){
 				zeroLevelSet[itt->x][itt->y] = 255;
 			}
-			//printf("lz.size(): %i \n", lz.size());
 		}
-		
 	}
 	printf("main loop finished\n");
 	
-	writeFile(img, 1);
+	writeFile(img, 3);
 	printf("output successfully stored");
 	
 	system("pause");
