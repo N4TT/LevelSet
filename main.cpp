@@ -210,11 +210,11 @@ void writeFile(BMP img, int id){
 int main(){
 	//read file
 	BMP img;
-	img.ReadFromFile("1img.bmp");
+	img.ReadFromFile("q1.bmp");
 	readFile(img);
 	
 	try{
-		fillInit(359, 268, 381, 296);
+		fillInit(221, 208, 396, 269);
 		printf("init filled\n");
 	}catch(int e){
 		if(e == -1){
@@ -233,7 +233,7 @@ int main(){
 	vector<Pixel>::iterator itt;
 
 	printf("starting main loop\n");
-	int iterations = 1000;
+	int iterations = 100;
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		updateLevelSets();
