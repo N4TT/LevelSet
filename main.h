@@ -10,7 +10,7 @@ using namespace std;
 
 struct Pixel{
 	int x, y, z;
-	Pixel(int k, int g):x(k), y(g){};
+	Pixel(int k, int g, int f):x(k), y(g), z(f){};
 
 };
 

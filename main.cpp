@@ -12,12 +12,12 @@
 
 using namespace std;
 
-double image[HEIGHT][WIDTH] = { 0 };//{ {0.1,0.2,0.1,0.3,0.4},{0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}  };
-double phi[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
-int init[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
-int label[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
-double F[HEIGHT][WIDTH] = { 0 };
-int zeroLevelSet[HEIGHT][WIDTH] = { 0 }; //output
+double image[HEIGHT][WIDTH][DEPTH] = { 0 };//{ {0.1,0.2,0.1,0.3,0.4},{0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}  };
+double phi[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER] = { 0 };
+int init[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER] = { 0 };
+int label[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER] = { 0 };
+double F[HEIGHT][WIDTH][DEPTH] = { 0 };
+int zeroLevelSet[HEIGHT][WIDTH][DEPTH] = { 0 }; //output
 
 vector<Pixel> lz;
 vector<Pixel> lp1;
@@ -31,48 +31,57 @@ vector<Pixel> sn1;
 vector<Pixel> sp2;
 vector<Pixel> sn2;
 
-void fillInit(int minX, int minY, int minZ int maxX, int maxY, int maxZ){
+void fillInit(int minX, int minY, int minZ, int maxX, int maxY, int maxZ){
 	if(maxX - minX <= 0){
 		throw -1;
 	}
 	else if(maxY - minY <= 0){
 		throw -1;
 	}
-	else if(maxZ . minZ <= 0){
+	else if(maxZ - minZ <= 0){
 		throw -1;
 	}
-	else if(minX < 0 || maxX > HEIGHT || minY < 0 || maxY > WIDTH){
+	else if(minX < 0 || maxX > HEIGHT || minY < 0 || maxY > WIDTH || minZ < 0 || maxZ > DEPTH){
 		throw 1;
 	}
 	
 	for (int i = minY+1; i<maxY+1; i++){
 		for (int j = minX+1; j<maxX+1; j++){
-			init[i][j] = 1;
+			for (int k = minZ+1; k<maxZ+1; k++){
+				init[i][j][k] = 1;
+			}
 		}
 	}
 }
 
-bool checkMaskNeighbours(int i, int j, int id, int res){ //res er verdien som vi sjekker opp mot, kriteriet for success
+bool checkMaskNeighbours(int i, int j, int k, int id, int res){ //res er verdien som vi sjekker opp mot, kriteriet for success
 	if(id == 1){ //id == 1 -> init
-		if(init[i+1][j] == res)
+		if(init[i+1][j][k] == res) //right neighbour
 			return true;
-		else if(init[i-1][j] == res)
+		else if(init[i-1][j][k] == res) //left neighbour
 			return true;
-		else if(init[i][j+1] == res)
+		else if(init[i][j+1][k] == res) //neighbour over
 			return true;
-		else if(init[i][j-1] == res)
+		else if(init[i][j-1][k] == res) //neighbour under
+			return true;
+		else if(init[i][j][k+1] == res) //neighbour in front
+			return true;
+		else if(init[i][j][k-1] == res) //neighbour behind
 			return true;
 	}
 	else if(id == 2){ //id == 2 -> label
-		if(label[i+1][j] == res)
+		if(label[i+1][j][k] == res)
 			return true;
-		else if(label[i-1][j] == res)
+		else if(label[i-1][j][k] == res)
 			return true;
-		else if(label[i][j+1] == res)
+		else if(label[i][j+1][k] == res)
 			return true;
-		else if(label[i][j-1] == res)
+		else if(label[i][j-1][k] == res)
 			return true;
-		
+		else if(label[i][j][k+1] == res)
+			return true;
+		else if(label[i][j][k-1] == res)
+			return true;
 	}
 	return false;
 }
@@ -81,23 +90,23 @@ void pushAndStuff(Pixel p, int level){//støtter Pixel struct
 	switch(level){
 	case 1:
 		lp1.push_back(p);
-		label[p.x][p.y] = level;
-		phi[p.x][p.y] = level;
+		label[p.x][p.y][p.z] = level;
+		phi[p.x][p.y][p.z] = level;
 		break;
 	case 2:
 		lp2.push_back(p);
-		label[p.x][p.y] = level;
-		phi[p.x][p.y] = level;
+		label[p.x][p.y][p.z] = level;
+		phi[p.x][p.y][p.z] = level;
 		break;
 	case -1:
 		ln1.push_back(p);
-		label[p.x][p.y] = level;
-		phi[p.x][p.y] = level;
+		label[p.x][p.y][p.z] = level;
+		phi[p.x][p.y][p.z] = level;
 		break;
 	case -2:
 		ln2.push_back(p);
-		label[p.x][p.y] = level;
-		phi[p.x][p.y] = level;	
+		label[p.x][p.y][p.z] = level;
+		phi[p.x][p.y][p.z] = level;	
 		break;
 	}
 }
@@ -106,40 +115,55 @@ void setLevels(Pixel p, int level){//støtter Pixel Struct
 /*
 	for(int i = p.x-1; i<p.x+1; i++){
 		for(int j = p.y-1; j<p.y+1; j++){
-			if(p.x != i && p.y != j){
-				if(label[i][j] == 3){
-					pushAndStuff(Pixel(i, j), level);
-				}
-				else if(label[i][j] == -3){
-					pushAndStuff(Pixel(i, j), level);
+			for(int k = p.z-1; k<p.z+1; k++){
+				if(p.x != i && p.y != j &&p.z != k){
+					if(label[i][j][k] == 3){
+						pushAndStuff(Pixel(i, j, k), level);
+					}
+					else if(label[i][j][k] == -3){
+						pushAndStuff(Pixel(i, j, k), level);
+					}
 				}
 			}
 		}
 	}
 */
-	if(label[p.x+1][p.y] == 3){
-		pushAndStuff(Pixel(p.x+1, p.y), level);
+	if(label[p.x+1][p.y][p.z] == 3){
+		pushAndStuff(Pixel(p.x+1, p.y, p.z), level);
 	}
-	if(label[p.x][p.y+1] == 3){
-		pushAndStuff(Pixel(p.x, p.y+1), level);
+	if(label[p.x][p.y+1][p.z] == 3){
+		pushAndStuff(Pixel(p.x, p.y+1, p.z), level);
 	}
-	if(label[p.x-1][p.y] == 3){
-		pushAndStuff(Pixel(p.x-1, p.y), level);
+	if(label[p.x-1][p.y][p.z] == 3){
+		pushAndStuff(Pixel(p.x-1, p.y, p.z), level);
 	}
-	if(label[p.x][p.y-1] == 3){
-		pushAndStuff(Pixel(p.x, p.y-1), level);
+	if(label[p.x][p.y-1][p.z] == 3){
+		pushAndStuff(Pixel(p.x, p.y-1, p.z), level);
 	}
-	if(label[p.x+1][p.y] == -3){
-		pushAndStuff(Pixel(p.x+1, p.y), -level);
+	if(label[p.x][p.y][p.z+1] == 3){
+		pushAndStuff(Pixel(p.x, p.y, p.z+1), level);
 	}
-	if(label[p.x][p.y+1] == -3){
-		pushAndStuff(Pixel(p.x, p.y+1), -level);
+	if(label[p.x][p.y][p.z-1] == 3){
+		pushAndStuff(Pixel(p.x, p.y, p.z-1), level);
 	}
-	if(label[p.x-1][p.y] == -3){
-		pushAndStuff(Pixel(p.x-1, p.y), -level);
+	
+	if(label[p.x+1][p.y][p.z] == -3){
+		pushAndStuff(Pixel(p.x+1, p.y, p.z), level);
 	}
-	if(label[p.x][p.y-1] == -3){
-		pushAndStuff(Pixel(p.x, p.y-1), -level);
+	if(label[p.x][p.y+1][p.z] == -3){
+		pushAndStuff(Pixel(p.x, p.y+1, p.z), level);
+	}
+	if(label[p.x-1][p.y][p.z] == -3){
+		pushAndStuff(Pixel(p.x-1, p.y, p.z), level);
+	}
+	if(label[p.x][p.y-1][p.z] == -3){
+		pushAndStuff(Pixel(p.x, p.y-1, p.z), level);
+	}
+	if(label[p.x][p.y][p.z+1] == -3){
+		pushAndStuff(Pixel(p.x, p.y, p.z+1), level);
+	}
+	if(label[p.x][p.y][p.z-1] == -3){
+		pushAndStuff(Pixel(p.x, p.y, p.z-1), level);
 	}
 
 }	
@@ -150,22 +174,26 @@ void initialization(){
 
 	for (int i = 0; i<HEIGHT+BORDER; i++){
 		for (int j = 0; j<WIDTH+BORDER; j++){
-			if(init[i][j] == 0){
-				label[i][j] = 3; 
-				phi[i][j] = 3;
-			}
-			else{
-				label[i][j] = -3; 
-				phi[i][j] = -3;
+			for (int k = 0; k<DEPTH+BORDER; k++){
+				if(init[i][j][k] == 0){
+					label[i][j][k] = 3; 
+					phi[i][j][k] = 3;
+				}
+				else{
+					label[i][j][k] = -3; 
+					phi[i][j][k] = -3;
+				}
 			}
 		}
 	}
 	for (int i = 1; i<HEIGHT+1; i++){
 		for (int j = 1; j<WIDTH+1; j++){
-			if(init[i][j] == 1 && checkMaskNeighbours(i, j, 1, 0) == true){
-				lz.push_back(Pixel(i,j));
-				label[i][j] = 0;
-				phi[i][j] = 0;
+			for (int k = 0; k<DEPTH+1; k++){
+				if(init[i][j][k] == 1 && checkMaskNeighbours(i, j, 1, 0) == true){
+					lz.push_back(Pixel(i,j,k));
+					label[i][j][k] = 0;
+					phi[i][j][k]= 0;
+				}
 			}
 		}
 	}
@@ -182,7 +210,7 @@ void initialization(){
 	}
 	
 }
-
+/*
 void readFile(BMP img){
 	//copy input data (img) to image[][] and normalize to [0, 1]
 	for (int i =0; i<HEIGHT; i++){
@@ -226,15 +254,16 @@ void writeFile(BMP img, int id){
 	img.WriteToFile("output.bmp");
 	//img.WriteToFile("output.bmp");
 }
-
+*/
 int main(){
 	//read file
+	/*
 	BMP img;
 	img.ReadFromFile("qq.bmp");
 	readFile(img);
-	
+	*/
 	try{
-		fillInit(220, 220, 290, 260);
+		fillInit(220, 220, 220, 290, 260, 260);
 		printf("init filled\n");
 	}catch(int e){
 		if(e == -1){
@@ -259,13 +288,13 @@ int main(){
 		updateLevelSets();
 		if(i == (iterations-1)){ //copy the zero level set pixels to zeroLevelSet
 			for(itt = lz.begin(); itt<lz.end(); itt++){
-				zeroLevelSet[itt->x][itt->y] = 255;
+				zeroLevelSet[itt->x][itt->y][itt->z] = 255;
 			}
 		}
 	}
 	printf("main loop finished\n");
 
-	writeFile(img, 3);
+	//writeFile(img, 3);
 	printf("output successfully stored");
 
 	system("pause");
