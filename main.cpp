@@ -31,16 +31,20 @@ vector<Pixel> sn1;
 vector<Pixel> sp2;
 vector<Pixel> sn2;
 
-void fillInit(int minX, int minY, int maxX, int maxY){
+void fillInit(int minX, int minY, int minZ int maxX, int maxY, int maxZ){
 	if(maxX - minX <= 0){
 		throw -1;
 	}
 	else if(maxY - minY <= 0){
 		throw -1;
 	}
+	else if(maxZ . minZ <= 0){
+		throw -1;
+	}
 	else if(minX < 0 || maxX > HEIGHT || minY < 0 || maxY > WIDTH){
 		throw 1;
 	}
+	
 	for (int i = minY+1; i<maxY+1; i++){
 		for (int j = minX+1; j<maxX+1; j++){
 			init[i][j] = 1;
@@ -99,7 +103,7 @@ void pushAndStuff(Pixel p, int level){//støtter Pixel struct
 }
 
 void setLevels(Pixel p, int level){//støtter Pixel Struct
-
+/*
 	for(int i = p.x-1; i<p.x+1; i++){
 		for(int j = p.y-1; j<p.y+1; j++){
 			if(p.x != i && p.y != j){
@@ -112,7 +116,7 @@ void setLevels(Pixel p, int level){//støtter Pixel Struct
 			}
 		}
 	}
-/*
+*/
 	if(label[p.x+1][p.y] == 3){
 		pushAndStuff(Pixel(p.x+1, p.y), level);
 	}
@@ -137,7 +141,7 @@ void setLevels(Pixel p, int level){//støtter Pixel Struct
 	if(label[p.x][p.y-1] == -3){
 		pushAndStuff(Pixel(p.x, p.y-1), -level);
 	}
-*/
+
 }	
 
 void initialization(){
@@ -226,7 +230,7 @@ void writeFile(BMP img, int id){
 int main(){
 	//read file
 	BMP img;
-	img.ReadFromFile("q1.bmp");
+	img.ReadFromFile("qq.bmp");
 	readFile(img);
 	
 	try{
