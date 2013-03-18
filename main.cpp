@@ -261,7 +261,7 @@ int main(){
 	}
 	printf("main loop finished\n");
 
-	writeFile(img, 1);
+	writeFile(img, 3);
 	printf("output successfully stored");
 
 	system("pause");
