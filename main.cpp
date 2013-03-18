@@ -68,6 +68,7 @@ bool checkMaskNeighbours(int i, int j, int id, int res){ //res er verdien som vi
 			return true;
 		else if(label[i][j-1] == res)
 			return true;
+		
 	}
 	return false;
 }
@@ -99,6 +100,19 @@ void pushAndStuff(Pixel p, int level){//støtter Pixel struct
 
 void setLevels(Pixel p, int level){//støtter Pixel Struct
 
+	for(int i = p.x-1; i<p.x+1; i++){
+		for(int j = p.y-1; j<p.y+1; j++){
+			if(p.x != i && p.y != j){
+				if(label[i][j] == 3){
+					pushAndStuff(Pixel(i, j), level);
+				}
+				else if(label[i][j] == -3){
+					pushAndStuff(Pixel(i, j), level);
+				}
+			}
+		}
+	}
+/*
 	if(label[p.x+1][p.y] == 3){
 		pushAndStuff(Pixel(p.x+1, p.y), level);
 	}
@@ -123,7 +137,7 @@ void setLevels(Pixel p, int level){//støtter Pixel Struct
 	if(label[p.x][p.y-1] == -3){
 		pushAndStuff(Pixel(p.x, p.y-1), -level);
 	}
-
+*/
 }	
 
 void initialization(){
@@ -196,6 +210,7 @@ void writeFile(BMP img, int id){
 		}
 	}
 	else{ //zeroLevelSet
+		printf("dsed");
 		for (int i =0; i<HEIGHT; i++){
 			for (int j = 0; j<WIDTH; j++){
 				img(i,j)->Red = zeroLevelSet[i][j]; 
@@ -205,6 +220,7 @@ void writeFile(BMP img, int id){
 		}
 	}
 	img.WriteToFile("output.bmp");
+	//img.WriteToFile("output.bmp");
 }
 
 int main(){
@@ -214,7 +230,7 @@ int main(){
 	readFile(img);
 	
 	try{
-		fillInit(221, 208, 396, 269);
+		fillInit(220, 220, 290, 260);
 		printf("init filled\n");
 	}catch(int e){
 		if(e == -1){
@@ -233,7 +249,7 @@ int main(){
 	vector<Pixel>::iterator itt;
 
 	printf("starting main loop\n");
-	int iterations = 100;
+	int iterations = 500;
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		updateLevelSets();
@@ -244,10 +260,10 @@ int main(){
 		}
 	}
 	printf("main loop finished\n");
-	
-	writeFile(img, 3);
+
+	writeFile(img, 1);
 	printf("output successfully stored");
-	
+
 	system("pause");
 	
 }

@@ -243,7 +243,7 @@ void updateLevelSets(){
 			it->x++;
 		}
 		if (phi[it->x][it->y-1] == -3){			
-			phi[it->x][it->y-1] = phi[it->x][it->y-1];
+			phi[it->x][it->y-1] = phi[it->x][it->y]-1;
 			it->y--;								//[x,y-1]
 			sn2.push_back(*it);
 			it->y++;
