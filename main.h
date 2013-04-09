@@ -3,16 +3,16 @@
 using namespace std;
 
 
-#define HEIGHT 512
-#define WIDTH 512
-#define DEPTH 512
+#define HEIGHT 256
+#define WIDTH 256
+#define DEPTH 256
 #define BORDER 2
 
 struct Pixel{
-	int x, y, z;
-	Pixel(int k, int g, int f):x(k), y(g), z(f){};
+	unsigned int x, y, z;
+	Pixel(unsigned int k, unsigned int g, unsigned int f):x(k), y(g), z(f){};
 
 };
 
-bool checkMaskNeighbours(int i, int j, int id, int res);
+bool checkMaskNeighbours(int i, int j, int k, int id, int res);
 

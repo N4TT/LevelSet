@@ -344,13 +344,13 @@ void updateLevelSets(){
 	sp1.clear();
 	
 	for (it = sn2.begin(); it < sn2.end(); it++){
-		label[it->x][it->y] = -2;
+		label[it->x][it->y][it->z] = -2;
 		ln2.push_back(*it);
 	}
 	sn2.clear();
 
 	for (it = sp2.begin(); it < sp2.end(); it++){
-		label[it->x][it->y] = 2;
+		label[it->x][it->y][it->z] = 2;
 		lp2.push_back(*it);
 	}
 	sp2.clear();
