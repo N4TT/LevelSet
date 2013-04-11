@@ -11,8 +11,7 @@
 #include "update.h"
 #include "SIPL/Core.hpp"
 using namespace std;
-
-
+using namespace SIPL;
 
 double image[HEIGHT][WIDTH][DEPTH] = { 0 };//{ {0.1,0.2,0.1,0.3,0.4},{0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}  };
 double phi[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER] = { 0 };
@@ -57,6 +56,22 @@ void fillInit(int minX, int minY, int minZ, int maxX, int maxY, int maxZ){
 		}
 	}
 	printf("\nloop done");
+}
+
+float fillSphere(int3 seed, int radius){
+	int numPixelsInside = 0;
+	float sumPixelValues = 0;
+	for(int i = seed.x - radius; i<seed.x + radius; i++){
+	for(int j = seed.y - radius; j<seed.y + radius; j++){
+	for(int k = seed.z - radius; k<seed.z + radius; k++){
+		int3 n(i,j,k);
+		if(sqrt((float)((seed.x-n.x)*(seed.x-n.x)+(seed.y-n.y)*(seed.y-n.y)+(seed.z-n.z)*(seed.z-n.z))) < radius){
+			numPixelsInside ++;
+			sumPixelValues += image[i][j][k];
+			init[index(i,j,k)] = 1;
+		}
+	}}}
+	return sumPixelValues/numPixelsInside;
 }
 
 bool checkMaskNeighbours(int i, int j, int k, int id, int res){ //res er verdien som vi sjekker opp mot, kriteriet for success
@@ -261,7 +276,6 @@ void writeFile(BMP img, int id){
 }
 */
 
-using namespace SIPL;
 void displayVolume(){
 	Volume<uchar> * V = new Volume<uchar>("aneurism.mhd");
 	
@@ -290,40 +304,31 @@ int main(){
 	Volume<uchar> * V = new Volume<uchar>("aneurism.mhd");
 	//V->show();
 	
-	int3 seed(100, 100, 100);
+	int3 seed(120, 100, 150);
+	printf("\n image: %f\n", image[120][100][150]);
 	Volume<float2> * v2 = new Volume<float2>(V->getSize());
 	for(int x = 0; x < v2->getWidth(); x++) {
 	for(int y = 0; y < v2->getHeight(); y++) {
 	for(int z = 0; z < v2->getDepth(); z++) {
 		float2 vector;
 		vector.x = (float)V->get(x,y,z) / 255.0f;
+		//if(vector.x > 0){
+		//	printf("%f ",vector.x);
+		//}
 		int3 n(x,y,z);	
 		image[x][y][z] = (int)V->get(x,y,z) / 255.0f;	
-		if(sqrt((float)((seed.x-n.x)*(seed.x-n.x)+(seed.y-n.y)*(seed.y-n.y)+(seed.z-n.z)*(seed.z-n.z))) < 5.0f){
+		if(sqrt((float)((seed.x-n.x)*(seed.x-n.x)+(seed.y-n.y)*(seed.y-n.y)+(seed.z-n.z)*(seed.z-n.z))) < 15.0f){
 		//if(seed.distance(n) < 5.0f) {
 			vector.y = 1.0f;
 		}
 		v2->set(n, vector);//guesswork:setter punktet n i v2 til verdiene i vector. v2 er et volum med elementer float2
 	}}}						//vector.y bestemmer om punktet er innenfor radiusen til seed punktet mens vector.x er verdien til bildet i det punktet.
-	//v2->showMIP();
+	v2->showMIP();
 	
-	//read file
-	/*
-	BMP img;
-	img.ReadFromFile("qq.bmp");
-	readFile(img);
-	*/
-	/*SIPL::Init();
-	SIPL::Volume<float> * v = new SIPL::Volume<float>("rawfile.raw", 181, 217, 181);
-	for(int i = 50; i<180; i+=10){
-		v->show(SIPL::Z, i, 80);
-		//system("pause");
-	}
-	*/
-	
-	
+	float thresold = 0;
 	try{
-		fillInit(100, 100, 140, 120, 120, 160);
+		//fillInit(110, 90, 140, 125, 105, 155);
+		thresold = fillSphere(seed, 10);
 		printf("init filled\n");
 	}catch(int e){
 		if(e == -1){
@@ -337,12 +342,12 @@ int main(){
 		}
 	}
 	initialization();
-	calculateMu();
+	calculateMu(thresold);
 
 	vector<Pixel>::iterator itt;
 
 	printf("starting main loop\n");
-	int iterations = 25;
+	int iterations = 20;
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		updateLevelSets();

@@ -5,7 +5,9 @@
 #include <algorithm>
 #include "main.h"
 #include "update.h"
+#include "SIPL/Core.hpp"
 using namespace std;
+using namespace SIPL;
 
 extern double image[HEIGHT][WIDTH][DEPTH]; //image to be segmented
 extern int init[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER]; //mask with seed points
@@ -111,12 +113,12 @@ double minMax(Pixel p, int greaterOrLess, int checkAgainst){//returns max if gre
 	
 }
 
-void calculateMu(){
+void calculateMu(float threshold){
 	double muTempInside = 0;
 	int numInside = 0;
 	double muTempOutside = 0;
 	int numOutside = 0;
-	double threshold = 0.4;
+	printf("\nthresold is %f\n", threshold);
 	for(int i = 0; i<HEIGHT; i++){
 		for(int j = 0; j<WIDTH; j++){
 			for (int k = 0; k<DEPTH; k++){
