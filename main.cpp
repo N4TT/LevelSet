@@ -348,7 +348,7 @@ int main(){
 	vector<Pixel>::iterator itt;
 
 	printf("starting main loop\n");
-	int iterations = 150;
+	int iterations = 50;
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		//printf("\n prepareUpdates done");
@@ -374,7 +374,7 @@ int main(){
 	//ostringstream filename;
 	//filename << iterations << "iter.raw";
 	//uchar f = filename;
-	v3->save("150iter.raw");
+	v3->save("100iter.raw");
 	printf("file stored");
 	system("pause");
 

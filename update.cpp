@@ -40,10 +40,8 @@ float muInside;
 
 vector<float> minMaxList;
 
-float minMax(Pixel p, int greaterOrLess, int checkAgainst){//returns max if greaterOrLess =">=", 
-	float result;
-	
-	
+float result;
+float minMax(Pixel p, short greaterOrLess, short checkAgainst){//returns max if greaterOrLess =">=", 
 	/*
 	if(greaterOrLess == 1){
 		for (int i = -1; i<2; i++){
@@ -63,8 +61,6 @@ float minMax(Pixel p, int greaterOrLess, int checkAgainst){//returns max if grea
 		result = *max_element(minMaxList.begin(), minMaxList.end());
 	}
 	*/
-	
-	
 	if(greaterOrLess == 1){
 		if(label[p.x+1][p.y][p.z] >= checkAgainst){
 			minMaxList.push_back(phi[p.x+1][p.y][p.z]);
@@ -153,10 +149,12 @@ double speedFunction(short x, short y, short z){
 	return (((image[x][y][z] - muInside)*(image[x][y][z] - muInside)) - ((image[x][y][z] - muOutside)*(image[x][y][z] - muOutside)))/2; 
 }
 
+
+float M;
+vector<Pixel>::iterator it;
 void prepareUpdates(){
 	start = std::clock();
 
-	vector<Pixel>::iterator it;
 	for(it = lz.begin(); it<lz.end();){//find pixels that are moving out of lz
 		phi[it->x][it->y][it->z] += speedFunction(it->x, it->y, it->z);
 		if(phi[it->x][it->y][it->z] > 0.5){
@@ -177,7 +175,7 @@ void prepareUpdates(){
 			it = ln1.erase(it);
 		}
 		else{
-			float M = minMax(*it, 1, 0);
+			M = minMax(*it, 1, 0);
 			phi[it->x][it->y][it->z] = M-1;
 			if(phi[it->x][it->y][it->z] >= -0.5){ //moving from ln1 to sz
 				sz.push_back(*it);
@@ -198,7 +196,7 @@ void prepareUpdates(){
 			it = lp1.erase(it);
 		}
 		else{
-			float M = minMax(*it, -1, 0);
+			M = minMax(*it, -1, 0);
 			phi[it->x][it->y][it->z] = M+1;
 			if(phi[it->x][it->y][it->z] <= 0.5){ 
 				sz.push_back(*it);
@@ -220,7 +218,7 @@ void prepareUpdates(){
 			it = ln2.erase(it);
 		}
 		else{
-			float M = minMax(*it, 1, -1);
+			M = minMax(*it, 1, -1);
 			phi[it->x][it->y][it->z] = M-1;
 			if(phi[it->x][it->y][it->z] >= -1.5){ 
 				sn1.push_back(*it);
@@ -243,7 +241,7 @@ void prepareUpdates(){
 			it = lp2.erase(it);
 		}
 		else{
-			float M = minMax(*it, -1, 1);
+			M = minMax(*it, -1, 1);
 			phi[it->x][it->y][it->z] = M+1;
 			if(phi[it->x][it->y][it->z] <= 1.5){
 				sp1.push_back(*it);
@@ -264,9 +262,7 @@ void prepareUpdates(){
 }
 
 void updateLevelSets(){	
-start = std::clock();
-
-	vector<Pixel>::iterator it;
+	start = std::clock();
 	
 	for (it = sz.begin(); it < sz.end(); it++){
 		label[it->x][it->y][it->z] = 0;					
