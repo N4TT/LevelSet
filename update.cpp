@@ -6,14 +6,21 @@
 #include "main.h"
 #include "update.h"
 #include "SIPL/Core.hpp"
+
+#include <cstdio>
+#include <ctime>
+
 using namespace std;
 using namespace SIPL;
 
-extern double image[HEIGHT][WIDTH][DEPTH]; //image to be segmented
-extern int init[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER]; //mask with seed points
-extern double phi[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER]; //representation of the zero level set interface
-extern int label[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER];//contains only integer values between -3 and 3
-extern double F[HEIGHT][WIDTH][DEPTH];
+clock_t start;
+double duration;
+
+extern float image[HEIGHT][WIDTH][DEPTH]; //image to be segmented
+extern short init[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER]; //mask with seed points
+extern float phi[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER]; //representation of the zero level set interface
+extern short label[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER];//contains only integer values between -3 and 3
+extern float F[HEIGHT][WIDTH][DEPTH];
 
 extern vector<Pixel> lz; // zero level set
 extern vector<Pixel> lp1;
@@ -28,13 +35,13 @@ extern vector<Pixel> sn1;
 extern vector<Pixel> sp2;
 extern vector<Pixel> sn2;
 
-double muOutside;
-double muInside;
+float muOutside;
+float muInside;
 
-vector<double> minMaxList;
+vector<float> minMaxList;
 
-double minMax(Pixel p, int greaterOrLess, int checkAgainst){//returns max if greaterOrLess =">=", 
-	double result;
+float minMax(Pixel p, int greaterOrLess, int checkAgainst){//returns max if greaterOrLess =">=", 
+	float result;
 	
 	
 	/*
@@ -114,9 +121,9 @@ double minMax(Pixel p, int greaterOrLess, int checkAgainst){//returns max if gre
 }
 
 void calculateMu(float threshold){
-	double muTempInside = 0;
+	float muTempInside = 0;
 	int numInside = 0;
-	double muTempOutside = 0;
+	float muTempOutside = 0;
 	int numOutside = 0;
 	printf("\nthresold is %f\n", threshold);
 	for(int i = 0; i<HEIGHT; i++){
@@ -141,12 +148,14 @@ void calculateMu(float threshold){
 	printf("muInside: %f, muOutside: %f \n", muInside, muOutside); 
 }
 
-double speedFunction(int x, int y, int z){
+double speedFunction(short x, short y, short z){
 	//printf("sp %f \n", (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2);
 	return (((image[x][y][z] - muInside)*(image[x][y][z] - muInside)) - ((image[x][y][z] - muOutside)*(image[x][y][z] - muOutside)))/2; 
 }
 
 void prepareUpdates(){
+	start = std::clock();
+
 	vector<Pixel>::iterator it;
 	for(it = lz.begin(); it<lz.end();){//find pixels that are moving out of lz
 		phi[it->x][it->y][it->z] += speedFunction(it->x, it->y, it->z);
@@ -168,7 +177,7 @@ void prepareUpdates(){
 			it = ln1.erase(it);
 		}
 		else{
-			double M = minMax(*it, 1, 0);
+			float M = minMax(*it, 1, 0);
 			phi[it->x][it->y][it->z] = M-1;
 			if(phi[it->x][it->y][it->z] >= -0.5){ //moving from ln1 to sz
 				sz.push_back(*it);
@@ -189,7 +198,7 @@ void prepareUpdates(){
 			it = lp1.erase(it);
 		}
 		else{
-			double M = minMax(*it, -1, 0);
+			float M = minMax(*it, -1, 0);
 			phi[it->x][it->y][it->z] = M+1;
 			if(phi[it->x][it->y][it->z] <= 0.5){ 
 				sz.push_back(*it);
@@ -211,7 +220,7 @@ void prepareUpdates(){
 			it = ln2.erase(it);
 		}
 		else{
-			double M = minMax(*it, 1, -1);
+			float M = minMax(*it, 1, -1);
 			phi[it->x][it->y][it->z] = M-1;
 			if(phi[it->x][it->y][it->z] >= -1.5){ 
 				sn1.push_back(*it);
@@ -234,7 +243,7 @@ void prepareUpdates(){
 			it = lp2.erase(it);
 		}
 		else{
-			double M = minMax(*it, -1, 1);
+			float M = minMax(*it, -1, 1);
 			phi[it->x][it->y][it->z] = M+1;
 			if(phi[it->x][it->y][it->z] <= 1.5){
 				sp1.push_back(*it);
@@ -250,9 +259,13 @@ void prepareUpdates(){
 			}
 		}
 	}
+	duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+	printf("\n Preperaupdates: %f", duration);
 }
 
 void updateLevelSets(){	
+start = std::clock();
+
 	vector<Pixel>::iterator it;
 	
 	for (it = sz.begin(); it < sz.end(); it++){
@@ -356,4 +369,7 @@ void updateLevelSets(){
 		lp2.push_back(*it);
 	}
 	sp2.clear();
+	
+	duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+	printf("\n updateslevelset: %f", duration);
 }

@@ -7,19 +7,21 @@
 #include <exception>
 #include <stdlib.h>
 #include <string.h>
+#include <sstream>
 #include "main.h"
 #include "update.h"
 #include "SIPL/Core.hpp"
+
 using namespace std;
 using namespace SIPL;
 
-double image[HEIGHT][WIDTH][DEPTH] = { 0 };//{ {0.1,0.2,0.1,0.3,0.4},{0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}  };
-double phi[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER] = { 0 };
-int* init = (int*) calloc(sizeof(int), (HEIGHT+BORDER)*(WIDTH+BORDER)*(DEPTH+BORDER));
+float image[HEIGHT][WIDTH][DEPTH] = { 0 };//{ {0.1,0.2,0.1,0.3,0.4},{0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}  };
+float phi[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER] = { 0 };
+short* init = (short*) calloc(sizeof(short), (HEIGHT+BORDER)*(WIDTH+BORDER)*(DEPTH+BORDER));
 //int init = new int[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER];
-int label[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER] = { 0 };
-double F[HEIGHT][WIDTH][DEPTH] = { 0 };
-int zeroLevelSet[HEIGHT][WIDTH][DEPTH] = { 0 }; //output
+short label[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER] = { 0 };
+float F[HEIGHT][WIDTH][DEPTH] = { 0 };
+short zeroLevelSet[HEIGHT][WIDTH][DEPTH] = { 0 }; //output
 
 #define index(i,j, k) ((i)+(j)*WIDTH+(k)*WIDTH*DEPTH)
 
@@ -35,7 +37,7 @@ vector<Pixel> sn1;
 vector<Pixel> sp2;
 vector<Pixel> sn2;
 
-void fillInit(int minX, int minY, int minZ, int maxX, int maxY, int maxZ){
+void fillInit(short minX, short minY, short minZ, short maxX, short maxY, short maxZ){
 	if(maxX - minX <= 0){
 		throw -1;
 	}
@@ -74,7 +76,7 @@ float fillSphere(int3 seed, int radius){
 	return sumPixelValues/numPixelsInside;
 }
 
-bool checkMaskNeighbours(int i, int j, int k, int id, int res){ //res er verdien som vi sjekker opp mot, kriteriet for success
+bool checkMaskNeighbours(int i, int j, int k, int id, short res){ //res er verdien som vi sjekker opp mot, kriteriet for success
 	if(id == 1){ //id == 1 -> init
 		if(init[index(i+1,j,k)] == res) //right neighbour
 			return true;
@@ -106,7 +108,7 @@ bool checkMaskNeighbours(int i, int j, int k, int id, int res){ //res er verdien
 	return false;
 }
 
-void pushAndStuff(Pixel p, int level){//støtter Pixel struct
+void pushAndStuff(Pixel p, short level){//støtter Pixel struct
 	switch(level){
 	case 1:
 		lp1.push_back(p);
@@ -131,7 +133,7 @@ void pushAndStuff(Pixel p, int level){//støtter Pixel struct
 	}
 }
 
-void setLevels(Pixel p, int level){//støtter Pixel Struct
+void setLevels(Pixel p, short level){//støtter Pixel Struct
 /*
 	for(int i = p.x-1; i<p.x+1; i++){
 		for(int j = p.y-1; j<p.y+1; j++){
@@ -276,10 +278,8 @@ void writeFile(BMP img, int id){
 }
 */
 
-void displayVolume(){
-	Volume<uchar> * V = new Volume<uchar>("aneurism.mhd");
-	
-	int3 seed(100, 100, 100);
+void displayVolume(Volume<uchar> * V, int3 seed){
+
 	Volume<float2> * v2 = new Volume<float2>(V->getSize());
 	for(int x = 0; x < v2->getWidth(); x++) {
 	for(int y = 0; y < v2->getHeight(); y++) {
@@ -293,8 +293,8 @@ void displayVolume(){
 		}
 		v2->set(n, vector);
 	}}}
-	v2->showMIP();
-	//v2->show();
+	//v2->showMIP();
+	v2->show();
 	
 }
 
@@ -304,8 +304,9 @@ int main(){
 	Volume<uchar> * V = new Volume<uchar>("aneurism.mhd");
 	//V->show();
 	
-	int3 seed(120, 100, 150);
+	int3 seed(105, 115, 160);
 	printf("\n image: %f\n", image[120][100][150]);
+	
 	Volume<float2> * v2 = new Volume<float2>(V->getSize());
 	for(int x = 0; x < v2->getWidth(); x++) {
 	for(int y = 0; y < v2->getHeight(); y++) {
@@ -317,18 +318,18 @@ int main(){
 		//}
 		int3 n(x,y,z);	
 		image[x][y][z] = (int)V->get(x,y,z) / 255.0f;	
-		if(sqrt((float)((seed.x-n.x)*(seed.x-n.x)+(seed.y-n.y)*(seed.y-n.y)+(seed.z-n.z)*(seed.z-n.z))) < 15.0f){
+		if(sqrt((float)((seed.x-n.x)*(seed.x-n.x)+(seed.y-n.y)*(seed.y-n.y)+(seed.z-n.z)*(seed.z-n.z))) < 5.0f){
 		//if(seed.distance(n) < 5.0f) {
 			vector.y = 1.0f;
 		}
 		v2->set(n, vector);//guesswork:setter punktet n i v2 til verdiene i vector. v2 er et volum med elementer float2
 	}}}						//vector.y bestemmer om punktet er innenfor radiusen til seed punktet mens vector.x er verdien til bildet i det punktet.
-	v2->showMIP();
+	v2->show();
 	
 	float thresold = 0;
 	try{
 		//fillInit(110, 90, 140, 125, 105, 155);
-		thresold = fillSphere(seed, 10);
+		thresold = fillSphere(seed, 5);
 		printf("init filled\n");
 	}catch(int e){
 		if(e == -1){
@@ -347,10 +348,12 @@ int main(){
 	vector<Pixel>::iterator itt;
 
 	printf("starting main loop\n");
-	int iterations = 20;
+	int iterations = 150;
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
+		//printf("\n prepareUpdates done");
 		updateLevelSets();
+		//printf("\n updateLevels done");
 		if(i == (iterations-1)){ //copy the zero level set pixels to zeroLevelSet
 			for(itt = lz.begin(); itt<lz.end(); itt++){
 				zeroLevelSet[itt->x][itt->y][itt->z] = 255;
@@ -359,10 +362,20 @@ int main(){
 		printf("\nloop %i done", i);
 	}
 	printf("\nmain loop finished\n");
-	displayVolume();
-	//writeFile(img, 3);
-	//printf("output successfully stored");
+	displayVolume(V, seed);
 	
+	//store zerolevelset as raw file
+	Volume<uchar> * v3 = new Volume<uchar>(V->getSize());
+	for(int x = 0; x < v2->getWidth(); x++) {
+	for(int y = 0; y < v2->getHeight(); y++) {
+	for(int z = 0; z < v2->getDepth(); z++) {
+		v3->set(x,y,z, (uchar)zeroLevelSet[x][y][z]);
+	}}}
+	//ostringstream filename;
+	//filename << iterations << "iter.raw";
+	//uchar f = filename;
+	v3->save("150iter.raw");
+	printf("file stored");
 	system("pause");
 
 }

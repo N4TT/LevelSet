@@ -9,10 +9,10 @@ using namespace std;
 #define BORDER 2
 
 struct Pixel{
-	unsigned int x, y, z;
-	Pixel(unsigned int k, unsigned int g, unsigned int f):x(k), y(g), z(f){};
+	short x, y, z;
+	Pixel(short k, short g, short f):x(k), y(g), z(f){};
 
 };
 
-bool checkMaskNeighbours(int i, int j, int k, int id, int res);
+bool checkMaskNeighbours(int i, int j, int k, int id, short res);
 
