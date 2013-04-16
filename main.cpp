@@ -12,6 +12,8 @@
 #include "update.h"
 #include "SIPL/Core.hpp"
 
+#include <omp.h> //openMP
+
 using namespace std;
 using namespace SIPL;
 
@@ -22,6 +24,7 @@ short* init = (short*) calloc(sizeof(short), (HEIGHT+BORDER)*(WIDTH+BORDER)*(DEP
 short label[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER] = { 0 };
 float F[HEIGHT][WIDTH][DEPTH] = { 0 };
 short zeroLevelSet[HEIGHT][WIDTH][DEPTH] = { 0 }; //output
+int num_threads;
 
 #define index(i,j, k) ((i)+(j)*WIDTH+(k)*WIDTH*DEPTH)
 
@@ -299,7 +302,8 @@ void displayVolume(Volume<uchar> * V, int3 seed){
 }
 
 int main(){
-
+	int num_threads = 10;
+	omp_set_num_threads(num_threads);
 	
 	Volume<uchar> * V = new Volume<uchar>("aneurism.mhd");
 	//V->show();
@@ -348,7 +352,7 @@ int main(){
 	vector<Pixel>::iterator itt;
 
 	printf("starting main loop\n");
-	int iterations = 50;
+	int iterations = 102;
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		//printf("\n prepareUpdates done");

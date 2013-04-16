@@ -7,8 +7,10 @@
 #include "update.h"
 #include "SIPL/Core.hpp"
 
-#include <cstdio>
-#include <ctime>
+#include <omp.h> //openMP
+
+#include <cstdio> //to calculate runtime
+#include <ctime>  //to calculate runtime
 
 using namespace std;
 using namespace SIPL;
@@ -34,6 +36,8 @@ extern vector<Pixel> sp1;
 extern vector<Pixel> sn1;
 extern vector<Pixel> sp2;
 extern vector<Pixel> sn2;
+
+extern int num_threads;
 
 float muOutside;
 float muInside;
@@ -154,7 +158,11 @@ float M;
 vector<Pixel>::iterator it;
 void prepareUpdates(){
 	start = std::clock();
-
+//#	pragma omp parallel num_threads(num_threads)
+	#pragma omp sections
+	{
+	#pragma omp section
+	{
 	for(it = lz.begin(); it<lz.end();){//find pixels that are moving out of lz
 		phi[it->x][it->y][it->z] += speedFunction(it->x, it->y, it->z);
 		if(phi[it->x][it->y][it->z] > 0.5){
@@ -169,6 +177,9 @@ void prepareUpdates(){
 			it++;
 		}
 	}
+	}
+	#pragma omp section
+	{
 	for(it = ln1.begin(); it<ln1.end();){//find pixels that are moving out of ln1
 		if(checkMaskNeighbours(it->x,it->y, it->z, 2, 0) == false){//if Ln1[i][j] has no neighbors q with label(q) == 0
 			sn2.push_back(*it);
@@ -190,6 +201,9 @@ void prepareUpdates(){
 			}
 		}
 	}
+	}
+	#pragma omp section
+	{
 	for(it = lp1.begin(); it<lp1.end();){//find pixels that are moving out of lp1
 		if(checkMaskNeighbours(it->x,it->y, it->z,  2, 0) == false){
 			sp2.push_back(*it);
@@ -211,6 +225,9 @@ void prepareUpdates(){
 			}
 		}
 	}
+	}
+	#pragma omp section
+	{
 	for(it = ln2.begin(); it < ln2.end();){
 		if(checkMaskNeighbours(it->x, it->y, it->z, 2, -1) == false){
 			label[it->x][it->y][it->z] = -3;
@@ -234,6 +251,9 @@ void prepareUpdates(){
 			}
 		}
 	}
+	}
+	#pragma omp section
+	{
 	for(it = lp2.begin(); it < lp2.end();){
 		if(checkMaskNeighbours(it->x, it->y, it->z, 2, 1) == false){
 			label[it->x][it->y][it->z] = 3;
@@ -256,6 +276,8 @@ void prepareUpdates(){
 				it++;
 			}
 		}
+	}
+	}
 	}
 	duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
 	printf("\n Preperaupdates: %f", duration);
