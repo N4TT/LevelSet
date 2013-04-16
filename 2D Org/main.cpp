@@ -100,14 +100,14 @@ void pushAndStuff(Pixel p, short level){//støtter Pixel struct
 
 void setLevels(Pixel p, short level){//støtter Pixel Struct
 
-	for(int i = p.x-1; i<p.x+1; i++){
-		for(int j = p.y-1; j<p.y+1; j++){
-			if(p.x != i && p.y != j){
+	for(int i = p.x-1; i<=p.x+1; i++){
+		for(int j = p.y-1; j<=p.y+1; j++){
+			if(i != p.x && j != p.y){
 				if(label[i][j] == 3){
 					pushAndStuff(Pixel(i, j), level);
 				}
 				else if(label[i][j] == -3){
-					pushAndStuff(Pixel(i, j), level);
+					pushAndStuff(Pixel(i, j), -level);
 				}
 			}
 		}
@@ -230,7 +230,7 @@ int main(){
 	readFile(img);
 	
 	try{
-		fillInit(150, 150, 300, 300);
+		fillInit(230, 260, 270, 310);
 		printf("init filled\n");
 	}catch(int e){
 		if(e == -1){
@@ -249,7 +249,7 @@ int main(){
 	vector<Pixel>::iterator itt;
 
 	printf("starting main loop\n");
-	int iterations = 0;
+	int iterations = 1;
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		updateLevelSets();

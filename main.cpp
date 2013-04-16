@@ -173,22 +173,22 @@ void setLevels(Pixel p, short level){//støtter Pixel Struct
 	}
 
 	if(label[p.x+1][p.y][p.z] == -3){
-		pushAndStuff(Pixel(p.x+1, p.y, p.z), level);
+		pushAndStuff(Pixel(p.x+1, p.y, p.z), -level);
 	}
 	if(label[p.x][p.y+1][p.z] == -3){
-		pushAndStuff(Pixel(p.x, p.y+1, p.z), level);
+		pushAndStuff(Pixel(p.x, p.y+1, p.z), -level);
 	}
 	if(label[p.x-1][p.y][p.z] == -3){
-		pushAndStuff(Pixel(p.x-1, p.y, p.z), level);
+		pushAndStuff(Pixel(p.x-1, p.y, p.z), -level);
 	}
 	if(label[p.x][p.y-1][p.z] == -3){
-		pushAndStuff(Pixel(p.x, p.y-1, p.z), level);
+		pushAndStuff(Pixel(p.x, p.y-1, p.z), -level);
 	}
 	if(label[p.x][p.y][p.z+1] == -3){
-		pushAndStuff(Pixel(p.x, p.y, p.z+1), level);
+		pushAndStuff(Pixel(p.x, p.y, p.z+1), -level);
 	}
 	if(label[p.x][p.y][p.z-1] == -3){
-		pushAndStuff(Pixel(p.x, p.y, p.z-1), level);
+		pushAndStuff(Pixel(p.x, p.y, p.z-1), -level);
 	}
 
 }	

@@ -130,8 +130,8 @@ float speedFunction(int x, int y){
 	
 	SumLn1Neighbours = 0;
 	NumLn1Neighbours = 0;
-	for(int i = x-1; i<x+1; i++){
-		for(int j = y-1; j<y+1; j++){
+	for(int i = x-1; i<=x+1; i++){
+		for(int j = y-1; j<=y+1; j++){
 			if(i != x && j != y){
 				if (label[i][j] == 1){ 	//if its not evaluating its own position and the neighbour is part of the zerolvlset
 					SumLp1Neighbours += image[i][j];
@@ -146,15 +146,19 @@ float speedFunction(int x, int y){
 			}
 		}
 	}
-	if(NumLn1Neighbours != 0 && NumLn1Neighbours != 0){
-		printf("asdf");
-		//return 0-5 -(1 - abs(SumLp1Neighbours/NumLp1Neighbours - SumLn1Neighbours/NumLn1Neighbours));
-		return (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2;
+	if(NumLp1Neighbours != 0 && NumLn1Neighbours != 0){
+		printf("%f \n", 0.5 -(1 - abs(SumLp1Neighbours/NumLp1Neighbours - SumLn1Neighbours/NumLn1Neighbours)));
+		return 1.5 -(1 - abs(SumLp1Neighbours/NumLp1Neighbours - SumLn1Neighbours/NumLn1Neighbours));
+		//return (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2;
 	}
 	else{
-		return 0;
+		//printf("kfsøef\n");
+		//return 0;
 	}
+	return rand()-0.5;
+	//return (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2;
 	//printf("\n sp: %f", 0.5 - (1 - abs((SumLp1Neighbours/NumLp1Neighbours) - (SumLn1Neighbours/NumLn1Neighbours))));
+	//printf("%f \n",(((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2);
 	//return 0.5 - (1 - abs((SumLp1Neighbours/NumLp1Neighbours) - (SumLn1Neighbours/NumLn1Neighbours)));
 	//return (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2;
 //  -1,-1		0,-1  	1,-1
