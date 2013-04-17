@@ -124,7 +124,7 @@ int NumLn1Neighbours;
 //float weights[9] = {0};// 0->right/up, 1->right, 2->right/down, 3->up, 4->middle, 5->down, 6->left/up, 7->left, 8->left/down
 float speedFunction(int x, int y){
 	//clearNeighbors();
-	
+	return (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2;
 	SumLp1Neighbours = 0;
 	NumLp1Neighbours = 0;
 	
@@ -147,8 +147,8 @@ float speedFunction(int x, int y){
 		}
 	}
 	if(NumLp1Neighbours != 0 && NumLn1Neighbours != 0){
-		printf("%f \n", 0.5 -(1 - abs(SumLp1Neighbours/NumLp1Neighbours - SumLn1Neighbours/NumLn1Neighbours)));
-		return 1.5 -(1 - abs(SumLp1Neighbours/NumLp1Neighbours - SumLn1Neighbours/NumLn1Neighbours));
+		//printf("%f \n", 0.5 -(1 - abs(SumLp1Neighbours/NumLp1Neighbours - SumLn1Neighbours/NumLn1Neighbours)));
+		//return 1.5 -(1 - abs(SumLp1Neighbours/NumLp1Neighbours - SumLn1Neighbours/NumLn1Neighbours));
 		//return (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2;
 	}
 	else{
@@ -160,7 +160,7 @@ float speedFunction(int x, int y){
 	//printf("\n sp: %f", 0.5 - (1 - abs((SumLp1Neighbours/NumLp1Neighbours) - (SumLn1Neighbours/NumLn1Neighbours))));
 	//printf("%f \n",(((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2);
 	//return 0.5 - (1 - abs((SumLp1Neighbours/NumLp1Neighbours) - (SumLn1Neighbours/NumLn1Neighbours)));
-	//return (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2;
+	
 //  -1,-1		0,-1  	1,-1
 //  -1,0		0,0	 	 1,0
 //   -1,1		0,1	     1,1
@@ -168,11 +168,13 @@ float speedFunction(int x, int y){
 }
 
 void prepareUpdates(){
+	//printf("\nsize prepare: %i ", sz.size());
 	vector<Pixel>::iterator it;
 	for(it = lz.begin(); it<lz.end();){//find pixels that are moving out of lz
 		phi[it->x][it->y] += speedFunction(it->x, it->y);
-		if(phi[it->x][it->y] > 0.5){
+		if(phi[it->x][it->y] >= 0.5){
 			sp1.push_back(*it);
+			//printf("\nsize prepare: %i ", lz.size());
 			it = lz.erase(it);		//erases elements at index i and j
 		}
 		else if(phi[it->x][it->y] < -0.5){
@@ -180,6 +182,7 @@ void prepareUpdates(){
 			it = lz.erase(it);
 		}
 		else{
+			//printf("\nphi[%i][%i] = %f ",it->x, it->y, phi[it->x][it->y]);
 			it++;
 		}
 	}
@@ -212,11 +215,11 @@ void prepareUpdates(){
 		else{
 			float M = minMax(*it, -1, 0);
 			phi[it->x][it->y] = M+1;
-			if(phi[it->x][it->y] <= 0.5){ 
+			if(phi[it->x][it->y] < 0.5){ 
 				sz.push_back(*it);
 				it = lp1.erase(it);
 			}
-			else if(phi[it->x][it->y] > 1.5){
+			else if(phi[it->x][it->y] >= 1.5){
 				sp2.push_back(*it);
 				it = lp1.erase(it);
 			}
@@ -257,11 +260,11 @@ void prepareUpdates(){
 		else{
 			float M = minMax(*it, -1, 1);
 			phi[it->x][it->y] = M+1;
-			if(phi[it->x][it->y] <= 1.5){
+			if(phi[it->x][it->y] < 1.5){
 				sp1.push_back(*it);
 				it = lp2.erase(it);
 			}
-			else if(phi[it->x][it->y] > 2.5){
+			else if(phi[it->x][it->y] >= 2.5){
 				label[it->x][it->y] = 3;
 				phi[it->x][it->y] = 3;
 				it = lp2.erase(it);
@@ -271,14 +274,17 @@ void prepareUpdates(){
 			}
 		}
 	}
+	//printf("   size prepareeee: %i ", sz.size());
 }
 
 void updateLevelSets(){	
+	//printf("\nsize update: %i ", sz.size());
 	vector<Pixel>::iterator it;
 	
 	for (it = sz.begin(); it < sz.end(); it++){
-		label[it->x][it->y] = 0;					
-		lz.push_back(*it);		
+		label[it->x][it->y] = 0;		
+		//printf("\nsize update: %i ", lz.size());		
+		lz.push_back(*it);	
 	}
 	sz.clear();
 
@@ -353,4 +359,5 @@ void updateLevelSets(){
 		lp2.push_back(*it);
 	}
 	sp2.clear();
+	//printf("    size update: %i \n ", sz.size());
 }

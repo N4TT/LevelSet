@@ -100,7 +100,7 @@ void pushAndStuff(Pixel p, short level){//støtter Pixel struct
 
 void setLevels(Pixel p, short level){//støtter Pixel Struct
 
-	for(int i = p.x-1; i<=p.x+1; i++){
+	/*for(int i = p.x-1; i<=p.x+1; i++){
 		for(int j = p.y-1; j<=p.y+1; j++){
 			if(i != p.x && j != p.y){
 				if(label[i][j] == 3){
@@ -112,7 +112,7 @@ void setLevels(Pixel p, short level){//støtter Pixel Struct
 			}
 		}
 	}
-/*
+*/
 	if(label[p.x+1][p.y] == 3){
 		pushAndStuff(Pixel(p.x+1, p.y), level);
 	}
@@ -137,7 +137,7 @@ void setLevels(Pixel p, short level){//støtter Pixel Struct
 	if(label[p.x][p.y-1] == -3){
 		pushAndStuff(Pixel(p.x, p.y-1), -level);
 	}
-*/
+
 }	
 
 void initialization(){
@@ -190,7 +190,7 @@ void readFile(BMP img){
 	printf("image filled \n");
 }
 
-void writeFile(BMP img, int id){
+void writeFile(BMP img, int id){//, int it){
 	if(id == 1){ //label
 		for (short i =0; i<HEIGHT; i++){
 			for (short j = 0; j<WIDTH; j++){
@@ -199,6 +199,7 @@ void writeFile(BMP img, int id){
 				img(i,j)->Blue = (label[i][j] +3)*42;
 			}
 		}
+		img.WriteToFile("output label.bmp");
 	}
 	else if(id == 2){ //phi
 		for (short i =0; i<HEIGHT; i++){
@@ -208,9 +209,9 @@ void writeFile(BMP img, int id){
 				img(i,j)->Blue = (phi[i][j] +3)*42;
 			}
 		}
+		img.WriteToFile("output phi.bmp");
 	}
 	else{ //zeroLevelSet
-		printf("dsed");
 		for (short i =0; i<HEIGHT; i++){
 			for (short j = 0; j<WIDTH; j++){
 				img(i,j)->Red = zeroLevelSet[i][j]; 
@@ -218,9 +219,9 @@ void writeFile(BMP img, int id){
 				img(i,j)->Blue = zeroLevelSet[i][j]; 
 			}
 		}
+		img.WriteToFile("output zero.bmp");
 	}
-	img.WriteToFile("output.bmp");
-	//img.WriteToFile("output.bmp");
+	
 }
 
 int main(){
@@ -249,21 +250,23 @@ int main(){
 	vector<Pixel>::iterator itt;
 
 	printf("starting main loop\n");
-	int iterations = 1;
-	for(int i=0; i<iterations; i++){
+	int iterations = 4;
+	for(int i=0; i<iterations; ++i){
 		prepareUpdates();
 		updateLevelSets();
 		if(i%10 == 0){
-			printf("\n iteration %i", i);
+			printf("\n%i", i);
 		}
 		if(i == (iterations-1)){ //copy the zero level set pixels to zeroLevelSet
 			for(itt = lz.begin(); itt<lz.end(); itt++){
 				zeroLevelSet[itt->x][itt->y] = 255;
 			}
+			//writeFile(img, 1, i);
 		}
 	}
 	printf("main loop finished\n");
 
+	writeFile(img, 3);
 	writeFile(img, 1);
 	printf("output successfully stored");
 
