@@ -227,7 +227,7 @@ void writeFile(BMP img, int id){//, int it){
 int main(){
 	//read file
 	BMP img;
-	img.ReadFromFile("qq.bmp");
+	img.ReadFromFile("C:/Users/N4TT/Documents/Visual Studio 2012/Projects/LevelSetProject/LevelSet/2D Org/qq.bmp");
 	readFile(img);
 	
 	try{
@@ -250,7 +250,7 @@ int main(){
 	vector<Pixel>::iterator itt;
 
 	printf("starting main loop\n");
-	int iterations = 4;
+	int iterations = 400;
 	for(int i=0; i<iterations; ++i){
 		prepareUpdates();
 		updateLevelSets();

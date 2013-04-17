@@ -116,7 +116,7 @@ void clearNeighbors(){
 	}
 }
 */
-
+float result;
 float SumLp1Neighbours;
 int NumLp1Neighbours;
 float SumLn1Neighbours;
@@ -124,7 +124,7 @@ int NumLn1Neighbours;
 //float weights[9] = {0};// 0->right/up, 1->right, 2->right/down, 3->up, 4->middle, 5->down, 6->left/up, 7->left, 8->left/down
 float speedFunction(int x, int y){
 	//clearNeighbors();
-	return (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2;
+	//return (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2;
 	SumLp1Neighbours = 0;
 	NumLp1Neighbours = 0;
 	
@@ -146,6 +146,18 @@ float speedFunction(int x, int y){
 			}
 		}
 	}
+
+		result = abs(SumLp1Neighbours/NumLp1Neighbours - SumLn1Neighbours/NumLn1Neighbours);
+	if( result < 0.5){
+		return -(0.5-result);
+	}
+	else if(result > 0.5){
+		return (result-0.5);
+	}
+	else{
+		return 0;
+	}
+	/*
 	if(NumLp1Neighbours != 0 && NumLn1Neighbours != 0){
 		//printf("%f \n", 0.5 -(1 - abs(SumLp1Neighbours/NumLp1Neighbours - SumLn1Neighbours/NumLn1Neighbours)));
 		//return 1.5 -(1 - abs(SumLp1Neighbours/NumLp1Neighbours - SumLn1Neighbours/NumLn1Neighbours));
@@ -160,7 +172,7 @@ float speedFunction(int x, int y){
 	//printf("\n sp: %f", 0.5 - (1 - abs((SumLp1Neighbours/NumLp1Neighbours) - (SumLn1Neighbours/NumLn1Neighbours))));
 	//printf("%f \n",(((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2);
 	//return 0.5 - (1 - abs((SumLp1Neighbours/NumLp1Neighbours) - (SumLn1Neighbours/NumLn1Neighbours)));
-	
+	*/
 //  -1,-1		0,-1  	1,-1
 //  -1,0		0,0	 	 1,0
 //   -1,1		0,1	     1,1
