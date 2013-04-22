@@ -165,7 +165,7 @@ void prepareUpdates(){
 	{
 	for(it = lz.begin(); it<lz.end();){//find pixels that are moving out of lz
 		phi[it->x][it->y][it->z] += speedFunction(it->x, it->y, it->z);
-		if(phi[it->x][it->y][it->z] > 0.5){
+		if(phi[it->x][it->y][it->z] >= 0.5){
 			sp1.push_back(*it);
 			it = lz.erase(it);		//erases elements at index i and j
 		}
@@ -212,11 +212,11 @@ void prepareUpdates(){
 		else{
 			M = minMax(*it, -1, 0);
 			phi[it->x][it->y][it->z] = M+1;
-			if(phi[it->x][it->y][it->z] <= 0.5){ 
+			if(phi[it->x][it->y][it->z] < 0.5){ 
 				sz.push_back(*it);
 				it = lp1.erase(it);
 			}
-			else if(phi[it->x][it->y][it->z] > 1.5){
+			else if(phi[it->x][it->y][it->z] >= 1.5){
 				sp2.push_back(*it);
 				it = lp1.erase(it);
 			}
@@ -263,11 +263,11 @@ void prepareUpdates(){
 		else{
 			M = minMax(*it, -1, 1);
 			phi[it->x][it->y][it->z] = M+1;
-			if(phi[it->x][it->y][it->z] <= 1.5){
+			if(phi[it->x][it->y][it->z] < 1.5){
 				sp1.push_back(*it);
 				it = lp2.erase(it);
 			}
-			else if(phi[it->x][it->y][it->z] > 2.5){
+			else if(phi[it->x][it->y][it->z] >= 2.5){
 				label[it->x][it->y][it->z] = 3;
 				phi[it->x][it->y][it->z] = 3;
 				it = lp2.erase(it);

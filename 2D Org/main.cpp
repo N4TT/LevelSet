@@ -18,6 +18,7 @@ short init[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
 short label[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
 float F[HEIGHT][WIDTH] = { 0 };
 short zeroLevelSet[HEIGHT][WIDTH] = { 0 }; //output
+float treshold;
 
 vector<Pixel> lz;
 vector<Pixel> lp1;
@@ -183,7 +184,7 @@ void readFile(BMP img){
 	//copy input data (img) to image[][] and normalize to [0, 1]
 	for (short i =0; i<HEIGHT; i++){
 		for (short j = 0; j<WIDTH; j++){
-			image[i][j] = img(i,j)->Red;
+			image[i][j] = (img(i,j)->Red + img(i,j)->Green + img(i,j)->Blue) / 3;
 			image[i][j] /= 255;
 		}
 	}
@@ -227,11 +228,11 @@ void writeFile(BMP img, int id){//, int it){
 int main(){
 	//read file
 	BMP img;
-	img.ReadFromFile("C:/Users/N4TT/Documents/Visual Studio 2012/Projects/LevelSetProject/LevelSet/2D Org/qq.bmp");
+	img.ReadFromFile("brain.bmp");
 	readFile(img);
 	
 	try{
-		fillInit(230, 260, 270, 310);
+		fillInit(100, 60, 125, 70);
 		printf("init filled\n");
 	}catch(int e){
 		if(e == -1){
@@ -249,9 +250,11 @@ int main(){
 	
 	vector<Pixel>::iterator itt;
 
+	treshold = 0.5;
+	
 	printf("starting main loop\n");
-	int iterations = 400;
-	for(int i=0; i<iterations; ++i){
+	int iterations = 1000;
+	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		updateLevelSets();
 		if(i%10 == 0){

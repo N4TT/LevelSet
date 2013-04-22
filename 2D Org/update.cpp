@@ -20,6 +20,8 @@ extern vector<Pixel> ln1;
 extern vector<Pixel> lp2;
 extern vector<Pixel> ln2;
 
+extern float treshold;
+
 //temp values
 extern vector<Pixel> sz; //values in sz are to be moved to lz
 extern vector<Pixel> sp1;
@@ -81,7 +83,7 @@ void calculateMu(){
 	int numInside = 0;
 	float muTempOutside = 0;
 	int numOutside = 0;
-	double threshold = 0.4;
+	double threshold = 0.5;
 	for(int i = 0; i<HEIGHT; i++){
 		for(int j = 0; j<WIDTH; j++){
 			if(image[i][j] > threshold){
@@ -116,6 +118,7 @@ void clearNeighbors(){
 	}
 }
 */
+
 float result;
 float SumLp1Neighbours;
 int NumLp1Neighbours;
@@ -135,7 +138,7 @@ float speedFunction(int x, int y){
 			if(i != x && j != y){
 				if (label[i][j] == 1){ 	//if its not evaluating its own position and the neighbour is part of the zerolvlset
 					SumLp1Neighbours += image[i][j];
-					NumLp1Neighbours++ ;
+					NumLp1Neighbours++;
 					//printf("\nif");
 				}
 				else if (label[i][j] == -1){
@@ -147,16 +150,18 @@ float speedFunction(int x, int y){
 		}
 	}
 
-		result = abs(SumLp1Neighbours/NumLp1Neighbours - SumLn1Neighbours/NumLn1Neighbours);
-	if( result < 0.5){
-		return -(0.5-result);
+	result = abs(SumLp1Neighbours/NumLp1Neighbours - SumLn1Neighbours/NumLn1Neighbours);
+	//printf("%f\n", result);
+	if( result < treshold){
+		return -(treshold-result);
 	}
-	else if(result > 0.5){
-		return (result-0.5);
+	else if(result > treshold){
+		return (result-treshold);
 	}
 	else{
 		return 0;
 	}
+	
 	/*
 	if(NumLp1Neighbours != 0 && NumLn1Neighbours != 0){
 		//printf("%f \n", 0.5 -(1 - abs(SumLp1Neighbours/NumLp1Neighbours - SumLn1Neighbours/NumLn1Neighbours)));
