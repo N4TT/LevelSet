@@ -232,7 +232,7 @@ int main(){
 	readFile(img);
 	
 	try{
-		fillInit(100, 60, 125, 70);
+		fillInit(123, 114, 143, 127);
 		printf("init filled\n");
 	}catch(int e){
 		if(e == -1){
@@ -251,10 +251,10 @@ int main(){
 	vector<Pixel>::iterator itt;
 
 	treshold = 0.5;
-	epsilon = 0.1;
-	alpha = 0.01;
+	epsilon = 0.001;
+	alpha = 0.95;
 	printf("starting main loop\n");
-	int iterations = 60;
+	int iterations = 200;
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		updateLevelSets();

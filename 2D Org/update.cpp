@@ -8,10 +8,6 @@
 #include "update.h"
 using namespace std;
 
-
-
-
-
 float muOutside;
 float muInside;
 
@@ -88,7 +84,7 @@ void calculateMu(){
 }
 
 float speedFunctionOld(int x, int y){
-	printf("sp: %f \n", (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2);
+	//printf("sp: %f \n", (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2);
 	return (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2; 
 }
 
@@ -115,7 +111,7 @@ float speedFunction(short i, short j){
 	D2 d2 = D2(i, j); //calculates the second order derivatives
 	Normal n = Normal(d1, d2); //calculates the normal
 	curvature = (n.nPlusX - n.nMinusX) + (n.nPlusY - n.nMinusY); //the curvature
-	float F = -1*alpha*data + (1-alpha)*curvature; //kanskje det første leddet ikke skal ganges med -1
+	float F = 1*alpha*data + (1-alpha)*curvature; //kanskje det første leddet ikke skal ganges med -1
 	
 	if (F<0){
 		dPhiMin(d1);
@@ -124,7 +120,7 @@ float speedFunction(short i, short j){
 		dPhiMax(d1);
 	}
 	float ret = F*deltaPhi;
-	printf("speed: %f\n", ret);
+	//printf("speed: %f\n", ret);
 	return ret; 
 }
 
