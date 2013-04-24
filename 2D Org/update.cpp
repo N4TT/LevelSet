@@ -8,26 +8,9 @@
 #include "update.h"
 using namespace std;
 
-extern float image[HEIGHT][WIDTH]; //image to be segmented
-extern short init[HEIGHT+BORDER][WIDTH+BORDER]; //mask with seed points
-extern float phi[HEIGHT+BORDER][WIDTH+BORDER]; //representation of the zero level set interface
-extern short label[HEIGHT+BORDER][WIDTH+BORDER];//contains only integer values between -3 and 3
-extern float F[HEIGHT][WIDTH];
 
-extern vector<Pixel> lz; // zero level set
-extern vector<Pixel> lp1;
-extern vector<Pixel> ln1;
-extern vector<Pixel> lp2;
-extern vector<Pixel> ln2;
 
-extern float treshold;
 
-//temp values
-extern vector<Pixel> sz; //values in sz are to be moved to lz
-extern vector<Pixel> sp1;
-extern vector<Pixel> sn1;
-extern vector<Pixel> sp2;
-extern vector<Pixel> sn2;
 
 float muOutside;
 float muInside;
@@ -109,86 +92,51 @@ float speedFunctionOld(int x, int y){
 	return (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2; 
 }
 
-/*
-pixel neighbors[8];
-int neighborNum = 0;
-void clearNeighbors(){
-	for(int i = 0; i<8; i++){
-		neighbors[i] = Pixel(9,9); //9 is just a temp value
-	}
+
+float nPlus, nMinus; //må flyttes in i metoden hvis det skal paralelliseres
+float deltaPhi, curvature;
+void dPhiMin(D1 d1){
+float dPhiX, dPhiY;
+	dPhiX = pow(max(d1.dxPlus,0.0f),2.0f) + pow(max(-d1.dxMinus,0.0f),2.0f);
+	dPhiY = pow(max(d1.dyPlus,0.0f),2.0f) + pow(max(-d1.dyMinus,0.0f),2.0f);
+	deltaPhi = sqrt(dPhiX + dPhiY);
 }
-*/
 
-float result;
-float SumLp1Neighbours;
-int NumLp1Neighbours;
-float SumLn1Neighbours;
-int NumLn1Neighbours;
-//float weights[9] = {0};// 0->right/up, 1->right, 2->right/down, 3->up, 4->middle, 5->down, 6->left/up, 7->left, 8->left/down
-float speedFunction(int x, int y){
-	//clearNeighbors();
-	//return (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2;
-	SumLp1Neighbours = 0;
-	NumLp1Neighbours = 0;
+void dPhiMax(D1 d1){
+float dPhiX, dPhiY;
+	dPhiX = pow(min(d1.dxPlus,0.0f),2.0f) + pow(min(-d1.dxMinus,0.0f),2.0f);
+	dPhiY = pow(min(d1.dyPlus,0.0f),2.0f) + pow(min(-d1.dyMinus,0.0f),2.0f);
+	deltaPhi = sqrt(dPhiX + dPhiY);  //istede for å ta roten av dPhiX og dPhiY for så å opphøye de i andre før de legges sammen i denne linjen,
+}          //skipper vi roten og legger de heller kun sammen når vi skal finne lengden på vektoren
+
+float speedFunction(short i, short j){
+	float data = epsilon - abs(image[i][j] - treshold); //the data term (based on pixel intensity)
+	D1 d1 = D1(i, j); //calculates the first order derivatives
+	D2 d2 = D2(i, j); //calculates the second order derivatives
+	Normal n = Normal(d1, d2); //calculates the normal
+	curvature = (n.nPlusX - n.nMinusX) + (n.nPlusY - n.nMinusY); //the curvature
+	float F = -1*alpha*data + (1-alpha)*curvature; //kanskje det første leddet ikke skal ganges med -1
 	
-	SumLn1Neighbours = 0;
-	NumLn1Neighbours = 0;
-	for(int i = x-1; i<=x+1; i++){
-		for(int j = y-1; j<=y+1; j++){
-			if(i != x && j != y){
-				if (label[i][j] == 1){ 	//if its not evaluating its own position and the neighbour is part of the zerolvlset
-					SumLp1Neighbours += image[i][j];
-					NumLp1Neighbours++;
-					//printf("\nif");
-				}
-				else if (label[i][j] == -1){
-					SumLn1Neighbours += image[i][j];
-					NumLn1Neighbours++;
-					//printf("\nelse");
-				}	
-			}
-		}
-	}
-
-	result = abs(SumLp1Neighbours/NumLp1Neighbours - SumLn1Neighbours/NumLn1Neighbours);
-	//printf("%f\n", result);
-	if( result < treshold){
-		return -(treshold-result);
-	}
-	else if(result > treshold){
-		return (result-treshold);
+	if (F<0){
+		dPhiMin(d1);
 	}
 	else{
-		return 0;
+		dPhiMax(d1);
 	}
-	
-	/*
-	if(NumLp1Neighbours != 0 && NumLn1Neighbours != 0){
-		//printf("%f \n", 0.5 -(1 - abs(SumLp1Neighbours/NumLp1Neighbours - SumLn1Neighbours/NumLn1Neighbours)));
-		//return 1.5 -(1 - abs(SumLp1Neighbours/NumLp1Neighbours - SumLn1Neighbours/NumLn1Neighbours));
-		//return (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2;
-	}
-	else{
-		//printf("kfsøef\n");
-		//return 0;
-	}
-	return rand()-0.5;
-	//return (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2;
-	//printf("\n sp: %f", 0.5 - (1 - abs((SumLp1Neighbours/NumLp1Neighbours) - (SumLn1Neighbours/NumLn1Neighbours))));
-	//printf("%f \n",(((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2);
-	//return 0.5 - (1 - abs((SumLp1Neighbours/NumLp1Neighbours) - (SumLn1Neighbours/NumLn1Neighbours)));
-	*/
-//  -1,-1		0,-1  	1,-1
-//  -1,0		0,0	 	 1,0
-//   -1,1		0,1	     1,1
- 
+	float ret = F*deltaPhi;
+	printf("speed: %f\n", ret);
+	return ret; 
 }
 
 void prepareUpdates(){
 	//printf("\nsize prepare: %i ", sz.size());
 	vector<Pixel>::iterator it;
+	int t = 0;
+	for(it = lz.begin(); it<lz.end(); it++){//find pixels that are moving out of lz
+		it->f = speedFunction(it->x, it->y);
+	}
 	for(it = lz.begin(); it<lz.end();){//find pixels that are moving out of lz
-		phi[it->x][it->y] += speedFunction(it->x, it->y);
+		phi[it->x][it->y] += it->f;
 		if(phi[it->x][it->y] >= 0.5){
 			sp1.push_back(*it);
 			//printf("\nsize prepare: %i ", lz.size());
@@ -203,6 +151,7 @@ void prepareUpdates(){
 			it++;
 		}
 	}
+	
 	for(it = ln1.begin(); it<ln1.end();){//find pixels that are moving out of ln1
 		if(checkMaskNeighbours(it->x,it->y, 2, 0) == false){//if Ln1[i][j] has no neighbors q with label(q) == 0
 			sn2.push_back(*it);

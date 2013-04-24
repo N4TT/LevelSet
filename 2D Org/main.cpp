@@ -18,7 +18,7 @@ short init[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
 short label[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
 float F[HEIGHT][WIDTH] = { 0 };
 short zeroLevelSet[HEIGHT][WIDTH] = { 0 }; //output
-float treshold;
+float treshold, alpha, epsilon;
 
 vector<Pixel> lz;
 vector<Pixel> lp1;
@@ -251,27 +251,29 @@ int main(){
 	vector<Pixel>::iterator itt;
 
 	treshold = 0.5;
-	
+	epsilon = 0.1;
+	alpha = 0.01;
 	printf("starting main loop\n");
-	int iterations = 1000;
+	int iterations = 60;
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		updateLevelSets();
-		if(i%10 == 0){
-			printf("\n%i", i);
-		}
+//		if(i%2 == 0){
+			printf("\niteration: %i\n", i);
+	//	}
 		if(i == (iterations-1)){ //copy the zero level set pixels to zeroLevelSet
+			printf("\nwriting to zeroLevelSet");
 			for(itt = lz.begin(); itt<lz.end(); itt++){
 				zeroLevelSet[itt->x][itt->y] = 255;
 			}
 			//writeFile(img, 1, i);
 		}
 	}
-	printf("main loop finished\n");
+	printf("\nmain loop finished");
 
 	writeFile(img, 3);
 	writeFile(img, 1);
-	printf("output successfully stored");
+	printf("\noutput successfully stored\n");
 
 	system("pause");
 	

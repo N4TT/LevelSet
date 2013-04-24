@@ -333,7 +333,7 @@ int main(){
 	float thresold = 0;
 	try{
 		//fillInit(110, 90, 140, 125, 105, 155);
-		thresold = fillSphere(seed, 5);
+		thresold = fillSphere(seed, 5) + 0,1;
 		printf("init filled\n");
 	}catch(int e){
 		if(e == -1){
