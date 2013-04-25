@@ -250,17 +250,19 @@ int main(){
 	
 	vector<Pixel>::iterator itt;
 
-	treshold = 0.5;
-	epsilon = 0.001;
-	alpha = 0.95;
+	//treshold = 0.6; epsilon = 0.05; alpha = 0.97;
+	//treshold = 0.5; epsilon = 0.06; alpha = 0.90;
+	treshold = 0.5; epsilon = 0.06; alpha = 0.96;
+	//treshold = 0.7; epsilon = 0.10; alpha = 0.96;
+
 	printf("starting main loop\n");
-	int iterations = 200;
+	int iterations = 4000;
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		updateLevelSets();
-//		if(i%2 == 0){
+		if(i%100 == 0){
 			printf("\niteration: %i\n", i);
-	//	}
+		}
 		if(i == (iterations-1)){ //copy the zero level set pixels to zeroLevelSet
 			printf("\nwriting to zeroLevelSet");
 			for(itt = lz.begin(); itt<lz.end(); itt++){

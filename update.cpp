@@ -18,27 +18,6 @@ using namespace SIPL;
 clock_t start;
 double duration;
 
-extern float image[HEIGHT][WIDTH][DEPTH]; //image to be segmented
-extern short init[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER]; //mask with seed points
-extern float phi[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER]; //representation of the zero level set interface
-extern short label[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER];//contains only integer values between -3 and 3
-extern float F[HEIGHT][WIDTH][DEPTH];
-
-extern vector<Pixel> lz; // zero level set
-extern vector<Pixel> lp1;
-extern vector<Pixel> ln1;
-extern vector<Pixel> lp2;
-extern vector<Pixel> ln2;
-
-//temp values
-extern vector<Pixel> sz; //values in sz are to be moved to lz
-extern vector<Pixel> sp1;
-extern vector<Pixel> sn1;
-extern vector<Pixel> sp2;
-extern vector<Pixel> sn2;
-
-extern int num_threads;
-
 float muOutside;
 float muInside;
 
@@ -148,9 +127,19 @@ void calculateMu(float threshold){
 	printf("muInside: %f, muOutside: %f \n", muInside, muOutside); 
 }
 
-double speedFunction(short x, short y, short z){
+double speedFunctionOld(short x, short y, short z){
 	//printf("sp %f \n", (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2);
 	return (((image[x][y][z] - muInside)*(image[x][y][z] - muInside)) - ((image[x][y][z] - muOutside)*(image[x][y][z] - muOutside)))/2; 
+}
+
+float nPlus, nMinus, curvature; //må flyttes in i metoden hvis det skal paralelliseres
+float speedFunction(short i, short j, short k){
+	float data = epsilon - abs(image[i][j][k] - treshold); //the data term (based on pixel intensity)
+	D1 d1 = D1(i, j, k); //calculates the first order derivatives
+	D2 d2 = D2(i, j, k); //calculates the second order derivatives
+	Normal n = Normal(d1, d2); //calculates the normals
+	curvature = (n.nPlusX - n.nMinusX) + (n.nPlusY - n.nMinusY); //the curvature
+	return 1*alpha*data + (1-alpha)*curvature; //the speed function F 
 }
 
 
@@ -159,12 +148,16 @@ vector<Pixel>::iterator it;
 void prepareUpdates(){
 	start = std::clock();
 //#	pragma omp parallel num_threads(num_threads)
-	#pragma omp sections
+	//#pragma omp sections
 	{
-	#pragma omp section
+	//#pragma omp section
 	{
+	for(it = lz.begin(); it<lz.end(); it++){//find pixels that are moving out of lz
+		it->f = speedFunction(it->x, it->y, it->z);
+	}
 	for(it = lz.begin(); it<lz.end();){//find pixels that are moving out of lz
-		phi[it->x][it->y][it->z] += speedFunction(it->x, it->y, it->z);
+		phi[it->x][it->y][it->z] += it->f;
+		//phi[it->x][it->y][it->z] += speedFunction(it->x, it->y, it->z);
 		if(phi[it->x][it->y][it->z] >= 0.5){
 			sp1.push_back(*it);
 			it = lz.erase(it);		//erases elements at index i and j
@@ -178,7 +171,7 @@ void prepareUpdates(){
 		}
 	}
 	}
-	#pragma omp section
+	//#pragma omp section
 	{
 	for(it = ln1.begin(); it<ln1.end();){//find pixels that are moving out of ln1
 		if(checkMaskNeighbours(it->x,it->y, it->z, 2, 0) == false){//if Ln1[i][j] has no neighbors q with label(q) == 0
@@ -202,7 +195,7 @@ void prepareUpdates(){
 		}
 	}
 	}
-	#pragma omp section
+	//#pragma omp section
 	{
 	for(it = lp1.begin(); it<lp1.end();){//find pixels that are moving out of lp1
 		if(checkMaskNeighbours(it->x,it->y, it->z,  2, 0) == false){
@@ -226,7 +219,7 @@ void prepareUpdates(){
 		}
 	}
 	}
-	#pragma omp section
+	//#pragma omp section
 	{
 	for(it = ln2.begin(); it < ln2.end();){
 		if(checkMaskNeighbours(it->x, it->y, it->z, 2, -1) == false){
@@ -252,7 +245,7 @@ void prepareUpdates(){
 		}
 	}
 	}
-	#pragma omp section
+	//#pragma omp section
 	{
 	for(it = lp2.begin(); it < lp2.end();){
 		if(checkMaskNeighbours(it->x, it->y, it->z, 2, 1) == false){

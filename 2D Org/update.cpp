@@ -109,7 +109,7 @@ float speedFunction(short i, short j){
 	float data = epsilon - abs(image[i][j] - treshold); //the data term (based on pixel intensity)
 	D1 d1 = D1(i, j); //calculates the first order derivatives
 	D2 d2 = D2(i, j); //calculates the second order derivatives
-	Normal n = Normal(d1, d2); //calculates the normal
+	Normal n = Normal(d1, d2); //calculates the normals
 	curvature = (n.nPlusX - n.nMinusX) + (n.nPlusY - n.nMinusY); //the curvature
 	float F = 1*alpha*data + (1-alpha)*curvature; //kanskje det første leddet ikke skal ganges med -1
 	
@@ -119,7 +119,7 @@ float speedFunction(short i, short j){
 	else{
 		dPhiMax(d1);
 	}
-	float ret = F*deltaPhi;
+	float ret = F;//*deltaPhi;
 	//printf("speed: %f\n", ret);
 	return ret; 
 }
@@ -127,7 +127,6 @@ float speedFunction(short i, short j){
 void prepareUpdates(){
 	//printf("\nsize prepare: %i ", sz.size());
 	vector<Pixel>::iterator it;
-	int t = 0;
 	for(it = lz.begin(); it<lz.end(); it++){//find pixels that are moving out of lz
 		it->f = speedFunction(it->x, it->y);
 	}

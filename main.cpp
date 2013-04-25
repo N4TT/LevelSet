@@ -12,21 +12,22 @@
 #include "update.h"
 #include "SIPL/Core.hpp"
 
-#include <omp.h> //openMP
+//#include <omp.h> //openMP
 
 using namespace std;
 using namespace SIPL;
 
 float image[HEIGHT][WIDTH][DEPTH] = { 0 };//{ {0.1,0.2,0.1,0.3,0.4},{0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}  };
 float phi[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER] = { 0 };
-short* init = (short*) calloc(sizeof(short), (HEIGHT+BORDER)*(WIDTH+BORDER)*(DEPTH+BORDER));
-//int init = new int[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER];
+//short* init = (short*) calloc(sizeof(short), (HEIGHT+BORDER)*(WIDTH+BORDER)*(DEPTH+BORDER));
+short init[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER] = { 0 };
 short label[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER] = { 0 };
 float F[HEIGHT][WIDTH][DEPTH] = { 0 };
 short zeroLevelSet[HEIGHT][WIDTH][DEPTH] = { 0 }; //output
 int num_threads;
+float treshold, alpha, epsilon;
 
-#define index(i,j, k) ((i)+(j)*WIDTH+(k)*WIDTH*DEPTH)
+//#define index(i,j, k) ((i)+(j)*WIDTH+(k)*WIDTH*DEPTH)
 
 vector<Pixel> lz;
 vector<Pixel> lp1;
@@ -56,7 +57,8 @@ void fillInit(short minX, short minY, short minZ, short maxX, short maxY, short 
 	for (int i = minY+1; i<maxY+1; i++){
 		for (int j = minX+1; j<maxX+1; j++){
 			for (int k = minZ+1; k<maxZ+1; k++){
-				init[index(i,j,k)] = 1; //programmet krasjer her når størrelsen er 512*512*512, men det virker fint ved 256*256*256
+				init[i][j][k] = 1;
+				//init[index(i,j,k)] = 1; //programmet krasjer her når størrelsen er 512*512*512, men det virker fint ved 256*256*256
 			}
 		}
 	}
@@ -73,7 +75,7 @@ float fillSphere(int3 seed, int radius){
 		if(sqrt((float)((seed.x-n.x)*(seed.x-n.x)+(seed.y-n.y)*(seed.y-n.y)+(seed.z-n.z)*(seed.z-n.z))) < radius){
 			numPixelsInside ++;
 			sumPixelValues += image[i][j][k];
-			init[index(i,j,k)] = 1;
+			init[i][j][k] = 1;
 		}
 	}}}
 	return sumPixelValues/numPixelsInside;
@@ -81,17 +83,17 @@ float fillSphere(int3 seed, int radius){
 
 bool checkMaskNeighbours(int i, int j, int k, int id, short res){ //res er verdien som vi sjekker opp mot, kriteriet for success
 	if(id == 1){ //id == 1 -> init
-		if(init[index(i+1,j,k)] == res) //right neighbour
+		if(init[i+1][j][k] == res) //right neighbour
 			return true;
-		else if(init[index(i-1,j,k)] == res) //left neighbour
+		else if(init[i-1][j][k] == res) //left neighbour
 			return true;
-		else if(init[index(i,j+1,k)] == res) //neighbour over
+		else if(init[i][j+1][k] == res) //neighbour over
 			return true;
-		else if(init[index(i,j-1,k)] == res) //neighbour under
+		else if(init[i][j-1][k] == res) //neighbour under
 			return true;
-		else if(init[index(i,j,k+1)] == res) //neighbour in front
+		else if(init[i][j][k+1] == res) //neighbour in front
 			return true;
-		else if(init[index(i,j,k)-1] == res) //neighbour behind
+		else if(init[i][j][k-1] == res) //neighbour behind
 			return true;
 	}
 	else if(id == 2){ //id == 2 -> label
@@ -200,7 +202,7 @@ void initialization(){
 	for (int i = 0; i<HEIGHT+BORDER; i++){
 		for (int j = 0; j<WIDTH+BORDER; j++){
 			for (int k = 0; k<DEPTH+BORDER; k++){
-				if(init[index(i,j,k)] == 0){
+				if(init[i][j][k] == 0){
 					label[i][j][k] = 3; 
 					phi[i][j][k] = 3;
 				}
@@ -214,7 +216,7 @@ void initialization(){
 	for (int i = 1; i<HEIGHT+1; i++){
 		for (int j = 1; j<WIDTH+1; j++){
 			for (int k = 0; k<DEPTH+1; k++){
-				if(init[index(i,j,k)] == 1 && checkMaskNeighbours(i, j, k, 1, 0) == true){
+				if(init[i][j][k] == 1 && checkMaskNeighbours(i, j, k, 1, 0) == true){
 					lz.push_back(Pixel(i,j,k));
 					label[i][j][k] = 0;
 					phi[i][j][k]= 0;
@@ -302,14 +304,13 @@ void displayVolume(Volume<uchar> * V, int3 seed){
 }
 
 int main(){
-	int num_threads = 10;
-	omp_set_num_threads(num_threads);
+	//int num_threads = 10;
+	//omp_set_num_threads(num_threads);
 	
 	Volume<uchar> * V = new Volume<uchar>("aneurism.mhd");
 	//V->show();
 	
 	int3 seed(105, 115, 160);
-	printf("\n image: %f\n", image[120][100][150]);
 	
 	Volume<float2> * v2 = new Volume<float2>(V->getSize());
 	for(int x = 0; x < v2->getWidth(); x++) {
@@ -317,24 +318,19 @@ int main(){
 	for(int z = 0; z < v2->getDepth(); z++) {
 		float2 vector;
 		vector.x = (float)V->get(x,y,z) / 255.0f;
-		//if(vector.x > 0){
-		//	printf("%f ",vector.x);
-		//}
 		int3 n(x,y,z);	
 		image[x][y][z] = (int)V->get(x,y,z) / 255.0f;	
 		if(sqrt((float)((seed.x-n.x)*(seed.x-n.x)+(seed.y-n.y)*(seed.y-n.y)+(seed.z-n.z)*(seed.z-n.z))) < 5.0f){
-		//if(seed.distance(n) < 5.0f) {
 			vector.y = 1.0f;
 		}
 		v2->set(n, vector);//guesswork:setter punktet n i v2 til verdiene i vector. v2 er et volum med elementer float2
 	}}}						//vector.y bestemmer om punktet er innenfor radiusen til seed punktet mens vector.x er verdien til bildet i det punktet.
 	v2->show();
 	
-	float thresold = 0;
 	try{
 		//fillInit(110, 90, 140, 125, 105, 155);
-		thresold = fillSphere(seed, 5) + 0,1;
-		printf("init filled\n");
+		treshold = fillSphere(seed, 5) + 0,1;
+		printf("init filled %f\n", treshold);
 	}catch(int e){
 		if(e == -1){
 			printf("minX er større enn maxX eller minY er større enn maxY\n");
@@ -347,12 +343,12 @@ int main(){
 		}
 	}
 	initialization();
-	calculateMu(thresold);
+	//calculateMu(treshold);
 
 	vector<Pixel>::iterator itt;
-
+	treshold = 0.5; epsilon = 0.06; alpha = 0.96;
 	printf("starting main loop\n");
-	int iterations = 102;
+	int iterations = 100;
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		//printf("\n prepareUpdates done");
@@ -378,7 +374,7 @@ int main(){
 	//ostringstream filename;
 	//filename << iterations << "iter.raw";
 	//uchar f = filename;
-	v3->save("100iter.raw");
+	v3->save("10iter.raw");
 	printf("file stored");
 	system("pause");
 

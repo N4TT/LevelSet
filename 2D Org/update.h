@@ -35,7 +35,7 @@ struct D1{ //first order derivative
 	}
 };
 
-struct D2{
+struct D2{ //second order derivatives
 	float dxPlusY, dxMinusY, dyPlusX, dyMinusX;
 	D2(short i, short j){
 		dxPlusY = (phi[i+1][j+1] - phi[i-1][j+1])/2;
@@ -45,7 +45,7 @@ struct D2{
 	}
 };
 
-struct Normal{
+struct Normal{ //normals
 	float nPlusX, nPlusY, nMinusX, nMinusY;
 	Normal(D1 d1, D2 d2){
 		nPlusX = d1.dxPlus / sqrt(d1.dxPlus*d1.dxPlus + pow((d2.dyPlusX + d1.dy) / 2, 2));
