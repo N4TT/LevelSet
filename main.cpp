@@ -283,24 +283,41 @@ void writeFile(BMP img, int id){
 }
 */
 
-void displayVolume(Volume<uchar> * V, int3 seed){
-
+void displayVolume(Volume<uchar> * V, int3 seed, int display){ //display == 0 -> display the input mhd data, display == 1 -> display the segmentation result
 	Volume<float2> * v2 = new Volume<float2>(V->getSize());
-	for(int x = 0; x < v2->getWidth(); x++) {
-	for(int y = 0; y < v2->getHeight(); y++) {
-	for(int z = 0; z < v2->getDepth(); z++) {
-		float2 vector;
-		vector.x = (float)zeroLevelSet[x][y][z] / 255.0f;
-		int3 n(x,y,z);	
-		if(sqrt((float)((seed.x-n.x)*(seed.x-n.x)+(seed.y-n.y)*(seed.y-n.y)+(seed.z-n.z)*(seed.z-n.z))) < 5.0f){
-		//if(seed.distance(n) < 5.0f) {
-			vector.y = 1.0f;
-		}
-		v2->set(n, vector);
-	}}}
-	//v2->showMIP();
-	v2->show();
-	
+	if(display == 0){ //display input data
+		Volume<float2> * v2 = new Volume<float2>(V->getSize());
+		for(int x = 0; x < v2->getWidth(); x++) {
+		for(int y = 0; y < v2->getHeight(); y++) {
+		for(int z = 0; z < v2->getDepth(); z++) {
+			float2 vector;
+			vector.x = (float)V->get(x,y,z) / 255.0f;
+			int3 n(x,y,z);	
+			image[x][y][z] = (int)V->get(x,y,z) / 255.0f;
+			if(sqrt((float)((seed.x-n.x)*(seed.x-n.x)+(seed.y-n.y)*(seed.y-n.y)+(seed.z-n.z)*(seed.z-n.z))) < 5.0f){
+				vector.y = 1.0f;
+			}
+			v2->set(n, vector);//guesswork:setter punktet n i v2 til verdiene i vector. v2 er et volum med elementer float2
+		}}}						//vector.y bestemmer om punktet er innenfor radiusen til seed punktet mens vector.x er verdien til bildet i det punktet.
+		//v2->showMIP();
+		//v2->show();
+	}
+	else{ //display segmentation result
+		for(int x = 0; x < v2->getWidth(); x++) {
+		for(int y = 0; y < v2->getHeight(); y++) {
+		for(int z = 0; z < v2->getDepth(); z++) {
+			float2 vector;
+			vector.x = (float)zeroLevelSet[x][y][z] / 255.0f;
+			int3 n(x,y,z);	
+			if(sqrt((float)((seed.x-n.x)*(seed.x-n.x)+(seed.y-n.y)*(seed.y-n.y)+(seed.z-n.z)*(seed.z-n.z))) < 5.0f){
+			//if(seed.distance(n) < 5.0f) {
+				vector.y = 1.0f;
+			}
+			v2->set(n, vector);
+		}}}
+		//v2->showMIP();
+		v2->show();
+	}
 }
 
 int main(){
@@ -308,30 +325,17 @@ int main(){
 	//omp_set_num_threads(num_threads);
 	
 	Volume<uchar> * V = new Volume<uchar>("aneurism.mhd");
-	//V->show();
+	//Volume<uchar> * V = new Volume<uchar>("circle_with_values_245.mhd");
 	
 	int3 seed(105, 115, 160);
-	
-	Volume<float2> * v2 = new Volume<float2>(V->getSize());
-	for(int x = 0; x < v2->getWidth(); x++) {
-	for(int y = 0; y < v2->getHeight(); y++) {
-	for(int z = 0; z < v2->getDepth(); z++) {
-		float2 vector;
-		vector.x = (float)V->get(x,y,z) / 255.0f;
-		int3 n(x,y,z);	
-		image[x][y][z] = (int)V->get(x,y,z) / 255.0f;	
-		if(sqrt((float)((seed.x-n.x)*(seed.x-n.x)+(seed.y-n.y)*(seed.y-n.y)+(seed.z-n.z)*(seed.z-n.z))) < 5.0f){
-			vector.y = 1.0f;
-		}
-		v2->set(n, vector);//guesswork:setter punktet n i v2 til verdiene i vector. v2 er et volum med elementer float2
-	}}}						//vector.y bestemmer om punktet er innenfor radiusen til seed punktet mens vector.x er verdien til bildet i det punktet.
-	v2->show();
+	displayVolume(V, seed, 0);
 	
 	try{
 		//fillInit(110, 90, 140, 125, 105, 155);
 		treshold = fillSphere(seed, 5) + 0,1;
 		printf("init filled %f\n", treshold);
-	}catch(int e){
+	}
+	catch(int e){
 		if(e == -1){
 			printf("minX er større enn maxX eller minY er større enn maxY\n");
 			system("pause");
@@ -343,12 +347,12 @@ int main(){
 		}
 	}
 	initialization();
-	//calculateMu(treshold);
+	calculateMu(treshold);
 
 	vector<Pixel>::iterator itt;
-	treshold = 0.5; epsilon = 0.06; alpha = 0.96;
+	//treshold = 0.05; epsilon = 0.05; alpha = 0.05;
 	printf("starting main loop\n");
-	int iterations = 100;
+	int iterations = 70;
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		//printf("\n prepareUpdates done");
@@ -362,20 +366,23 @@ int main(){
 		printf("\nloop %i done", i);
 	}
 	printf("\nmain loop finished\n");
-	displayVolume(V, seed);
+	
+	displayVolume(V, seed, 1);
 	
 	//store zerolevelset as raw file
 	Volume<uchar> * v3 = new Volume<uchar>(V->getSize());
-	for(int x = 0; x < v2->getWidth(); x++) {
-	for(int y = 0; y < v2->getHeight(); y++) {
-	for(int z = 0; z < v2->getDepth(); z++) {
+	for(int x = 0; x < V->getWidth(); x++) {
+	for(int y = 0; y < V->getHeight(); y++) {
+	for(int z = 0; z < V->getDepth(); z++) {
+	int3 n(x,y,z);	
+		/*code to create e 3D circle
+		if(sqrt((float)((seed.x-n.x)*(seed.x-n.x)+(seed.y-n.y)*(seed.y-n.y)+(seed.z-n.z)*(seed.z-n.z))) < 50.0f){
+			v3->set(x,y,z, (uchar)245);
+		}*/
 		v3->set(x,y,z, (uchar)zeroLevelSet[x][y][z]);
 	}}}
-	//ostringstream filename;
-	//filename << iterations << "iter.raw";
-	//uchar f = filename;
-	v3->save("10iter.raw");
-	printf("file stored");
+	v3->save("iters.raw");
+	printf("file stored\n");
+	
 	system("pause");
-
 }

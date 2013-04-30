@@ -124,9 +124,10 @@ float speedFunction(short i, short j){
 	return ret; 
 }
 
+vector<Pixel>::iterator it;
+float M = 0;
 void prepareUpdates(){
 	//printf("\nsize prepare: %i ", sz.size());
-	vector<Pixel>::iterator it;
 	for(it = lz.begin(); it<lz.end(); it++){//find pixels that are moving out of lz
 		it->f = speedFunction(it->x, it->y);
 	}
@@ -153,7 +154,7 @@ void prepareUpdates(){
 			it = ln1.erase(it);
 		}
 		else{
-			float M = minMax(*it, 1, 0);
+			M = minMax(*it, 1, 0);
 			phi[it->x][it->y] = M-1;
 			if(phi[it->x][it->y] >= -0.5){ //moving from ln1 to sz
 				sz.push_back(*it);
@@ -174,7 +175,7 @@ void prepareUpdates(){
 			it = lp1.erase(it);
 		}
 		else{
-			float M = minMax(*it, -1, 0);
+			M = minMax(*it, -1, 0);
 			phi[it->x][it->y] = M+1;
 			if(phi[it->x][it->y] < 0.5){ 
 				sz.push_back(*it);
@@ -196,7 +197,7 @@ void prepareUpdates(){
 			it = ln2.erase(it);
 		}
 		else{
-			float M = minMax(*it, 1, -1);
+			M = minMax(*it, 1, -1);
 			phi[it->x][it->y] = M-1;
 			if(phi[it->x][it->y] >= -1.5){ 
 				sn1.push_back(*it);
@@ -219,7 +220,7 @@ void prepareUpdates(){
 			it = lp2.erase(it);
 		}
 		else{
-			float M = minMax(*it, -1, 1);
+			M = minMax(*it, -1, 1);
 			phi[it->x][it->y] = M+1;
 			if(phi[it->x][it->y] < 1.5){
 				sp1.push_back(*it);
@@ -239,12 +240,8 @@ void prepareUpdates(){
 }
 
 void updateLevelSets(){	
-	//printf("\nsize update: %i ", sz.size());
-	vector<Pixel>::iterator it;
-	
 	for (it = sz.begin(); it < sz.end(); it++){
-		label[it->x][it->y] = 0;		
-		//printf("\nsize update: %i ", lz.size());		
+		label[it->x][it->y] = 0;
 		lz.push_back(*it);	
 	}
 	sz.clear();
@@ -320,5 +317,4 @@ void updateLevelSets(){
 		lp2.push_back(*it);
 	}
 	sp2.clear();
-	//printf("    size update: %i \n ", sz.size());
 }

@@ -256,7 +256,7 @@ int main(){
 	//treshold = 0.7; epsilon = 0.10; alpha = 0.96;
 
 	printf("starting main loop\n");
-	int iterations = 4000;
+	int iterations = 2000;
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		updateLevelSets();
