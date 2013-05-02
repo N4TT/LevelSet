@@ -1,4 +1,4 @@
-
+#include "EasyBMP.h"
 #include <gtk/gtk.h>
 //#include "EasyBMP.h"
 #include <iostream>
@@ -17,6 +17,8 @@
 using namespace std;
 using namespace SIPL;
 
+float maxCurvature = 0;
+float minCurvature = 0;
 float image[HEIGHT][WIDTH][DEPTH] = { 0 };//{ {0.1,0.2,0.1,0.3,0.4},{0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}  };
 float phi[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER] = { 0 };
 //short* init = (short*) calloc(sizeof(short), (HEIGHT+BORDER)*(WIDTH+BORDER)*(DEPTH+BORDER));
@@ -326,6 +328,7 @@ int main(){
 	
 	Volume<uchar> * V = new Volume<uchar>("aneurism.mhd");
 	//Volume<uchar> * V = new Volume<uchar>("circle_with_values_245.mhd");
+	//Volume<uchar> * V = new Volume<uchar>("rectangle.mhd");
 	
 	int3 seed(105, 115, 160);
 	displayVolume(V, seed, 0);
@@ -350,38 +353,54 @@ int main(){
 	calculateMu(treshold);
 
 	vector<Pixel>::iterator itt;
-	//treshold = 0.05; epsilon = 0.05; alpha = 0.05;
+	//treshold = 0.95; epsilon = 0.05; alpha = 0.95; //virker perfekt med sirkel volumet
+	treshold = 0.95; epsilon = 0.1; alpha = 0.95;
 	printf("starting main loop\n");
-	int iterations = 70;
+	int iterations = 100;
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
-		//printf("\n prepareUpdates done");
 		updateLevelSets();
-		//printf("\n updateLevels done");
+		
 		if(i == (iterations-1)){ //copy the zero level set pixels to zeroLevelSet
 			for(itt = lz.begin(); itt<lz.end(); itt++){
 				zeroLevelSet[itt->x][itt->y][itt->z] = 255;
 			}
 		}
-		printf("\nloop %i done", i);
+		//if(i&10 == 0){
+			printf("\nloop %i done", i);
+		//}
 	}
 	printf("\nmain loop finished\n");
 	
 	displayVolume(V, seed, 1);
 	
+	
+	/*BMP img;
+		img.ReadFromFile("star.bmp");*/
 	//store zerolevelset as raw file
 	Volume<uchar> * v3 = new Volume<uchar>(V->getSize());
 	for(int x = 0; x < V->getWidth(); x++) {
 	for(int y = 0; y < V->getHeight(); y++) {
 	for(int z = 0; z < V->getDepth(); z++) {
 	int3 n(x,y,z);	
-		/*code to create e 3D circle
+		/*//created circle_with_values_245.raw:
 		if(sqrt((float)((seed.x-n.x)*(seed.x-n.x)+(seed.y-n.y)*(seed.y-n.y)+(seed.z-n.z)*(seed.z-n.z))) < 50.0f){
 			v3->set(x,y,z, (uchar)245);
 		}*/
+		/*//reated rectangle.raw:
+		if((x > seed.x-20 && x < seed.x+20) && (y > seed.y-20 && y < seed.y+20) && (z > seed.z-20 && z < seed.z+20)){
+			init[x][y][z] = 1;
+				v3->set(x,y,z, (uchar)245);
+		}*/
+		/*//star.raw must include bmp.h and call readfromfile()
+		if(z > seed.z-20 && z < seed.z+20){
+			float asdf = (img(x,y)->Red + img(x,y)->Green + img(x,y)->Blue) / 3 - 1;
+			v3->set(x,y,z, (uchar)asdf); -> code failed
+		}*/	
 		v3->set(x,y,z, (uchar)zeroLevelSet[x][y][z]);
 	}}}
-	v3->save("iters.raw");
+	printf("\n maxCurvature: %f,  minCurvature: %f \n",maxCurvature, minCurvature);
+	//v3->save("iters.raw");
 	printf("file stored\n");
 	
 	system("pause");
