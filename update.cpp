@@ -203,7 +203,7 @@ void prepareUpdates(){
 		if(checkMaskNeighbours(it->x,it->y, it->z, 2, 0) == false){//if Ln1[i][j] has no neighbors q with label(q) == 0
 			sn2.push_back(*it);
 			if(phi[it->x][it->y][it->z] > -1.5){
-				//printf("faileeeeeedeeed: sn2.push: %f", phi[it->x][it->y][it->z]);
+				printf("ln1->sn2.push: %f, (x,y,z): %i,%i,%i", phi[it->x][it->y][it->z], it->x, it->y, it->z);
 				//phi[it->x][it->y][it->z] = -1.49;
 			}
 			it = ln1.erase(it);
@@ -213,14 +213,14 @@ void prepareUpdates(){
 			phi[it->x][it->y][it->z] = M-1;
 			if(phi[it->x][it->y][it->z] >= -0.5){ //moving from ln1 to sz
 				if(phi[it->x][it->y][it->z] >= 0.5){
-					printf("ln1->sz >= 0.5:  %f  iteration: %i\n", phi[it->x][it->y][it->z], iteration);
+					printf("ln1->sz >= 0.5:  %f  iteration: %i, M: %f\n\n", phi[it->x][it->y][it->z], iteration, M);
 				}
 				sz.push_back(*it);
 				it = ln1.erase(it);
 			}
 			else if(phi[it->x][it->y][it->z] < -1.5){
 				if(phi[it->x][it->y][it->z] < -2.5){
-					printf("ln1->sn2 < -2.5:  %f  iteration: %i\n", phi[it->x][it->y][it->z], iteration);
+					printf("ln1->sn2 < -2.5:  %f  iteration: %i, M: %f\n\n", phi[it->x][it->y][it->z], iteration, M);
 				}
 				sn2.push_back(*it);
 				it = ln1.erase(it);
@@ -234,7 +234,8 @@ void prepareUpdates(){
 		if(checkMaskNeighbours(it->x,it->y, it->z,  2, 0) == false){
 			sp2.push_back(*it);
 			if(phi[it->x][it->y][it->z] <= 1.5){
-			//	phi[it->x][it->y][it->z] = 1.51;
+				printf("lp1->sp2.push: %f", phi[it->x][it->y][it->z]);
+				//	phi[it->x][it->y][it->z] = 1.51;
 			}
 			it = lp1.erase(it);
 		}
@@ -250,7 +251,7 @@ void prepareUpdates(){
 			}
 			else if(phi[it->x][it->y][it->z] >= 1.5){
 				if(phi[it->x][it->y][it->z] >= 2.5){
-					printf("lp1->sp2 >= 2.5:  %f  iteration: %i\n", phi[it->x][it->y][it->z], iteration);
+					printf("lp1->sp2 >= 2.5:  %f  iteration: %i, M: %f\n\n", phi[it->x][it->y][it->z], iteration, M);
 				}
 				sp2.push_back(*it);
 				it = lp1.erase(it);
@@ -297,7 +298,7 @@ void prepareUpdates(){
 			phi[it->x][it->y][it->z] = M+1;
 			if(phi[it->x][it->y][it->z] < 1.5){
 				if(phi[it->x][it->y][it->z] < 0.5){
-					printf("lp2->sp1 < 0.5:  %f  iteration: %i\n", phi[it->x][it->y][it->z], iteration);
+					printf("lp2->sp1 < 0.5:  %f  iteration: %i, M: %f\n\n", phi[it->x][it->y][it->z], iteration, M);
 				}
 				sp1.push_back(*it);
 				it = lp2.erase(it);
@@ -333,7 +334,7 @@ void updateLevelSets(){
 			it->x++;	//[x+1,y,z]
 			sn2.push_back(*it);
 			if(phi[it->x][it->y][it->z] >= -1.5) {
-				printf("\npushed %f to sn2 in iter %i, first if", phi[it->x+1][it->y][it->z], iteration);
+				printf("\npushed %f to sn2 in iter %i, first if", phi[it->x][it->y][it->z], iteration);
 			}
 			it->x--;	//Siden vi bruker if, og ikke if else setninger må verdien settes tilbake til x
 		}
@@ -342,7 +343,7 @@ void updateLevelSets(){
 			it->y++;	//[x,y+1,z]
 			sn2.push_back(*it);
 			if(phi[it->x][it->y][it->z] >= -1.5) {
-				printf("\npushed %f to sn2 in iter %i, sec if", phi[it->x+1][it->y][it->z], iteration);
+				printf("\npushed %f to sn2 in iter %i, sec if", phi[it->x][it->y][it->z], iteration);
 			}
 			it->y--;
 		}
@@ -351,7 +352,7 @@ void updateLevelSets(){
 			it->z++;	//[x,y,z+1]
 			sn2.push_back(*it);
 			if(phi[it->x][it->y][it->z] >= -1.5) {
-				printf("\npushed %f to sn2 in iter %i, third if", phi[it->x+1][it->y][it->z], iteration);
+				printf("\npushed %f to sn2 in iter %i, third if", phi[it->x][it->y][it->z], iteration);
 			}
 			it->z--;
 		}
@@ -360,7 +361,7 @@ void updateLevelSets(){
 			it->x--;	//[x-1,y,z]
 			sn2.push_back(*it);
 			if(phi[it->x][it->y][it->z] >= -1.5) {
-				printf("\npushed %f to sn2 in iter %i, fourth if", phi[it->x+1][it->y][it->z], iteration);
+				printf("\npushed %f to sn2 in iter %i, fourth if", phi[it->x][it->y][it->z], iteration);
 			}
 			it->x++;
 		}
@@ -369,7 +370,7 @@ void updateLevelSets(){
 			it->y--;	//[x,y-1,z]
 			sn2.push_back(*it);
 			if(phi[it->x][it->y][it->z] >= -1.5) {
-				printf("\npushed %f to sn2 in iter %i, fifth if", phi[it->x+1][it->y][it->z], iteration);
+				printf("\npushed %f to sn2 in iter %i, fifth if", phi[it->x][it->y][it->z], iteration);
 			}
 			it->y++;
 		}
@@ -378,7 +379,7 @@ void updateLevelSets(){
 			it->z--;	//[x,y,z-1]
 			sn2.push_back(*it);
 			if(phi[it->x][it->y][it->z] >= -1.5) {
-				printf("\npushed %f to sn2 in iter %i, sixth if", phi[it->x+1][it->y][it->z], iteration);
+				printf("\npushed %f to sn2 in iter %i, sixth if", phi[it->x][it->y][it->z], iteration);
 			}
 			it->z++;
 		}
@@ -392,36 +393,54 @@ void updateLevelSets(){
 			phi[it->x+1][it->y][it->z] = phi[it->x][it->y][it->z]+1;
 			it->x++;
 			sp2.push_back(*it);
+			if(phi[it->x][it->y][it->z] < 1.5) {
+				printf("\npushed %f to sp2 in iter %i, first if", phi[it->x][it->y][it->z], iteration);
+			}
 			it->x--;
 		}
 		if (phi[it->x][it->y+1][it->z] == 3){	
 			phi[it->x][it->y+1][it->z] = phi[it->x][it->y][it->z]+1;
 			it->y++;
 			sp2.push_back(*it);
+			if(phi[it->x][it->y][it->z] < 1.5) {
+				printf("\npushed %f to sp2 in iter %i, sec if", phi[it->x][it->y][it->z], iteration);
+			}
 			it->y--;
 		}
 		if (phi[it->x][it->y][it->z+1] == 3){			
 			phi[it->x][it->y][it->z+1] = phi[it->x][it->y][it->z]+1;
 			it->z++;	//[x,y,z-1]
 			sp2.push_back(*it); //her lå feilen, det stod sn2.push_back istedenfor sp2.push_back
+			if(phi[it->x][it->y][it->z] < 1.5) {
+				printf("\npushed %f to sp2 in iter %i, third if", phi[it->x][it->y][it->z], iteration);
+			}
 			it->z--;
 		}
 		if (phi[it->x-1][it->y][it->z] == 3){			
 			phi[it->x-1][it->y][it->z] = phi[it->x][it->y][it->z]+1;
 			it->x--;
 			sp2.push_back(*it);
+			if(phi[it->x][it->y][it->z] < 1.5) {
+				printf("\npushed %f to sp2 in iter %i, fourth if", phi[it->x][it->y][it->z], iteration);
+			}
 			it->x++;
 		}
 		if (phi[it->x][it->y-1][it->z] == 3){			
 			phi[it->x][it->y-1][it->z] = phi[it->x][it->y][it->z]+1;
 			it->y--;
 			sp2.push_back(*it);
+			if(phi[it->x][it->y][it->z] < 1.5) {
+				printf("\npushed %f to sp2 in iter %i, fifth if", phi[it->x][it->y][it->z], iteration);
+			}
 			it->y++;
 		}
 		if (phi[it->x][it->y][it->z-1] == 3){			
 			phi[it->x][it->y][it->z-1] = phi[it->x][it->y][it->z]+1;
 			it->z--;	//[x,y,z-1]
 			sp2.push_back(*it);
+			if(phi[it->x][it->y][it->z] < 1.5) {
+				printf("\npushed %f to sp2 in iter %i, sixth if", phi[it->x][it->y][it->z], iteration);
+			}
 			it->z++;
 		}
 	}

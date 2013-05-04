@@ -356,7 +356,7 @@ int main(){
 	//treshold = 0.95; epsilon = 0.05; alpha = 0.95; //virker perfekt med sirkel volumet
 	treshold = 0.95; epsilon = 0.1; alpha = 0.95;
 	printf("starting main loop\n");
-	int iterations = 100;
+	int iterations = 40;
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		updateLevelSets();
