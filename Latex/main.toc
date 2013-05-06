@@ -1,16 +1,26 @@
-\contentsline {chapter}{\numberline {1}Level Set Method}{2}{chapter.1}
-\contentsline {section}{\numberline {1.1}Introduction}{2}{section.1.1}
-\contentsline {section}{\numberline {1.2}Signed Distance Transform}{4}{section.1.2}
-\contentsline {section}{\numberline {1.3}Narrow Band}{6}{section.1.3}
-\contentsline {section}{\numberline {1.4}Sparse Field}{7}{section.1.4}
-\contentsline {section}{\numberline {1.5}Discretization by upwinding and difference of normals}{8}{section.1.5}
-\contentsline {section}{\numberline {1.6}Parallel implementation in GPU}{11}{section.1.6}
-\contentsline {chapter}{\numberline {2}blablabla}{13}{chapter.2}
-\contentsline {section}{\numberline {2.1}asdf}{13}{section.2.1}
-\contentsline {section}{\numberline {2.2}cc}{13}{section.2.2}
-\contentsline {chapter}{\numberline {3}blabla}{14}{chapter.3}
-\contentsline {section}{\numberline {3.1}asdfg}{14}{section.3.1}
-\contentsline {section}{\numberline {3.2}bb}{14}{section.3.2}
-\contentsline {chapter}{\numberline {4}bla}{15}{chapter.4}
-\contentsline {section}{\numberline {4.1}asd}{15}{section.4.1}
-\contentsline {section}{\numberline {4.2}aa}{15}{section.4.2}
+\contentsline {chapter}{\numberline {1}Segmentation}{2}{chapter.1}
+\contentsline {section}{\numberline {1.1}Histogram-based segmentation methods}{3}{section.1.1}
+\contentsline {subsection}{\numberline {1.1.1}Thresholding}{3}{subsection.1.1.1}
+\contentsline {subsection}{\numberline {1.1.2}Otsu's thresholding method}{4}{subsection.1.1.2}
+\contentsline {section}{\numberline {1.2}Region based segmentation}{4}{section.1.2}
+\contentsline {subsection}{\numberline {1.2.1}Region growing}{6}{subsection.1.2.1}
+\contentsline {subsection}{\numberline {1.2.2}Region splitting}{6}{subsection.1.2.2}
+\contentsline {section}{\numberline {1.3}Edge based segmentation}{6}{section.1.3}
+\contentsline {subsection}{\numberline {1.3.1}First and second order operators}{7}{subsection.1.3.1}
+\contentsline {subsection}{\numberline {1.3.2}Canny edge detector}{8}{subsection.1.3.2}
+\contentsline {chapter}{\numberline {2}Level Set Method}{10}{chapter.2}
+\contentsline {section}{\numberline {2.1}Introduction}{10}{section.2.1}
+\contentsline {section}{\numberline {2.2}Signed Distance Transform}{13}{section.2.2}
+\contentsline {section}{\numberline {2.3}Narrow Band}{15}{section.2.3}
+\contentsline {section}{\numberline {2.4}Sparse Field}{16}{section.2.4}
+\contentsline {section}{\numberline {2.5}Discretization by upwinding and difference of normals}{17}{section.2.5}
+\contentsline {section}{\numberline {2.6}Parallel implementation in GPU}{20}{section.2.6}
+\contentsline {chapter}{\numberline {3}blablabla}{22}{chapter.3}
+\contentsline {section}{\numberline {3.1}asdf}{22}{section.3.1}
+\contentsline {section}{\numberline {3.2}cc}{22}{section.3.2}
+\contentsline {chapter}{\numberline {4}blabla}{23}{chapter.4}
+\contentsline {section}{\numberline {4.1}asdfg}{23}{section.4.1}
+\contentsline {section}{\numberline {4.2}bb}{23}{section.4.2}
+\contentsline {chapter}{\numberline {5}bla}{24}{chapter.5}
+\contentsline {section}{\numberline {5.1}asd}{24}{section.5.1}
+\contentsline {section}{\numberline {5.2}aa}{24}{section.5.2}

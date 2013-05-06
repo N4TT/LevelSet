@@ -1,15 +1,30 @@
 \chapter{Level Set Method}
-\label{levelSet}
 \section{Introduction}
-Surfaces that evolves over time can be difficult to represent parametrically. When a surface deforms, the model have to be reparemeterized, which, due to the computional overhead (especially in 3D) add limitations to what kind of shapes a parameterical model can represent effectively. Topological changes, such as splitting or merging parts during the deformation is difficult to represent using parametric models. Sharp corners, distant edges blending together and the complexity of representing boundaries in higher dimensions are some other reasons why an evolving (deforming) surface is difficult to represent parametrically. The level set method is, like Active Shape Model, an extension based on deformable models, and was first introduced by Osher and Sethian in 1988\cite{osher88}. The main idea behind the level set method is to represent the boundary/interface of a surface implicitly by using a higher dimensional function. Adding an extra dimension simplifies the problems mentioned above significantly. This higher dimension function is called the level set function, and represents a 2D model as
+Surfaces that evolves over time can be difficult to represent. Taking the surface in figure \ref{interface} as an example, assume that the red surface is heat and the arrows on the interface as the direction of its movement, which is normal to the interface itself. One way to represent the propagation of this interface is by the function $y = f(x,t)$, where $t$ represents time and $x,y$ are coordinates. The problem with this representation is that it cannot represent every concievable shape of the interface. If for instance the shape
+of the inerface has more y coordinates for a particular x coordinate (which is true for all closed interfaces), the intercane cannot be correctly represented using this notion.
+\begin{figure}[h!]
+\centering
+\includegraphics[width=.5\textwidth]{levelset/interface}
+\caption{Interface of a moving surface.}
+\label{interface}
+\end{figure}
+A better alternative is to use an parametric equation. The problem mentioned above would then be solved because the iterface would then only depend on the time variable t. But surfaces that evolves over time can also be difficult to represent parametrically. When a surface evolves, the model have to be reparemeterized, which, due to the computional overhead (especially in 3D) add limitations to what kind of shapes a parameterical model can represent effectively. Topological changes, such as splitting or merging parts during the propagation is difficult to represent using parametric models. Sharp corners, distant edges blending together and the complexity of representing boundaries in higher dimensions are some other reasons why an evolving surface is difficult to represent parametrically. A simple example is shown in figure \ref{problematicEvo}, the two interfaces have to be represented as a single parametric function when merging and as two seperate againg when they split, and some sort of collison detection must be used to discover when the interfaces merge/split.
+\begin{figure}[h!]
+\centering
+\includegraphics[width=.5\textwidth]{levelset/twoCircles}
+\caption{Interface evolution difficult to represent parametrically.}
+\label{problematicEvo}
+\end{figure}
+
+As a solution to all the problems mentioned above Osher and Sethian introduced the level set method in 1988 in \cite{osher88}. The main idea behind the level set method is to represent the interface of a surface implicitly by using a higher dimensional function. Adding an extra dimension simplifies the problems mentioned above significantly. This higher dimension function is called the level set function, and a 2D interface (a curve) is represented by the 3D level set function
 \begin{equation}
 \phi(x, y, t) 
 \end{equation}
-where the additional dimension \(t\) represents time. The level set can represent any model in any dimension by adding this extra dimension. At a given time step, the evolving surface/model can be represented as a closed curve by the boundary of the level set at that time step. This representation of the model is called the zero level set and is defined as the set of points where the level set is zero:
+where the additional dimension \(t\) represents time. Similarly any 3D or higher level function can be represented by a level set function by adding one dimension. At a given time step, the evolving surface/model can be represented as a closed curve by the boundary of the level set at that time step. This representation of the model is called the zero level set and is defined as the set of points where the level set is zero:
 \begin{equation}
 \Gamma(x, y, t) = \{\phi(x, y, t) = 0\}. 
 \end{equation}
-The initial curve is at the xy-plane, that is, at \(\phi(x,y,0)\). As an example, figure \ref{levelsetEx}a depicts a circle with arrows pointing in the direction it is evolving, and figure \ref{levelsetEx}b is the cone that represents the corresponding level set function with the initial/start-position in red.
+The initial curve is at the xy-plane, that is, at \(\phi(x,y,0)\). As an example, figure \ref{levelsetEx}a depicts a circle with arrows pointing in the direction it is evolving, and figure \ref{levelsetEx}b is the cone that represents the corresponding level set function with the start-position in red.
 
 \begin{figure}[h!]
 \centering

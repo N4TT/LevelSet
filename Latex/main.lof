@@ -1,7 +1,12 @@
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {1.1}{\ignorespaces (a): Circle with arrows pointing in direction of movement, (b): Corresponding level set function\relax }}{3}{figure.caption.3}
-\contentsline {figure}{\numberline {1.2}{\ignorespaces (a): Binary image, (b): SDT based on city-block distance, (c): SDT based on euclidean distance\relax }}{5}{figure.caption.4}
-\contentsline {figure}{\numberline {1.3}{\ignorespaces The narrow band extending out with a width of k from the level set.\relax }}{6}{figure.caption.5}
+\contentsline {figure}{\numberline {1.1}{\ignorespaces (a): Image to be segmented, (b): Histogram of image, (c): Segmented using iterative global thresholding, with $T = 0.7332$, (d): Segmented using Otus's method with $T = 0.7686$.\relax }}{5}{figure.caption.3}
+\contentsline {figure}{\numberline {1.2}{\ignorespaces (a): Image to be segmented, (b): LoG, (c): Sobel - highlighting horizontal edges, (d):Sobel - highlighting vertical edges\relax }}{9}{figure.caption.4}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Interface of a moving surface.\relax }}{10}{figure.caption.5}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Interface evolution difficult to represent parametrically.\relax }}{11}{figure.caption.6}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces (a): Circle with arrows pointing in direction of movement, (b): Corresponding level set function\relax }}{12}{figure.caption.7}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces (a): Binary image, (b): SDT based on city-block distance, (c): SDT based on euclidean distance\relax }}{14}{figure.caption.8}
+\contentsline {figure}{\numberline {2.5}{\ignorespaces The narrow band extending out with a width of k from the level set.\relax }}{15}{figure.caption.9}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
