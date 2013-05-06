@@ -1,0 +1,50 @@
+\documentclass[11pt,b5paper, titlepage]{report}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{graphicx} %figures, \includegraphics[attr1=val1, attr2=val2, ..., attrn=valn]{imagename}
+\usepackage{comment} %multi-line commenting, \begin{comment}, end{comment}
+\usepackage{wrapfig} %to wrap text around figure  (in deformableModels)
+\usepackage[lmargin=25mm,rmargin=25mm,tmargin=27mm,bmargin=30mm]{geometry}
+\usepackage[hidelinks]{hyperref}
+\usepackage{caption} %to be able to do linebreak inside captions, and more
+\usepackage[bottom]{footmisc}
+
+\newcommand{\indentitem}{\setlength\itemindent{25pt}} 
+%instead of writing {\setlength\itemindent{25pt} to indent an item inside the itemize envirnment, {\indentitem} can now be used..see last section in the chapter about level set method
+
+%modify date format (used in titlepage)
+\usepackage{datetime}
+\renewcommand{\dateseparator}{.}
+\ddmmyyyydate
+	
+\begin{document}
+
+%\input{forside}
+
+% Set the page numbers to be roman, starting at page 1
+\pagestyle{headings}
+\setcounter{page}{1}
+\pagenumbering{roman}
+
+%\begin{abstract}
+%TODO
+%\end{abstract}
+
+\tableofcontents
+\listoffigures
+%\listoftables ikke vits for bare en table
+%\clearpage
+
+% set the page numbers to be arabic, starting at page 1 %
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+%input each chapter
+\input{levelset/Levelset} %fra forrige semester..skal endres på eller tas helt vekk
+\input{kap1/Kap1}
+\input{kap2/Kap2}
+\input{kap3/Kap3}
+
+\input{references/references}
+\end{document}
+\end
