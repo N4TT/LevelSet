@@ -354,9 +354,9 @@ int main(){
 
 	vector<Pixel>::iterator itt;
 	//treshold = 0.95; epsilon = 0.05; alpha = 0.95; //virker perfekt med sirkel volumet
-	treshold = 0.95; epsilon = 0.1; alpha = 0.95;
+	treshold = 1.0; epsilon = 0.3; alpha = 0.75;
 	printf("starting main loop\n");
-	int iterations = 40;
+	int iterations = 1000;
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		updateLevelSets();
@@ -366,9 +366,9 @@ int main(){
 				zeroLevelSet[itt->x][itt->y][itt->z] = 255;
 			}
 		}
-		//if(i&10 == 0){
+		if(i%10 == 0){
 			printf("\nloop %i done", i);
-		//}
+		}
 	}
 	printf("\nmain loop finished\n");
 	
@@ -400,7 +400,7 @@ int main(){
 		v3->set(x,y,z, (uchar)zeroLevelSet[x][y][z]);
 	}}}
 	printf("\n maxCurvature: %f,  minCurvature: %f \n",maxCurvature, minCurvature);
-	//v3->save("iters.raw");
+	v3->save("1000iters.raw");
 	printf("file stored\n");
 	
 	system("pause");

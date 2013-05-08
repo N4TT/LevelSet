@@ -76,7 +76,7 @@ float minMax(Pixel p, short greaterOrLess, short checkAgainst){//returns max if 
 			minMaxList.push_back(phi[p.x][p.y+1][p.z]);
 		}
 		if(label[p.x][p.y][p.z+1] <= checkAgainst){
-			minMaxList.push_back(phi[p.x][p.y][p.z+1]);		
+			minMaxList.push_back(phi[p.x][p.y][p.z+1]);	
 		}
 		if(label[p.x-1][p.y][p.z] <= checkAgainst){
 			minMaxList.push_back(phi[p.x-1][p.y][p.z]);
@@ -173,7 +173,7 @@ vector<Pixel>::iterator it;
 void prepareUpdates(){
 	iteration++;
 	//ln2: [-2.5, -1.5>  ln1: [-1,5, -0.5>   lz: [-0.5, 0.5>   lp1: [0.5, 1.5>   lp2: [1.5, 2.5>
-	start = std::clock();
+	//start = std::clock();
 	for(it = lz.begin(); it<lz.end(); it++){//find pixels that are moving out of lz
 		it->f = speedFunction(it->x, it->y, it->z);
 	}
@@ -313,12 +313,12 @@ void prepareUpdates(){
 			}
 		}
 	}
-	duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-	printf("\n Preperaupdates: %f", duration);
+	//duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+	//printf("\n Preperaupdates: %f", duration);
 }
 
 void updateLevelSets(){	
-	start = std::clock();
+	//start = std::clock();
 	
 	for (it = sz.begin(); it < sz.end(); it++){
 		label[it->x][it->y][it->z] = 0;					
@@ -485,8 +485,8 @@ void updateLevelSets(){
 		}
 	}*/
 	
-	printf("\n");
+	//printf("\n");
 	
-	duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-	printf("\n updateslevelset: %f", duration);
+	//duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+	//printf("\n updateslevelset: %f", duration);
 }

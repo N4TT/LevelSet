@@ -11,16 +11,18 @@
 \contentsline {chapter}{\numberline {2}Level Set Method}{10}{chapter.2}
 \contentsline {section}{\numberline {2.1}Introduction}{10}{section.2.1}
 \contentsline {section}{\numberline {2.2}Signed Distance Transform}{13}{section.2.2}
-\contentsline {section}{\numberline {2.3}Narrow Band}{15}{section.2.3}
-\contentsline {section}{\numberline {2.4}Sparse Field}{16}{section.2.4}
-\contentsline {section}{\numberline {2.5}Discretization by upwinding and difference of normals}{17}{section.2.5}
-\contentsline {section}{\numberline {2.6}Parallel implementation in GPU}{20}{section.2.6}
-\contentsline {chapter}{\numberline {3}blablabla}{22}{chapter.3}
-\contentsline {section}{\numberline {3.1}asdf}{22}{section.3.1}
-\contentsline {section}{\numberline {3.2}cc}{22}{section.3.2}
-\contentsline {chapter}{\numberline {4}blabla}{23}{chapter.4}
-\contentsline {section}{\numberline {4.1}asdfg}{23}{section.4.1}
-\contentsline {section}{\numberline {4.2}bb}{23}{section.4.2}
-\contentsline {chapter}{\numberline {5}bla}{24}{chapter.5}
-\contentsline {section}{\numberline {5.1}asd}{24}{section.5.1}
-\contentsline {section}{\numberline {5.2}aa}{24}{section.5.2}
+\contentsline {section}{\numberline {2.3}Sparse Field}{15}{section.2.3}
+\contentsline {section}{\numberline {2.4}Discretization by upwinding and difference of normals}{16}{section.2.4}
+\contentsline {section}{\numberline {2.5}Parallel implementation in GPU}{19}{section.2.5}
+\contentsline {chapter}{\numberline {3}Narrow Band - uferdig}{20}{chapter.3}
+\contentsline {section}{\numberline {3.1}Introduction}{20}{section.3.1}
+\contentsline {section}{\numberline {3.2}Overview of the Narrow Band method}{20}{section.3.2}
+\contentsline {chapter}{\numberline {4}blablabla}{22}{chapter.4}
+\contentsline {section}{\numberline {4.1}asdf}{22}{section.4.1}
+\contentsline {section}{\numberline {4.2}cc}{22}{section.4.2}
+\contentsline {chapter}{\numberline {5}blabla}{23}{chapter.5}
+\contentsline {section}{\numberline {5.1}asdfg}{23}{section.5.1}
+\contentsline {section}{\numberline {5.2}bb}{23}{section.5.2}
+\contentsline {chapter}{\numberline {6}bla}{24}{chapter.6}
+\contentsline {section}{\numberline {6.1}asd}{24}{section.6.1}
+\contentsline {section}{\numberline {6.2}aa}{24}{section.6.2}
