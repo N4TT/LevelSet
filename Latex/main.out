@@ -14,15 +14,8 @@
 \BOOKMARK [1][-]{section.2.3}{Sparse Field}{chapter.2}% 14
 \BOOKMARK [1][-]{section.2.4}{Discretization by upwinding and difference of normals}{chapter.2}% 15
 \BOOKMARK [1][-]{section.2.5}{Parallel implementation in GPU}{chapter.2}% 16
-\BOOKMARK [0][-]{chapter.3}{Narrow Band - uferdig}{}% 17
+\BOOKMARK [0][-]{chapter.3}{Narrow Band - for lite?}{}% 17
 \BOOKMARK [1][-]{section.3.1}{Introduction}{chapter.3}% 18
 \BOOKMARK [1][-]{section.3.2}{Overview of the Narrow Band method}{chapter.3}% 19
-\BOOKMARK [0][-]{chapter.4}{blablabla}{}% 20
-\BOOKMARK [1][-]{section.4.1}{asdf}{chapter.4}% 21
-\BOOKMARK [1][-]{section.4.2}{cc}{chapter.4}% 22
-\BOOKMARK [0][-]{chapter.5}{blabla}{}% 23
-\BOOKMARK [1][-]{section.5.1}{asdfg}{chapter.5}% 24
-\BOOKMARK [1][-]{section.5.2}{bb}{chapter.5}% 25
-\BOOKMARK [0][-]{chapter.6}{bla}{}% 26
-\BOOKMARK [1][-]{section.6.1}{asd}{chapter.6}% 27
-\BOOKMARK [1][-]{section.6.2}{aa}{chapter.6}% 28
+\BOOKMARK [0][-]{appendix.A}{Sparse Field - Pseudocode}{}% 20
+\BOOKMARK [0][-]{appendix.B}{Implemented Sparse field method}{}% 21
