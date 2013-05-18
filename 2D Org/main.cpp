@@ -3,7 +3,7 @@
 #include "EasyBMP.h"
 #include <iostream>
 #include <stdio.h>
-#include <vector>
+#include <list>
 #include <exception>
 #include <stdlib.h>
 //#include <string.h>
@@ -20,17 +20,17 @@ float F[HEIGHT][WIDTH] = { 0 };
 short zeroLevelSet[HEIGHT][WIDTH] = { 0 }; //output
 float treshold, alpha, epsilon;
 
-vector<Pixel> lz;
-vector<Pixel> lp1;
-vector<Pixel> ln1;
-vector<Pixel> lp2;
-vector<Pixel> ln2;
+list<Pixel> lz;
+list<Pixel> lp1;
+list<Pixel> ln1;
+list<Pixel> lp2;
+list<Pixel> ln2;
 
-vector<Pixel> sz;
-vector<Pixel> sp1;
-vector<Pixel> sn1;
-vector<Pixel> sp2;
-vector<Pixel> sn2;
+list<Pixel> sz;
+list<Pixel> sp1;
+list<Pixel> sn1;
+list<Pixel> sp2;
+list<Pixel> sn2;
 
 void fillInit(short minX, short minY, short maxX, short maxY){
 	if(maxX - minX <= 0){
@@ -143,7 +143,7 @@ void setLevels(Pixel p, short level){//støtter Pixel Struct
 
 void initialization(){
 
-	vector<Pixel>::iterator it;
+	list<Pixel>::iterator it;
 
 	for (int i = 0; i<HEIGHT+BORDER; i++){
 		for (int j = 0; j<WIDTH+BORDER; j++){
@@ -167,14 +167,14 @@ void initialization(){
 		}
 	}
 	
-	for (it = lz.begin(); it < lz.end(); it++){
+	for (it = lz.begin(); it != lz.end(); it++){
 		setLevels(*it, 1);//second levelSet (level 1)			
 	}
 	
-	for (it = lp1.begin(); it < lp1.end(); it++){
+	for (it = lp1.begin(); it != lp1.end(); it++){
 		setLevels(*it, 2);
 	}
-	for (it = ln1.begin(); it < ln1.end(); it++){
+	for (it = ln1.begin(); it != ln1.end(); it++){
 		setLevels(*it, 2);
 	}
 	
@@ -248,7 +248,7 @@ int main(){
 	initialization();
 	calculateMu();
 	
-	vector<Pixel>::iterator itt;
+	list<Pixel>::iterator itt;
 
 	//treshold = 0.6; epsilon = 0.05; alpha = 0.97;
 	//treshold = 0.5; epsilon = 0.06; alpha = 0.90;
@@ -256,16 +256,16 @@ int main(){
 	//treshold = 0.7; epsilon = 0.10; alpha = 0.96;
 
 	printf("starting main loop\n");
-	int iterations = 2000;
+	int iterations = 1500;
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		updateLevelSets();
-		if(i%100 == 0){
+		if(i%10 == 0){
 			printf("\niteration: %i\n", i);
 		}
 		if(i == (iterations-1)){ //copy the zero level set pixels to zeroLevelSet
 			printf("\nwriting to zeroLevelSet");
-			for(itt = lz.begin(); itt<lz.end(); itt++){
+			for(itt = lz.begin(); itt != lz.end(); itt++){
 				zeroLevelSet[itt->x][itt->y] = 255;
 			}
 			//writeFile(img, 1, i);

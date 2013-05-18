@@ -1,27 +1,27 @@
 #include <iostream>
 #include <stdio.h>
-#include <vector>
+#include <list>
 #include <exception>
 #include <algorithm>
 #include "main.h"
 #include "update.h"
 #include "SIPL/Core.hpp"
 
-#include <omp.h> //openMP
+//#include <omp.h> //openMP
 
-#include <cstdio> //to calculate runtime
-#include <ctime>  //to calculate runtime
+//#include <cstdio> //to calculate runtime
+//#include <ctime>  //to calculate runtime
 
 using namespace std;
 using namespace SIPL;
 
-clock_t start;
-double duration;
+//clock_t start;
+//double duration;
 
 float muOutside;
 float muInside;
 
-vector<float> minMaxList;
+list<float> minMaxList;
 
 float result;
 float minMax(Pixel p, short greaterOrLess, short checkAgainst){//returns max if greaterOrLess =">=", 
@@ -169,27 +169,27 @@ float speedFunction(short i, short j, short k){
 
 float M;
 int iteration = -1;
-vector<Pixel>::iterator it;
+list<Pixel>::iterator it;
 void prepareUpdates(){
 	iteration++;
 	//ln2: [-2.5, -1.5>  ln1: [-1,5, -0.5>   lz: [-0.5, 0.5>   lp1: [0.5, 1.5>   lp2: [1.5, 2.5>
 	//start = std::clock();
-	for(it = lz.begin(); it<lz.end(); it++){//find pixels that are moving out of lz
+	for(it = lz.begin(); it != lz.end(); it++){//find pixels that are moving out of lz
 		it->f = speedFunction(it->x, it->y, it->z);
 	}
-	for(it = lz.begin(); it<lz.end();){//find pixels that are moving out of lz
+	for(it = lz.begin(); it != lz.end();){//find pixels that are moving out of lz
 		phi[it->x][it->y][it->z] += it->f;
 		//phi[it->x][it->y][it->z] += speedFunction(it->x, it->y, it->z);
 		if(phi[it->x][it->y][it->z] >= 0.5){
 			if(phi[it->x][it->y][it->z] >= 1.5){
-				printf("lz->sp1 >= 1.5:  %f  iteration: %i\n", phi[it->x][it->y][it->z], iteration);
+				//printf("lz->sp1 >= 1.5:  %f  iteration: %i\n", phi[it->x][it->y][it->z], iteration);
 			}
 			sp1.push_back(*it);
 			it = lz.erase(it);		//erases elements at index i and j
 		}
 		else if(phi[it->x][it->y][it->z] < -0.5){
 			if(phi[it->x][it->y][it->z] < -1.5){
-				printf("lz->sn1 < -1.5:  %f  iteration: %i\n", phi[it->x][it->y][it->z], iteration);
+				//printf("lz->sn1 < -1.5:  %f  iteration: %i\n", phi[it->x][it->y][it->z], iteration);
 			}
 			sn1.push_back(*it);
 			it = lz.erase(it);
@@ -199,11 +199,11 @@ void prepareUpdates(){
 		}
 	}
 	
-	for(it = ln1.begin(); it<ln1.end();){//find pixels that are moving out of ln1
+	for(it = ln1.begin(); it != ln1.end();){//find pixels that are moving out of ln1
 		if(checkMaskNeighbours(it->x,it->y, it->z, 2, 0) == false){//if Ln1[i][j] has no neighbors q with label(q) == 0
 			sn2.push_back(*it);
 			if(phi[it->x][it->y][it->z] > -1.5){
-				printf("ln1->sn2.push: %f, (x,y,z): %i,%i,%i", phi[it->x][it->y][it->z], it->x, it->y, it->z);
+				//printf("ln1->sn2.push: %f, (x,y,z): %i,%i,%i", phi[it->x][it->y][it->z], it->x, it->y, it->z);
 				//phi[it->x][it->y][it->z] = -1.49;
 			}
 			it = ln1.erase(it);
@@ -213,14 +213,14 @@ void prepareUpdates(){
 			phi[it->x][it->y][it->z] = M-1;
 			if(phi[it->x][it->y][it->z] >= -0.5){ //moving from ln1 to sz
 				if(phi[it->x][it->y][it->z] >= 0.5){
-					printf("ln1->sz >= 0.5:  %f  iteration: %i, M: %f\n\n", phi[it->x][it->y][it->z], iteration, M);
+					//printf("ln1->sz >= 0.5:  %f  iteration: %i, M: %f\n\n", phi[it->x][it->y][it->z], iteration, M);
 				}
 				sz.push_back(*it);
 				it = ln1.erase(it);
 			}
 			else if(phi[it->x][it->y][it->z] < -1.5){
 				if(phi[it->x][it->y][it->z] < -2.5){
-					printf("ln1->sn2 < -2.5:  %f  iteration: %i, M: %f\n\n", phi[it->x][it->y][it->z], iteration, M);
+					//printf("ln1->sn2 < -2.5:  %f  iteration: %i, M: %f\n\n", phi[it->x][it->y][it->z], iteration, M);
 				}
 				sn2.push_back(*it);
 				it = ln1.erase(it);
@@ -230,11 +230,11 @@ void prepareUpdates(){
 			}
 		}
 	}
-	for(it = lp1.begin(); it<lp1.end();){//find pixels that are moving out of lp1
+	for(it = lp1.begin(); it != lp1.end();){//find pixels that are moving out of lp1
 		if(checkMaskNeighbours(it->x,it->y, it->z,  2, 0) == false){
 			sp2.push_back(*it);
 			if(phi[it->x][it->y][it->z] <= 1.5){
-				printf("lp1->sp2.push: %f", phi[it->x][it->y][it->z]);
+				//printf("lp1->sp2.push: %f", phi[it->x][it->y][it->z]);
 				//	phi[it->x][it->y][it->z] = 1.51;
 			}
 			it = lp1.erase(it);
@@ -244,14 +244,14 @@ void prepareUpdates(){
 			phi[it->x][it->y][it->z] = M+1;
 			if(phi[it->x][it->y][it->z] < 0.5){ 
 				if(phi[it->x][it->y][it->z] < -0.5){
-					printf("lp1->sz < -0.5:  %f  iteration: %i, M: %f\n", phi[it->x][it->y][it->z], iteration, M);
+					//printf("lp1->sz < -0.5:  %f  iteration: %i, M: %f\n", phi[it->x][it->y][it->z], iteration, M);
 				}
 				sz.push_back(*it);
 				it = lp1.erase(it);
 			}
 			else if(phi[it->x][it->y][it->z] >= 1.5){
 				if(phi[it->x][it->y][it->z] >= 2.5){
-					printf("lp1->sp2 >= 2.5:  %f  iteration: %i, M: %f\n\n", phi[it->x][it->y][it->z], iteration, M);
+					//printf("lp1->sp2 >= 2.5:  %f  iteration: %i, M: %f\n\n", phi[it->x][it->y][it->z], iteration, M);
 				}
 				sp2.push_back(*it);
 				it = lp1.erase(it);
@@ -261,7 +261,7 @@ void prepareUpdates(){
 			}
 		}
 	}
-	for(it = ln2.begin(); it < ln2.end();){
+	for(it = ln2.begin(); it != ln2.end();){
 		if(checkMaskNeighbours(it->x, it->y, it->z, 2, -1) == false){
 			label[it->x][it->y][it->z] = -3;
 			phi[it->x][it->y][it->z] = -3;
@@ -272,7 +272,7 @@ void prepareUpdates(){
 			phi[it->x][it->y][it->z] = M-1;
 			if(phi[it->x][it->y][it->z] >= -1.5){ 
 				if(phi[it->x][it->y][it->z] >= -0.5){
-					printf("ln2->sn1 >= -0.5:  %f  iteration: %i, M: %f\n", phi[it->x][it->y][it->z], iteration, M);
+					//printf("ln2->sn1 >= -0.5:  %f  iteration: %i, M: %f\n", phi[it->x][it->y][it->z], iteration, M);
 				}
 				sn1.push_back(*it);
 				it = ln2.erase(it);
@@ -287,7 +287,7 @@ void prepareUpdates(){
 			}
 		}
 	}
-	for(it = lp2.begin(); it < lp2.end();){
+	for(it = lp2.begin(); it != lp2.end();){
 		if(checkMaskNeighbours(it->x, it->y, it->z, 2, 1) == false){
 			label[it->x][it->y][it->z] = 3;
 			phi[it->x][it->y][it->z] = 3;
@@ -298,7 +298,7 @@ void prepareUpdates(){
 			phi[it->x][it->y][it->z] = M+1;
 			if(phi[it->x][it->y][it->z] < 1.5){
 				if(phi[it->x][it->y][it->z] < 0.5){
-					printf("lp2->sp1 < 0.5:  %f  iteration: %i, M: %f\n\n", phi[it->x][it->y][it->z], iteration, M);
+					//printf("lp2->sp1 < 0.5:  %f  iteration: %i, M: %f\n\n", phi[it->x][it->y][it->z], iteration, M);
 				}
 				sp1.push_back(*it);
 				it = lp2.erase(it);
@@ -320,13 +320,13 @@ void prepareUpdates(){
 void updateLevelSets(){	
 	//start = std::clock();
 	
-	for (it = sz.begin(); it < sz.end(); it++){
+	for (it = sz.begin(); it != sz.end(); it++){
 		label[it->x][it->y][it->z] = 0;					
 		lz.push_back(*it);		
 	}
 	sz.clear();
 
-	for (it = sn1.begin(); it < sn1.end(); it++){
+	for (it = sn1.begin(); it != sn1.end(); it++){
 		label[it->x][it->y][it->z] = -1;
 		ln1.push_back(*it);
 		if (phi[it->x+1][it->y][it->z] == -3){	
@@ -334,7 +334,7 @@ void updateLevelSets(){
 			it->x++;	//[x+1,y,z]
 			sn2.push_back(*it);
 			if(phi[it->x][it->y][it->z] >= -1.5) {
-				printf("\npushed %f to sn2 in iter %i, first if", phi[it->x][it->y][it->z], iteration);
+				//printf("\npushed %f to sn2 in iter %i, first if", phi[it->x][it->y][it->z], iteration);
 			}
 			it->x--;	//Siden vi bruker if, og ikke if else setninger må verdien settes tilbake til x
 		}
@@ -343,7 +343,7 @@ void updateLevelSets(){
 			it->y++;	//[x,y+1,z]
 			sn2.push_back(*it);
 			if(phi[it->x][it->y][it->z] >= -1.5) {
-				printf("\npushed %f to sn2 in iter %i, sec if", phi[it->x][it->y][it->z], iteration);
+				//printf("\npushed %f to sn2 in iter %i, sec if", phi[it->x][it->y][it->z], iteration);
 			}
 			it->y--;
 		}
@@ -352,7 +352,7 @@ void updateLevelSets(){
 			it->z++;	//[x,y,z+1]
 			sn2.push_back(*it);
 			if(phi[it->x][it->y][it->z] >= -1.5) {
-				printf("\npushed %f to sn2 in iter %i, third if", phi[it->x][it->y][it->z], iteration);
+				//printf("\npushed %f to sn2 in iter %i, third if", phi[it->x][it->y][it->z], iteration);
 			}
 			it->z--;
 		}
@@ -361,7 +361,7 @@ void updateLevelSets(){
 			it->x--;	//[x-1,y,z]
 			sn2.push_back(*it);
 			if(phi[it->x][it->y][it->z] >= -1.5) {
-				printf("\npushed %f to sn2 in iter %i, fourth if", phi[it->x][it->y][it->z], iteration);
+				//printf("\npushed %f to sn2 in iter %i, fourth if", phi[it->x][it->y][it->z], iteration);
 			}
 			it->x++;
 		}
@@ -370,7 +370,7 @@ void updateLevelSets(){
 			it->y--;	//[x,y-1,z]
 			sn2.push_back(*it);
 			if(phi[it->x][it->y][it->z] >= -1.5) {
-				printf("\npushed %f to sn2 in iter %i, fifth if", phi[it->x][it->y][it->z], iteration);
+				//printf("\npushed %f to sn2 in iter %i, fifth if", phi[it->x][it->y][it->z], iteration);
 			}
 			it->y++;
 		}
@@ -379,14 +379,14 @@ void updateLevelSets(){
 			it->z--;	//[x,y,z-1]
 			sn2.push_back(*it);
 			if(phi[it->x][it->y][it->z] >= -1.5) {
-				printf("\npushed %f to sn2 in iter %i, sixth if", phi[it->x][it->y][it->z], iteration);
+				//printf("\npushed %f to sn2 in iter %i, sixth if", phi[it->x][it->y][it->z], iteration);
 			}
 			it->z++;
 		}
 	}
 	sn1.clear();
 	
-	for (it = sp1.begin(); it < sp1.end(); it++){
+	for (it = sp1.begin(); it != sp1.end(); it++){
 		label[it->x][it->y][it->z] = 1;
 		lp1.push_back(*it);
 		if (phi[it->x+1][it->y][it->z] == 3){			
@@ -394,7 +394,7 @@ void updateLevelSets(){
 			it->x++;
 			sp2.push_back(*it);
 			if(phi[it->x][it->y][it->z] < 1.5) {
-				printf("\npushed %f to sp2 in iter %i, first if", phi[it->x][it->y][it->z], iteration);
+				//printf("\npushed %f to sp2 in iter %i, first if", phi[it->x][it->y][it->z], iteration);
 			}
 			it->x--;
 		}
@@ -403,7 +403,7 @@ void updateLevelSets(){
 			it->y++;
 			sp2.push_back(*it);
 			if(phi[it->x][it->y][it->z] < 1.5) {
-				printf("\npushed %f to sp2 in iter %i, sec if", phi[it->x][it->y][it->z], iteration);
+				//printf("\npushed %f to sp2 in iter %i, sec if", phi[it->x][it->y][it->z], iteration);
 			}
 			it->y--;
 		}
@@ -412,7 +412,7 @@ void updateLevelSets(){
 			it->z++;	//[x,y,z-1]
 			sp2.push_back(*it); //her lå feilen, det stod sn2.push_back istedenfor sp2.push_back
 			if(phi[it->x][it->y][it->z] < 1.5) {
-				printf("\npushed %f to sp2 in iter %i, third if", phi[it->x][it->y][it->z], iteration);
+				//printf("\npushed %f to sp2 in iter %i, third if", phi[it->x][it->y][it->z], iteration);
 			}
 			it->z--;
 		}
@@ -421,7 +421,7 @@ void updateLevelSets(){
 			it->x--;
 			sp2.push_back(*it);
 			if(phi[it->x][it->y][it->z] < 1.5) {
-				printf("\npushed %f to sp2 in iter %i, fourth if", phi[it->x][it->y][it->z], iteration);
+				//printf("\npushed %f to sp2 in iter %i, fourth if", phi[it->x][it->y][it->z], iteration);
 			}
 			it->x++;
 		}
@@ -430,7 +430,7 @@ void updateLevelSets(){
 			it->y--;
 			sp2.push_back(*it);
 			if(phi[it->x][it->y][it->z] < 1.5) {
-				printf("\npushed %f to sp2 in iter %i, fifth if", phi[it->x][it->y][it->z], iteration);
+				//printf("\npushed %f to sp2 in iter %i, fifth if", phi[it->x][it->y][it->z], iteration);
 			}
 			it->y++;
 		}
@@ -439,20 +439,20 @@ void updateLevelSets(){
 			it->z--;	//[x,y,z-1]
 			sp2.push_back(*it);
 			if(phi[it->x][it->y][it->z] < 1.5) {
-				printf("\npushed %f to sp2 in iter %i, sixth if", phi[it->x][it->y][it->z], iteration);
+				//printf("\npushed %f to sp2 in iter %i, sixth if", phi[it->x][it->y][it->z], iteration);
 			}
 			it->z++;
 		}
 	}
 	sp1.clear();
 	
-	for (it = sn2.begin(); it < sn2.end(); it++){
+	for (it = sn2.begin(); it != sn2.end(); it++){
 		label[it->x][it->y][it->z] = -2;
 		ln2.push_back(*it);
 	}
 	sn2.clear();
 
-	for (it = sp2.begin(); it < sp2.end(); it++){
+	for (it = sp2.begin(); it != sp2.end(); it++){
 		label[it->x][it->y][it->z] = 2;
 		lp2.push_back(*it);
 	}

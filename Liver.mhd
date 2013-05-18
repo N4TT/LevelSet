@@ -1,0 +1,17 @@
+ObjectType = Image 
+NDims = 3 
+BinaryData = True 
+BinaryDataByteOrderMSB = False 
+ElementSpacing = 1.188 1.188 3.000 
+DimSize = 320 220 72 
+Position = -205.663 -143.878 -105.295
+Orientation = 1.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 1.000000
+ElementType = MET_USHORT 
+Modality = MET_MOD_MR
+WindowLevel = 330.000
+WindowWidth = 705.000
+ImageType1 = ORIGINAL
+ImageType2 = PRIMARY
+ImageType3 = M
+ElementDataFile = Liver.raw 
+Creator = DICOMtoMetadataFilter

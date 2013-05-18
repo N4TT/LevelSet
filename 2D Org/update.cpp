@@ -1,7 +1,8 @@
 #include <iostream>
 #include <stdio.h>
 #include <cmath>
-#include <vector>
+//#include <vector>
+#include <list>
 #include <exception>
 #include <algorithm>
 #include "main.h"
@@ -11,7 +12,7 @@ using namespace std;
 float muOutside;
 float muInside;
 
-vector<float> minMaxList;
+list<float> minMaxList;
 
 float minMax(Pixel p, short greaterOrLess, short checkAgainst){//returns max if greaterOrLess =">=", 
 	float result;
@@ -124,14 +125,14 @@ float speedFunction(short i, short j){
 	return ret; 
 }
 
-vector<Pixel>::iterator it;
+list<Pixel>::iterator it;
 float M = 0;
 void prepareUpdates(){
 	//printf("\nsize prepare: %i ", sz.size());
-	for(it = lz.begin(); it<lz.end(); it++){//find pixels that are moving out of lz
+	for(it = lz.begin(); it != lz.end(); it++){//find pixels that are moving out of lz
 		it->f = speedFunction(it->x, it->y);
 	}
-	for(it = lz.begin(); it<lz.end();){//find pixels that are moving out of lz
+	for(it = lz.begin(); it != lz.end();){//find pixels that are moving out of lz
 		phi[it->x][it->y] += it->f;
 		if(phi[it->x][it->y] >= 0.5){
 			sp1.push_back(*it);
@@ -148,7 +149,7 @@ void prepareUpdates(){
 		}
 	}
 	
-	for(it = ln1.begin(); it<ln1.end();){//find pixels that are moving out of ln1
+	for(it = ln1.begin(); it != ln1.end();){//find pixels that are moving out of ln1
 		if(checkMaskNeighbours(it->x,it->y, 2, 0) == false){//if Ln1[i][j] has no neighbors q with label(q) == 0
 			sn2.push_back(*it);
 			it = ln1.erase(it);
@@ -169,7 +170,7 @@ void prepareUpdates(){
 			}
 		}
 	}
-	for(it = lp1.begin(); it<lp1.end();){//find pixels that are moving out of lp1
+	for(it = lp1.begin(); it != lp1.end();){//find pixels that are moving out of lp1
 		if(checkMaskNeighbours(it->x,it->y, 2, 0) == false){
 			sp2.push_back(*it);
 			it = lp1.erase(it);
@@ -190,7 +191,7 @@ void prepareUpdates(){
 			}
 		}
 	}
-	for(it = ln2.begin(); it < ln2.end();){
+	for(it = ln2.begin(); it != ln2.end();){
 		if(checkMaskNeighbours(it->x,it->y, 2, -1) == false){
 			label[it->x][it->y] = -3;
 			phi[it->x][it->y] = -3;
@@ -213,7 +214,7 @@ void prepareUpdates(){
 			}
 		}
 	}
-	for(it = lp2.begin(); it < lp2.end();){
+	for(it = lp2.begin(); it != lp2.end();){
 		if(checkMaskNeighbours(it->x,it->y, 2, 1) == false){
 			label[it->x][it->y] = 3;
 			phi[it->x][it->y] = 3;
@@ -240,13 +241,13 @@ void prepareUpdates(){
 }
 
 void updateLevelSets(){	
-	for (it = sz.begin(); it < sz.end(); it++){
+	for (it = sz.begin(); it != sz.end(); it++){
 		label[it->x][it->y] = 0;
 		lz.push_back(*it);	
 	}
 	sz.clear();
 
-	for (it = sn1.begin(); it < sn1.end(); it++){
+	for (it = sn1.begin(); it != sn1.end(); it++){
 		label[it->x][it->y] = -1;
 		ln1.push_back(*it);
 		if (phi[it->x+1][it->y] == -3){	
@@ -276,7 +277,7 @@ void updateLevelSets(){
 	}
 	sn1.clear();
 	
-	for (it = sp1.begin(); it < sp1.end(); it++){
+	for (it = sp1.begin(); it != sp1.end(); it++){
 		label[it->x][it->y] = 1;
 		lp1.push_back(*it);
 		if (phi[it->x+1][it->y] == 3){			
@@ -306,13 +307,13 @@ void updateLevelSets(){
 	}
 	sp1.clear();
 	
-	for (it = sn2.begin(); it < sn2.end(); it++){
+	for (it = sn2.begin(); it != sn2.end(); it++){
 		label[it->x][it->y] = -2;
 		ln2.push_back(*it);
 	}
 	sn2.clear();
 
-	for (it = sp2.begin(); it < sp2.end(); it++){
+	for (it = sp2.begin(); it != sp2.end(); it++){
 		label[it->x][it->y] = 2;
 		lp2.push_back(*it);
 	}

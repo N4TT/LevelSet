@@ -4,20 +4,20 @@ extern float phi[HEIGHT+BORDER][WIDTH+BORDER]; //representation of the zero leve
 extern short label[HEIGHT+BORDER][WIDTH+BORDER];//contains only integer values between -3 and 3
 extern float F[HEIGHT][WIDTH];
 
-extern vector<Pixel> lz; // zero level set
-extern vector<Pixel> lp1;
-extern vector<Pixel> ln1;
-extern vector<Pixel> lp2;
-extern vector<Pixel> ln2;
+extern list<Pixel> lz; // zero level set
+extern list<Pixel> lp1;
+extern list<Pixel> ln1;
+extern list<Pixel> lp2;
+extern list<Pixel> ln2;
 
 extern float treshold, alpha, epsilon;
 
 //temp values
-extern vector<Pixel> sz; //values in sz are to be moved to lz
-extern vector<Pixel> sp1;
-extern vector<Pixel> sn1;
-extern vector<Pixel> sp2;
-extern vector<Pixel> sn2;
+extern list<Pixel> sz; //values in sz are to be moved to lz
+extern list<Pixel> sp1;
+extern list<Pixel> sn1;
+extern list<Pixel> sp2;
+extern list<Pixel> sn2;
 
 void prepareUpdates();
 void updateLevelSets();

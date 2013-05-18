@@ -1,0 +1,5 @@
+NDims = 3
+DimSize = 256 256 256
+ElementType = MET_UCHAR
+ElementDataFile = aneurism.raw
+

@@ -1,9 +1,7 @@
-#include "EasyBMP.h"
 #include <gtk/gtk.h>
-//#include "EasyBMP.h"
 #include <iostream>
 #include <stdio.h>
-#include <vector>
+#include <list>
 #include <exception>
 #include <stdlib.h>
 #include <string.h>
@@ -11,6 +9,11 @@
 #include "main.h"
 #include "update.h"
 #include "SIPL/Core.hpp"
+
+#include <cstdio> //to calculate runtime
+#include <ctime>  //to calculate runtime
+clock_t start;
+double duration;
 
 //#include <omp.h> //openMP
 
@@ -31,17 +34,17 @@ float treshold, alpha, epsilon;
 
 //#define index(i,j, k) ((i)+(j)*WIDTH+(k)*WIDTH*DEPTH)
 
-vector<Pixel> lz;
-vector<Pixel> lp1;
-vector<Pixel> ln1;
-vector<Pixel> lp2;
-vector<Pixel> ln2;
+list<Pixel> lz;
+list<Pixel> lp1;
+list<Pixel> ln1;
+list<Pixel> lp2;
+list<Pixel> ln2;
 
-vector<Pixel> sz;
-vector<Pixel> sp1;
-vector<Pixel> sn1;
-vector<Pixel> sp2;
-vector<Pixel> sn2;
+list<Pixel> sz;
+list<Pixel> sp1;
+list<Pixel> sn1;
+list<Pixel> sp2;
+list<Pixel> sn2;
 
 void fillInit(short minX, short minY, short minZ, short maxX, short maxY, short maxZ){
 	if(maxX - minX <= 0){
@@ -67,20 +70,15 @@ void fillInit(short minX, short minY, short minZ, short maxX, short maxY, short 
 	printf("\nloop done");
 }
 
-float fillSphere(int3 seed, int radius){
-	int numPixelsInside = 0;
-	float sumPixelValues = 0;
+void fillSphere(int3 seed, int radius){
 	for(int i = seed.x - radius; i<seed.x + radius; i++){
 	for(int j = seed.y - radius; j<seed.y + radius; j++){
 	for(int k = seed.z - radius; k<seed.z + radius; k++){
 		int3 n(i,j,k);
 		if(sqrt((float)((seed.x-n.x)*(seed.x-n.x)+(seed.y-n.y)*(seed.y-n.y)+(seed.z-n.z)*(seed.z-n.z))) < radius){
-			numPixelsInside ++;
-			sumPixelValues += image[i][j][k];
 			init[i][j][k] = 1;
 		}
 	}}}
-	return sumPixelValues/numPixelsInside;
 }
 
 bool checkMaskNeighbours(int i, int j, int k, int id, short res){ //res er verdien som vi sjekker opp mot, kriteriet for success
@@ -141,22 +139,6 @@ void pushAndStuff(Pixel p, short level){//støtter Pixel struct
 }
 
 void setLevels(Pixel p, short level){//støtter Pixel Struct
-/*
-	for(int i = p.x-1; i<p.x+1; i++){
-		for(int j = p.y-1; j<p.y+1; j++){
-			for(int k = p.z-1; k<p.z+1; k++){
-				if(p.x != i && p.y != j &&p.z != k){
-					if(label[i][j][k] == 3){
-						pushAndStuff(Pixel(i, j, k), level);
-					}
-					else if(label[i][j][k] == -3){
-						pushAndStuff(Pixel(i, j, k), level);
-					}
-				}
-			}
-		}
-	}
-*/
 	if(label[p.x+1][p.y][p.z] == 3){
 		pushAndStuff(Pixel(p.x+1, p.y, p.z), level);
 	}
@@ -199,7 +181,7 @@ void setLevels(Pixel p, short level){//støtter Pixel Struct
 
 void initialization(){
 
-	vector<Pixel>::iterator it;
+	list<Pixel>::iterator it;
 
 	for (int i = 0; i<HEIGHT+BORDER; i++){
 		for (int j = 0; j<WIDTH+BORDER; j++){
@@ -227,95 +209,49 @@ void initialization(){
 		}
 	}
 
-	for (it = lz.begin(); it < lz.end(); it++){
+	for (it = lz.begin(); it != lz.end(); it++){
 		setLevels(*it, 1);//second levelSet (level 1)			
 	}
 
-	for (it = lp1.begin(); it < lp1.end(); it++){
+	for (it = lp1.begin(); it != lp1.end(); it++){
 		setLevels(*it, 2);
 	}
-	for (it = ln1.begin(); it < ln1.end(); it++){
+	for (it = ln1.begin(); it != ln1.end(); it++){
 		setLevels(*it, 2);
 	}
 
 }
-/*
-void readFile(BMP img){
-	//copy input data (img) to image[][] and normalize to [0, 1]
-	for (int i =0; i<HEIGHT; i++){
-		for (int j = 0; j<WIDTH; j++){
-			image[i][j] = img(i,j)->Red;
-			image[i][j] /= 255;
-		}
-	}
-	printf("image filled \n");
-}
 
-void writeFile(BMP img, int id){
-	if(id == 1){ //label
-		for (int i =0; i<HEIGHT; i++){
-			for (int j = 0; j<WIDTH; j++){
-				img(i,j)->Red = (label[i][j] +3)*42; //normalize to [0, 255]
-				img(i,j)->Green = (label[i][j] +3)*42;
-				img(i,j)->Blue = (label[i][j] +3)*42;
-			}
-		}
-	}
-	else if(id == 2){ //phi
-		for (int i =0; i<HEIGHT; i++){
-			for (int j = 0; j<WIDTH; j++){
-				img(i,j)->Red = (phi[i][j] +3)*42; //normalize to [0, 255]
-				img(i,j)->Green = (phi[i][j] +3)*42;
-				img(i,j)->Blue = (phi[i][j] +3)*42;
-			}
-		}
-	}
-	else{ //zeroLevelSet
-		printf("dsed");
-		for (int i =0; i<HEIGHT; i++){
-			for (int j = 0; j<WIDTH; j++){
-				img(i,j)->Red = zeroLevelSet[i][j]; 
-				img(i,j)->Green = zeroLevelSet[i][j]; 
-				img(i,j)->Blue = zeroLevelSet[i][j]; 
-			}
-		}
-	}
-	img.WriteToFile("output.bmp");
-	//img.WriteToFile("output.bmp");
-}
-*/
-
-void displayVolume(Volume<uchar> * V, int3 seed, int display){ //display == 0 -> display the input mhd data, display == 1 -> display the segmentation result
+void displayVolume(Volume<ushort> * V, int3 seed, int display){ //display == 0 -> display the input mhd data, display == 1 -> display the segmentation result
 	Volume<float2> * v2 = new Volume<float2>(V->getSize());
 	if(display == 0){ //display input data
-		Volume<float2> * v2 = new Volume<float2>(V->getSize());
-		for(int x = 0; x < v2->getWidth(); x++) {
-		for(int y = 0; y < v2->getHeight(); y++) {
-		for(int z = 0; z < v2->getDepth(); z++) {
-			float2 vector;
-			vector.x = (float)V->get(x,y,z) / 255.0f;
+		for(int x = 0; x < V->getWidth(); x++) {
+		for(int y = 0; y < V->getHeight(); y++) {
+		for(int z = 0; z < V->getDepth(); z++) {
+			float2 list;
+			list.x = (float)V->get(x,y,z) / 255.0f;
 			int3 n(x,y,z);	
 			image[x][y][z] = (int)V->get(x,y,z) / 255.0f;
 			if(sqrt((float)((seed.x-n.x)*(seed.x-n.x)+(seed.y-n.y)*(seed.y-n.y)+(seed.z-n.z)*(seed.z-n.z))) < 5.0f){
-				vector.y = 1.0f;
+				list.y = 1.0f;
 			}
-			v2->set(n, vector);//guesswork:setter punktet n i v2 til verdiene i vector. v2 er et volum med elementer float2
-		}}}						//vector.y bestemmer om punktet er innenfor radiusen til seed punktet mens vector.x er verdien til bildet i det punktet.
+			v2->set(n, list);//guesswork:setter punktet n i v2 til verdiene i list. v2 er et volum med elementer float2
+		}}}						//list.y bestemmer om punktet er innenfor radiusen til seed punktet mens list.x er verdien til bildet i det punktet.
 		//v2->showMIP();
-		//v2->show();
+		v2->show();
 	}
 	else{ //display segmentation result
-		for(int x = 0; x < v2->getWidth(); x++) {
-		for(int y = 0; y < v2->getHeight(); y++) {
-		for(int z = 0; z < v2->getDepth(); z++) {
-			float2 vector;
-			vector.x = (float)zeroLevelSet[x][y][z] / 255.0f;
+		for(int x = 0; x < V->getWidth(); x++) {
+		for(int y = 0; y < V->getHeight(); y++) {
+		for(int z = 0; z < V->getDepth(); z++) {
+			float2 list;
+			list.x = (float)zeroLevelSet[x][y][z] / 255.0f;
 			int3 n(x,y,z);	
 			if(sqrt((float)((seed.x-n.x)*(seed.x-n.x)+(seed.y-n.y)*(seed.y-n.y)+(seed.z-n.z)*(seed.z-n.z))) < 5.0f){
 			//if(seed.distance(n) < 5.0f) {
-				vector.y = 1.0f;
+				list.y = 1.0f;
 			}
-			v2->set(n, vector);
+			v2->set(n, list);
 		}}}
 		//v2->showMIP();
 		v2->show();
@@ -326,16 +262,18 @@ int main(){
 	//int num_threads = 10;
 	//omp_set_num_threads(num_threads);
 	
-	Volume<uchar> * V = new Volume<uchar>("aneurism.mhd");
+	
+	//Volume<uchar> * V = new Volume<uchar>("aneurism.mhd");
+	Volume<ushort> * V = new Volume<ushort>("Liver.mhd");
 	//Volume<uchar> * V = new Volume<uchar>("circle_with_values_245.mhd");
 	//Volume<uchar> * V = new Volume<uchar>("rectangle.mhd");
 	
-	int3 seed(105, 115, 160);
+	int3 seed(189, 97, 51);
 	displayVolume(V, seed, 0);
 	
 	try{
 		//fillInit(110, 90, 140, 125, 105, 155);
-		treshold = fillSphere(seed, 5) + 0,1;
+		fillSphere(seed, 5);
 		printf("init filled %f\n", treshold);
 	}
 	catch(int e){
@@ -352,17 +290,18 @@ int main(){
 	initialization();
 	calculateMu(treshold);
 
-	vector<Pixel>::iterator itt;
+	list<Pixel>::iterator itt;
 	//treshold = 0.95; epsilon = 0.05; alpha = 0.95; //virker perfekt med sirkel volumet
 	treshold = 1.0; epsilon = 0.3; alpha = 0.75;
 	printf("starting main loop\n");
-	int iterations = 1000;
+	int iterations = 500;
+	start = std::clock();
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		updateLevelSets();
 		
 		if(i == (iterations-1)){ //copy the zero level set pixels to zeroLevelSet
-			for(itt = lz.begin(); itt<lz.end(); itt++){
+			for(itt = lz.begin(); itt != lz.end(); itt++){
 				zeroLevelSet[itt->x][itt->y][itt->z] = 255;
 			}
 		}
@@ -370,14 +309,12 @@ int main(){
 			printf("\nloop %i done", i);
 		}
 	}
+	duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+	printf("\n time used: %f", duration);
 	printf("\nmain loop finished\n");
 	
 	displayVolume(V, seed, 1);
 	
-	
-	/*BMP img;
-		img.ReadFromFile("star.bmp");*/
-	//store zerolevelset as raw file
 	Volume<uchar> * v3 = new Volume<uchar>(V->getSize());
 	for(int x = 0; x < V->getWidth(); x++) {
 	for(int y = 0; y < V->getHeight(); y++) {
@@ -400,6 +337,7 @@ int main(){
 		v3->set(x,y,z, (uchar)zeroLevelSet[x][y][z]);
 	}}}
 	printf("\n maxCurvature: %f,  minCurvature: %f \n",maxCurvature, minCurvature);
+	printf("%i, %i, %i, %i, %i\n", lz.size(), ln1.size(), lp1.size(), ln2.size(), lp2.size());
 	v3->save("1000iters.raw");
 	printf("file stored\n");
 	

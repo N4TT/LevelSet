@@ -1,11 +1,11 @@
-#include <vector>
+#include <list>
 #include <string>
 using namespace std;
 
 
-#define HEIGHT 256
-#define WIDTH 256
-#define DEPTH 256
+#define HEIGHT 320
+#define WIDTH 220
+#define DEPTH 72
 #define BORDER 2
 
 struct Pixel{

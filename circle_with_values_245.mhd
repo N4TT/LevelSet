@@ -1,0 +1,4 @@
+NDims = 3
+DimSize = 256 256 256
+ElementType = MET_UCHAR
+ElementDataFile = circle_with_values_245.raw
