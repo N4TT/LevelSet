@@ -17,5 +17,11 @@
 \BOOKMARK [0][-]{chapter.3}{Narrow Band - for lite?}{}% 17
 \BOOKMARK [1][-]{section.3.1}{Introduction}{chapter.3}% 18
 \BOOKMARK [1][-]{section.3.2}{Overview of the Narrow Band method}{chapter.3}% 19
-\BOOKMARK [0][-]{appendix.A}{Sparse Field - Pseudocode}{}% 20
-\BOOKMARK [0][-]{appendix.B}{Implemented Sparse field method}{}% 21
+\BOOKMARK [0][-]{chapter.4}{Sparse Field - Implemented code}{}% 20
+\BOOKMARK [1][-]{section.4.1}{Introduction}{chapter.4}% 21
+\BOOKMARK [1][-]{section.4.2}{TODO}{chapter.4}% 22
+\BOOKMARK [1][-]{section.4.3}{Forskjeller fra vår kode og pseudokoden til lankton}{chapter.4}% 23
+\BOOKMARK [1][-]{section.4.4}{Om koden vår}{chapter.4}% 24
+\BOOKMARK [1][-]{section.4.5}{Performance}{chapter.4}% 25
+\BOOKMARK [0][-]{appendix.A}{Sparse Field - Pseudocode}{}% 26
+\BOOKMARK [0][-]{appendix.B}{Implemented Sparse field method}{}% 27

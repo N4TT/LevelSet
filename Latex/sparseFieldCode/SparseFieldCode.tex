@@ -1,0 +1,63 @@
+\chapter{Sparse Field - Implemented code}
+\section{Introduction}
+The sparse field level set method was implemented in C++ for the project, and the implemented code is mainly based on the pseudocode in \cite{lankton09}, which again is based on Whitaker's introduction to the sparse field method in \cite{whitaker89}. The implemented code can be found in appendix B, and its pseudocode can be found in appendix A. In this chapter the pseudocode in \cite{lankton09} will be explained first, along with how it works. Secondly, the differences between the pseudocodes in appendix A and \cite{lankton09} will be described. And finally there will be a detailed explanation of the implemented code. 
+
+\section{TODO}
+As previously mentioned, the sparse field method can be implemented using linked lists to hold the pixels being used in the calculations. Pixels in this context does not mean the pixels in the original or segmented image, but the points in the matrix that represents the $\phi$.These pixels are seperated into five layers, each represented by a linked list. One of the lists holds the active points, i.e the zero level set, and is referred to as the Lz list. The rest of the needed pixels are seperated according to their closeness to the pixels in Lz and which side of the Lz pixels they are located. The Ln1 list contains the pixels that are adjacent to Lz pixels on the inside of the object being segmented. Similarly Lp1 contains pixels that are adjacent, but on the outside. All pixels that are adjacent to those in Ln1 except for those in Lz are elements in the Ln2 list, and similarly the ones adjacent to Lp1 on the opposite side of Lz are part of Lp2. This becomes more clear when looking at table \ref{rangeTab1} and figure \ref{labelExample}. 
+
+\begin{table}[h] %h = here
+	\begin{tabular}{| c | c |} 
+	% l = left-justified columns, alternatives are: r (right) and c (center)
+	% | = vertical line, \hline = horizontal line
+	\hline
+	List name & Range\\
+	\hline
+	Lz & [-0.5, 0.5]\\
+	Ln1 & [-1.5, -0.5>\\
+	Lp1 & <0.5, 1.5]\\
+	Ln2 & [-2.5, -1.5>\\
+	Lp2 & <1.5, 2.5]\\
+	\hline
+	\end{tabular}
+	\caption{Range of lists used in \cite{lankton09}}
+	\label{rangeTab1}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.65\textwidth]{sparseFieldCode/labelExample}
+\caption{Steps in iterative shape averaging. All except the first transformation is non-rigid.}
+\label{labelExample}
+\end{figure}
+
+
+As described in table X Lz contains of pixels with values in the range
+
+\section{Forskjeller fra vår kode og pseudokoden til lankton}
+BlaBla ...   blabal ... .... Table X1 describes the ranges used for the different lists in the implemented code. By comparing table X with table X1 a small difference in the list ranges can be seen (Nevn hvilke forandiringer her). These small changes in the ranges of the lists may seem unsignificant but they are quite important. Figures X2 and X3 depicts the segmentation result of the same original input image with equal number of iterations completed, with the ranges from table X and X1 used resprectively.
+
+\begin{table}[h] %h = here
+	\begin{tabular}{| c | c |} 
+	% l = left-justified columns, alternatives are: r (right) and c (center)
+	% | = vertical line, \hline = horizontal line
+	\hline
+	List name & Range\\
+	\hline
+	Lz & [-0.5, 0.5>\\
+	Ln1 & [-1.5, -0.5>\\
+	Lp1 & [0.5, 1.5>\\
+	Ln2 & [-2.5, -1.5>\\
+	Lp2 & [1.5, 2.5>\\
+	\hline
+	\end{tabular}
+	\caption{Range of lists used in the implementation}
+	\label{rangeTab2}
+\end{table}
+Som vi ser så ser X3 mye bedre ut blabalba. 
+
+\section{Om koden vår}
+TODO
+
+\section{Performance}
+Nevn at vi først brukte vector i 2D versjonen, men at det gikk veldig tregt i 3D versjonen. Forskjellige ting ble brukt for å minske farten, deriblant å bruke float istedenfor double, noe som senket økte farten med X. Vi brukte også OpenMP som en midlertidig løsning for speedup da vi testet koden på forskjellige datasett. Grunnen til at vi brukte vector var fordi det var nevnt i \cite{lankton09} på en måte alik at det kunne misforstås å være linked-list. Ved begynnelsen av implementeringen ble det ikke tenkt gjennom at vector kanskje ikke var den beste løsningen å bruke. Men siden en full segmentering av et 512*512*265 bilde tok over 20min begynte vi å se nærmere på hva som kan endres på. Fant da ut at det er stor forskjell mellom vector og list i C++. (Nevn noen av de største forskjellene her.) Endret så til å bruke list istedenfor vector, og fikk en speed increase på en faktor av 10 i 3D. MER!! (Nevn CUDA også hvis det blir implementert.. burde vel ha eget kapittel elr section for det.) 
+
