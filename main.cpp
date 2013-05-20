@@ -262,7 +262,6 @@ int main(){
 	//int num_threads = 10;
 	//omp_set_num_threads(num_threads);
 	
-	
 	//Volume<uchar> * V = new Volume<uchar>("aneurism.mhd");
 	Volume<ushort> * V = new Volume<ushort>("Liver.mhd");
 	//Volume<uchar> * V = new Volume<uchar>("circle_with_values_245.mhd");
