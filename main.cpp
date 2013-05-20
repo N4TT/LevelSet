@@ -293,7 +293,7 @@ int main(){
 	//treshold = 0.95; epsilon = 0.05; alpha = 0.95; //virker perfekt med sirkel volumet
 	treshold = 1.0; epsilon = 0.3; alpha = 0.75;
 	printf("starting main loop\n");
-	int iterations = 500;
+	int iterations = 1000;
 	start = std::clock();
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();

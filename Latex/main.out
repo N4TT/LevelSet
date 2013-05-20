@@ -23,8 +23,10 @@
 \BOOKMARK [0][-]{chapter.5}{Sparse Field - Implemented code}{}% 23
 \BOOKMARK [1][-]{section.5.1}{Introduction}{chapter.5}% 24
 \BOOKMARK [1][-]{section.5.2}{TODO}{chapter.5}% 25
-\BOOKMARK [1][-]{section.5.3}{Forskjeller fra vår kode og pseudokoden til lankton}{chapter.5}% 26
-\BOOKMARK [1][-]{section.5.4}{Om koden vår}{chapter.5}% 27
-\BOOKMARK [1][-]{section.5.5}{Performance}{chapter.5}% 28
-\BOOKMARK [0][-]{appendix.A}{Sparse Field - Pseudocode}{}% 29
-\BOOKMARK [0][-]{appendix.B}{Implemented Sparse field method}{}% 30
+\BOOKMARK [2][-]{subsection.5.2.1}{Datastructures and types used - elr noe lignende}{section.5.2}% 26
+\BOOKMARK [1][-]{section.5.3}{Forskjeller fra vår kode og pseudokoden til lankton}{chapter.5}% 27
+\BOOKMARK [1][-]{section.5.4}{Om koden vår}{chapter.5}% 28
+\BOOKMARK [1][-]{section.5.5}{Problems met}{chapter.5}% 29
+\BOOKMARK [1][-]{section.5.6}{Performance}{chapter.5}% 30
+\BOOKMARK [0][-]{appendix.A}{Sparse Field - Pseudocode}{}% 31
+\BOOKMARK [0][-]{appendix.B}{Implemented Sparse field method}{}% 32

@@ -10,7 +10,7 @@ As previously mentioned, the sparse field method can be implemented using linked
 	% l = left-justified columns, alternatives are: r (right) and c (center)
 	% | = vertical line, \hline = horizontal line
 	\hline
-	List name & Range\\
+	List Name & Range\\
 	\hline
 	Lz & [-0.5, 0.5]\\
 	Ln1 & [-1.5, -0.5>\\
@@ -23,15 +23,36 @@ As previously mentioned, the sparse field method can be implemented using linked
 	\label{rangeTab1}
 \end{table}
 
-\begin{figure}[h]
+\begin{figure}[h!]
 \centering
 \includegraphics[width=0.65\textwidth]{sparseFieldCode/labelExample}
-\caption{Steps in iterative shape averaging. All except the first transformation is non-rigid.}
+\caption{Label image: image showing the different layers under segmentation.}
 \label{labelExample}
 \end{figure}
 
+Figure \ref{labelExample} represents the 5 different layers with different colors. The black colored part is defined to be inside the object being segmented, the white part as outside, and these two parts are not used in the computation for the current iteration. The dark blue pixels around the dark part are the pixels contained in Ln2, and the brown pixels are those on Ln1. The dark-purple colored pixels are Lz elements, light-purple are Lp1 and light-blue are pixels in Lp2. This type of image will henceforth be referred to as the label image, because it shows the labels of the image being segmented.
 
-As described in table X Lz contains of pixels with values in the range
+\subsection{Datastructures and types used - elr noe lignende}
+In addition to the five layers represented as five lists, there are some other structures implemented in the code. One of them is the label image described above, which is used to track where the pixels containing the different layers are on the image domain. Given a pixel, to find out which layer (if any) that pixel is a member of, a simple lookup to the label is enough. Another excellent feature of the label image is that it can be used to verify that all the layers are correclty aligned and if there are any pixels of any layers that are poorly placed. It can thus be used to find artifacts that might have resulted from code errors. An example of a label image (zoomed in) which clearly states that there is something wrong with how the layers are handled in the code is shown in figure \ref{labelFailedEx}. How the label image actually should have been is depicted in figure \ref{labelOkEx}.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.90\textwidth]{sparseFieldCode/labelFailedEx}
+\caption{A label image with pixels in places they should not be.}
+\label{labelFailedEx}
+\end{figure}
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.90\textwidth]{sparseFieldCode/labelOkEx}
+\caption{How the label image should have been.}
+\label{labelOkEx}
+\end{figure}
+
+The level set ($\phi$) is also represented as an image...TODO
+
+
 
 \section{Forskjeller fra vår kode og pseudokoden til lankton}
 BlaBla ...   blabal ... .... Table X1 describes the ranges used for the different lists in the implemented code. By comparing table X with table X1 a small difference in the list ranges can be seen (Nevn hvilke forandiringer her). These small changes in the ranges of the lists may seem unsignificant but they are quite important. Figures X2 and X3 depicts the segmentation result of the same original input image with equal number of iterations completed, with the ranges from table X and X1 used resprectively.
@@ -58,6 +79,10 @@ Som vi ser så ser X3 mye bedre ut blabalba.
 \section{Om koden vår}
 TODO
 
+\section{Problems met}
+
+
 \section{Performance}
 Nevn at vi først brukte vector i 2D versjonen, men at det gikk veldig tregt i 3D versjonen. Forskjellige ting ble brukt for å minske farten, deriblant å bruke float istedenfor double, noe som senket økte farten med X. Vi brukte også OpenMP som en midlertidig løsning for speedup da vi testet koden på forskjellige datasett. Grunnen til at vi brukte vector var fordi det var nevnt i \cite{lankton09} på en måte alik at det kunne misforstås å være linked-list. Ved begynnelsen av implementeringen ble det ikke tenkt gjennom at vector kanskje ikke var den beste løsningen å bruke. Men siden en full segmentering av et 512*512*265 bilde tok over 20min begynte vi å se nærmere på hva som kan endres på. Fant da ut at det er stor forskjell mellom vector og list i C++. (Nevn noen av de største forskjellene her.) Endret så til å bruke list istedenfor vector, og fikk en speed increase på en faktor av 10 i 3D. MER!! (Nevn CUDA også hvis det blir implementert.. burde vel ha eget kapittel elr section for det.) 
+
 
