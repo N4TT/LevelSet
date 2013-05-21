@@ -1,6 +1,6 @@
 \chapter{Sparse Field}
 
-\section{Theory} //Theory eller introduction som seksjons-overskrift?
+\section{Introduction}
 
 The narrow band  method assumes that the computation of the SDT is so slow that it cannot be computed for every iteration. The sparse field method introduced in \cite{whitaker89} uses a fast approximation of the distance transform that makes it feasible to compute the neighborhood of the level set model for each iteration. In the sparse field method the idea of using a thin band is taken to the extreme by working on a band that is only one point wide. The points (immediately?) adjacent to the level set are called active points, and all of them together are referred to as the active set. At each iteration only a thin layer of points near the active set are visited and updated. Using only the active points to compute the derivatives would not give sufficient accuracy. Because of this, the method extends out from the active points in small layers to create a neighborhood that is precisely the width needed to calculate the derivatives needed. 
 
@@ -11,21 +11,9 @@ A disadvantage of the narrow band method is that the stability at the boundaries
 
 The sparse field algorithm is based on an important approximation, it assumes that points adjacent to the active points undergoes the same change in value as their nearby active set neighbors. But despite this, the errors introduced by the sparse field algorithm are no worse than many other level set algorithms. Since only those grid points whose values are changing (the active points and their neighbors) are visited at each time step the growth computation time is \(d^{n-1}\), where d is the number of pixels in along one dimension of the image. This is the same as for parameterized models where the computation times increase with the resolution of the domain, rather than the range. 
 
+\section{Overwiew of the Sparse Field method}
 
-
-The Up-Winding scheme gives the curvature in an area surrounding a point in the active set. This scheme uses both first and second order derivatives, and to calculte them it needs a 3x3x3(3D) grid of points surrounding the point for which it is calculating the speed. 
-
-
-\section{Implementation}
-
-We implemented the Sparse Field method using C/C++. Out implementation used lists, a C++ struct, to maintain the different
-
-
-
-
-Cutouts and working progress stuff:
-
-The neighbours of the active set are tracked in lists, L1, L2, L-1 and L-2, and in addition we have the active set L0. These lists keep track of the coordinates of where the different layers reside in each iteration. 
+Like described in section (INSERT UP_WINDING SCHEME SECTION NUMBER HERE), the Up-Winding scheme gives the curvature in an area surrounding a point in the active set. This scheme uses both first and second order derivatives, and to calculte them it needs a 3x3x3(3D) grid of points surrounding the point for which it is calculating the speed. This creates a lower limit for the number of layers surrounding the active set. In addition to the active set which is stored in \(L{0}\) we need 
 
 
 
