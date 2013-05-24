@@ -1,9 +1,9 @@
 \chapter{Sparse Field - Implemented code}
 \section{Introduction}
-The sparse field level set method was implemented in C++ for the project, and the implemented code is mainly based on the pseudocode in \cite{lankton09}, which again is based on Whitaker's introduction to the sparse field method in \cite{whitaker89}. The implemented code can be found in appendix B, and its pseudocode can be found in appendix A. In this chapter the pseudocode in \cite{lankton09} will be explained first, along with how it works. Secondly, the differences between the pseudocodes in appendix A and \cite{lankton09} will be described. And finally there will be a detailed explanation of the implemented code. 
+The sparse field level set method was implemented in C++ for the project, and the implemented code is mainly based on the pseudocode in \cite{lankton09}, which again is based on Whitaker's introduction to the sparse field method in \cite{whitaker89}. The implemented code can be found in appendix B, and its pseudocode can be found in appendix A. In this chapter the pseudocode in \cite{lankton09} will be explained first, along with how it works. Secondly, the differences between Lankton's pseudocodes in \cite{lankton09} and the implemented code will be described. And finally there will be a detailed explanation of the implemented code.
 
 \section{TODO}
-As previously mentioned, the sparse field method can be implemented using linked lists to hold the pixels being used in the calculations. Pixels in this context does not mean the pixels in the original or segmented image, but the points in the matrix that represents the $\phi$.These pixels are seperated into five layers, each represented by a linked list. One of the lists holds the active points, i.e the zero level set, and is referred to as the Lz list. The rest of the needed pixels are seperated according to their closeness to the pixels in Lz and which side of the Lz pixels they are located. The Ln1 list contains the pixels that are adjacent to Lz pixels on the inside of the object being segmented. Similarly Lp1 contains pixels that are adjacent, but on the outside. All pixels that are adjacent to those in Ln1 except for those in Lz are elements in the Ln2 list, and similarly the ones adjacent to Lp1 on the opposite side of Lz are part of Lp2. This becomes more clear when looking at table \ref{rangeTab1} and figure \ref{labelExample}. 
+As previously mentioned, the sparse field method can be implemented using linked lists to hold the pixels being used in the calculations. Pixels in this context does not mean the pixels in the original or segmented image, but the points in the matrix that represents the $\phi$. These pixels are seperated into five layers, each represented by a linked list. One of the lists holds the active points, i.e the zero level set, and is referred to as the Lz list. The rest of the needed pixels are seperated according to their closeness to the pixels in Lz and which side of the Lz pixels they are located. The Ln1 list contains the pixels that are adjacent to Lz pixels on the inside of the object being segmented. Similarly Lp1 contains pixels that are adjacent, but on the outside. All pixels that are adjacent to those in Ln1 except for those in Lz are elements in the Ln2 list, and similarly the ones adjacent to Lp1 on the opposite side of Lz are part of Lp2. This becomes more clear when looking at table \ref{rangeTab1} and figure \ref{labelExample}. 
 
 \begin{table}[h] %h = here
 	\begin{tabular}{| c | c |} 
@@ -25,37 +25,16 @@ As previously mentioned, the sparse field method can be implemented using linked
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.65\textwidth]{sparseFieldCode/labelExample}
+\includegraphics[width=0.65\textwidth]{implemented/labelExample}
 \caption{Label image: image showing the different layers under segmentation.}
 \label{labelExample}
 \end{figure}
 
-Figure \ref{labelExample} represents the 5 different layers with different colors. The black colored part is defined to be inside the object being segmented, the white part as outside, and these two parts are not used in the computation for the current iteration. The dark blue pixels around the dark part are the pixels contained in Ln2, and the brown pixels are those on Ln1. The dark-purple colored pixels are Lz elements, light-purple are Lp1 and light-blue are pixels in Lp2. This type of image will henceforth be referred to as the label image, because it shows the labels of the image being segmented.
-
-\subsection{Datastructures and types used - elr noe lignende}
-In addition to the five layers represented as five lists, there are some other structures implemented in the code. One of them is the label image (a 2D array) described above, which is used to track where the pixels containing the different layers are on the image domain. Given a pixel, to find out which layer (if any) that pixel is a member of, a simple lookup to the label is enough. Another excellent feature of the label image is that it can be used to verify that all the layers are correclty aligned and if there are any pixels of any layers that are poorly placed. It can thus be used to find artifacts that might have resulted from code errors. An example of a label image (zoomed in) which clearly states that there is something wrong with how the layers are handled in the code is shown in figure \ref{labelFailedEx}. How the label image actually should have been is illustrated in figure \ref{labelOkEx}.
-
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.90\textwidth]{sparseFieldCode/labelFailedEx}
-\caption{A label image with pixels in places they should not be.}
-\label{labelFailedEx}
-\end{figure}
-
-
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.90\textwidth]{sparseFieldCode/labelOkEx}
-\caption{How the label image should have been.}
-\label{labelOkEx}
-\end{figure}
-
-The level set ($\phi$) is also represented as an image...TODO
-
-
+Figure \ref{labelExample} represents the 5 different layers with different colors. The black colored part is defined to be inside the object being segmented, the white part as outside, and these two parts are not used in the computation for the current iteration. The dark blue pixels around the dark part are the pixels contained in Ln2, and the brown pixels are those on Ln1. The dark-purple colored pixels are Lz elements, light-purple are Lp1 and light-blue are pixels in Lp2. This type of image will henceforth be referred to as the $label$ image, because it shows the labels of the image being segmented.
 
 \section{Forskjeller fra vår kode og pseudokoden til lankton}
-BlaBla ...   blabal ... .... Table X1 describes the ranges used for the different lists in the implemented code. By comparing table X with table X1 a small difference in the list ranges can be seen (Nevn hvilke forandiringer her). These small changes in the ranges of the lists may seem unsignificant but they are quite important. Figures X2 and X3 depicts the segmentation result of the same original input image with equal number of iterations completed, with the ranges from table X and X1 used resprectively.
+Some improvements and changes from Lankton's pseudocode were made
+By looking closer at table \ref{rangeTab1} it can be seen that Lz has a slightly wider ramge than the other lists. This range of exactly 1 causes in some cases huge problems that lead to disortions and artifacts in the segmentation. What these problems are will be discussed in LINK TIL DET HER. To overcome these problems the ranges of the lists were slightly changed to make all the lists equal in range. The range-corrected lists are shown in table \ref{rangeTab2}, and even though the change seems insignificant it actually does change the result significantly (as will be discussed in SAMME LINKEN HER).
 
 \begin{table}[h] %h = here
 	\begin{tabular}{| c | c |} 
@@ -74,15 +53,49 @@ BlaBla ...   blabal ... .... Table X1 describes the ranges used for the differen
 	\caption{Range of lists used in the implementation}
 	\label{rangeTab2}
 \end{table}
-Som vi ser så ser X3 mye bedre ut blabalba. 
+
 
 \section{Om koden vår}
-TODO
+\subsection{Datastructures and types used - elr noe lignende}
+In addition to the five lists representing the as five layers, two arrays of equal size and dimension as the image to be segmented are used. One of them is the $label$ image described above, which is used to track where the pixels containing the different layers are on the domain. Given a pixel, to find out which layer (if any) that pixel is a member of, a simple lookup to the $label$ is enough. Another excellent feature of the $label$ array is that it can be used to verify that all the layers are correclty aligned and if there are any pixels of any layers that are poorly placed. The $label$ image can thus be used to find artifacts that might have resulted from code errors. An example of a $label$ image (zoomed in) which clearly states that there is something wrong with how the layers are handled in the code is shown in figure \ref{labelFailedEx}. How the $label$ label image actually should have been is illustrated in figure \ref{labelOkEx}.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.90\textwidth]{implemented/labelFailedEx}
+\caption{A label image with pixels in places they should not be.}
+\label{labelFailedEx}
+\end{figure}
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.90\textwidth]{implemented/labelOkEx}
+\caption{How the label image should have been.}
+\label{labelOkEx}
+\end{figure}
+
+The other array used is the $\phi$ - array, which contains the actual $\phi$ values of each pixel in the domain. The range of the values is exactly the same as in the $label$ image, but while the $label$ image only contains integer values describing which layer a pixel is part of, the $\phi$ image contains the actual values (floating point numbers) of the level set. The images represented by the $label$ and $\phi$ arrays would thus be very similar (though small differences may be seen) when looking at, but they do have different tasks. The $label$ is as mentioned used as a lookup table, while the $\phi$ array determines which layer a pixel belongs to after its pixels have been updated with the speed function.
+
+To correctly move pixels between the layers some temporary lists have to be used, one for each layer. By using these temporary lists, called Sn2, Sn1, Sz, Sp2 and Sp2, pixels are prevented from being moved more than 1 layer at a single iteration. Assume that pixel $A$ is in Ln1 and has two neighbours in Lz. These two neighbours will be updated by the speed function and may move out of Lz into either Ln1 or Lp1. If both these pixels are moved out of Lz, pixel $A$ will no longer have any neighbours in Lz and will in most cases be incorrectly moved to Ln2. This is only of of many possible mistakes that could happen when not using temporary lists, an another example is that a pixel could be moved to a list and then back to where it came from within the same iteration. Using temporary lists prevent such problems by adding the pixels that are to change layer into them, removing the pixels from the original lists, and finally when all temporary lists are filled with pixels to be moved and all the original lists have the pixels moving out of them removed, then the original lists are filled with those in the temporary lists. And then the temporary lists are emptied before the next iteration starts.
+
+
+FLYTT dette vekk til et annet sted...................
+Before explaining what this means, a brief look into how the pixels are pushed to and popped from the different lists is needed. First the speed function is calculated for each pixel in Lz (will be explained in more detail in LINK TIL DER SPEED FUNCTION BLIR FORKLART). Then the four remaining lists are updated, but not using the speed function as with the Lz pixels. Since Ln1 and Lp1 are defined to be neighbours to Lz on each side, and Lp2 and Ln2 as neighbour to Lp1 Ln1 respectively, there is no need to use computation time to calculate their speed function. They will follow Lz, e.g. if a pixel in Lz moves to the right, then its neighbours (in Ln1 and Lp1) at each side will also move a step to the right. Similarly Ln2 and Lp2 pixels will follwow Ln1 and Lp1 respectively. How this actually is implemented is described in LINK HER
+
+\subsection{Code structure}
+The code is seperated into two C++ files, main.cpp and update.cpp, and two corresponding header files. The update.cpp file consist of everything that happens at each iteration, this icnludes calculating the speed function, updating the $\phi$ - array with the speed, updating the $label$ array and update the lists. The main.cpp file consist of actions that are executed before and after the actual segmentation, such as initializing everything, handle input and reading/writing to/from the input image and segmentation result. 
+
+\subsection{Input and initialization}
+TODO skriv om input
+An array of same size as $label$ and the $\phi$ - array is used to initialize $label$, the $\phi$ - array and Lz. This array, called init, is initialized to zero elements at start, and then filled with 1's given the x,y (and z in 3D) coordinates along with a radius given as input. These input values creates a circle of 1's in the init array that represents the seed point. Multiple coodrinates and radiuses can be given as input to create multiple seed points. Based on the values in init the two arrays $label$ and $\phi$ are initialized. All pixels in $label$ and $\phi$ corresponding with the ones in init with value 1 are set to -3 to indicate that they are inside the segmentation object. All other pixels in $label$ and $\phi$ are set to 3 indicating that they are outside the object. Then the corresponding pixels to all values in init that are 1 but have 0 valued neighbours are set to 0, indicating that they are part of the zero level set. Then these pixels are added to Lz as initial zero level set values. Then $Ln1$, $Lp1$, $Ln2$ and $Lp2$ are filled according to their definitions, and the $label$ and $\phi$ arrays are updated to refelct these changes. After these initializing actions are finished the segmentation process can start.
+The $\phi$ - array is initialized by the using the x,y (and z in 3D) coordinates along with the radius to create a circle. This circle is 
 
 \section{Problems met}
-
+...
+Figures X2 and X3 depicts the segmentation result of the same original input image with equal number of iterations completed, with the ranges from table  \ref{rangeTab1} and \ref{rangeTab2} used resprectively. Som vi ser så ser X3 mye bedre ut blabalba, pga endringene in the ranges of the lists
+....
 
 \section{Performance}
-Nevn at vi først brukte vector i 2D versjonen, men at det gikk veldig tregt i 3D versjonen. Forskjellige ting ble brukt for å minske farten, deriblant å bruke float istedenfor double, noe som senket økte farten med X. Vi brukte også OpenMP som en midlertidig løsning for speedup da vi testet koden på forskjellige datasett. Grunnen til at vi brukte vector var fordi det var nevnt i \cite{lankton09} på en måte alik at det kunne misforstås å være linked-list. Ved begynnelsen av implementeringen ble det ikke tenkt gjennom at vector kanskje ikke var den beste løsningen å bruke. Men siden en full segmentering av et 512*512*265 bilde tok over 20min begynte vi å se nærmere på hva som kan endres på. Fant da ut at det er stor forskjell mellom vector og list i C++. (Nevn noen av de største forskjellene her.) Endret så til å bruke list istedenfor vector, og fikk en speed increase på en faktor av 10 i 3D. MER!! (Nevn CUDA også hvis det blir implementert.. burde vel ha eget kapittel elr section for det.) 
+Nevn at vi først brukte vector i 2D versjonen, men at det gikk veldig tregt i 3D versjonen. Forskjellige ting ble brukt for å minske farten, deriblant å bruke float istedenfor double, noe som senket økte farten med X. Vi brukte også OpenMP som en midlertidig løsning for speedup da vi testet koden på forskjellige datasett. Grunnen til at vi brukte OpenMP da, og ikke CUDA var fordi vi var midt i implementasjonen og vi ville ikke komplisere ting enda mer ved å utvide en halvferdig kode til CUDA. Dessuten er OpenMP enkelt å btuke, bare noen få linjer med koder var nødvendig for å paralellisere de delene vil ville. Grunnen til at vi brukte vector var fordi det var nevnt i \cite{lankton09} på en måte alik at det kunne misforstås å være linked-list. Ved begynnelsen av implementeringen ble det ikke tenkt gjennom at vector kanskje ikke var den beste løsningen å bruke. Men siden en full segmentering av et 512*512*265 bilde tok over 20min begynte vi å se nærmere på hva som kan endres på. Fant da ut at det er stor forskjell mellom vector og list i C++. (Nevn noen av de største forskjellene her.) Endret så til å bruke list istedenfor vector, og fikk en speed increase på en faktor av 10 i 3D. MER!! (Nevn CUDA også hvis det blir implementert.. burde vel ha eget kapittel elr section for det.) 
 
 
