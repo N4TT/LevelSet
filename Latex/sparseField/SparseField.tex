@@ -2,18 +2,45 @@
 
 \section{Introduction}
 
-The narrow band  method assumes that the computation of the SDT is so slow that it cannot be computed for every iteration. The sparse field method introduced in \cite{whitaker89} uses a fast approximation of the distance transform that makes it feasible to compute the neighborhood of the level set model for each iteration. In the sparse field method the idea of using a thin band is taken to the extreme by working on a band that is only one point wide. The points (immediately?) adjacent to the level set are called active points, and all of them together are referred to as the active set. At each iteration only a thin layer of points near the active set are visited and updated. Using only the active points to compute the derivatives would not give sufficient accuracy. Because of this, the method extends out from the active points in small layers to create a neighborhood that is precisely the width needed to calculate the derivatives needed. 
+The narrow band  method assumes that the computation of the SDT is so slow that it cannot be computed for every iteration. The sparse field method introduced in \cite{whitaker89} uses a fast approximation of the distance transform that makes it feasible to compute the neighborhood of the level set model for each iteration. In the sparse field method the idea of using a thin band is taken to the extreme by working on a band that is only one point wide. The band is kept track of by defining the points nearest the level set as active points(dette må muligens forandres igjen. stusser veldig på hvordan dette skal skrives). Combining them gives us the active set. 
 
-Several advantages to this approach are mentioned in \cite{whitaker89}. No more than the precise number of calculations to find the next position of the zero level set surface is used. The number of points being computed is so small that a linked-list can be used to keep track of them. This also results in that only those points whose values control the position of the zero level set surface are visited at each iteration. 
+Using only the active points to compute the derivatives would not give sufficient accuracy. Because of this, the method extends out from the active points in layers one pixel wide to create a neighborhood that is precisely the width needed to calculate the derivatives for each time step. 
+
+Several advantages to this approach are mentioned in \cite{whitaker89}. Like stated above, no more than the precise number of calculations to find the next position of the zero level set surface is used. This also results in that only those points whose values control the position of the zero level set surface are visited at each iteration, which minimizes the calculations necessary. The number of points being computed is so small that a linked-list can be used to keep track of them. 
 
 
-A disadvantage of the narrow band method is that the stability at the boundaries of the band have to be maintained (e.g. by smoothing) since some points are undergoing the evolution while other neighbouring points remain fixed. The sparse field method avoid this by not letting any point entering or leaving the active set affecting its value. A point enters the active set if it is adjacent to the model. As the model evolves, points in the active set that are no longer adjacent to the model are removed from the active set. This is done by defining the neighborhoods of the active set in layers and keeping the values of points entering or leaving the active set unchanged. A layer is a set of pixels represented as \(L_{i}\) where \(i\) is the city-block distance from the active set. The layer \(L_{0}\) represents the active set, and \(L_{\pm 1}\) reprsents pixels adjacent to the active set on both sides. Using linked lists to represents the layers and arrays (matrices) to represent distance values makes the algorithm very efficient. 
+%This approach ensures that no unnecessary calculations are performed. 
 
-The sparse field algorithm is based on an important approximation, it assumes that points adjacent to the active points undergoes the same change in value as their nearby active set neighbors. But despite this, the errors introduced by the sparse field algorithm are no worse than many other level set algorithms. Since only those grid points whose values are changing (the active points and their neighbors) are visited at each time step the growth computation time is \(d^{n-1}\), where d is the number of pixels in along one dimension of the image. This is the same as for parameterized models where the computation times increase with the resolution of the domain, rather than the range. 
+
+
+A disadvantage of the narrow band method is that the stability at the boundaries of the band have to be maintained (by smoothing) since some points are undergoing the evolution while other neighbouring points remain fixed. The sparse field method avoid this by not letting any point entering or leaving the active set affect its value. A point enters the active set if it is adjacent to the model. As the model evolves, points in the active set that are no longer adjacent to the model are removed from the active set. This is done by defining the neighborhoods of the active set in layers and keeping the values of points entering or leaving the active set unchanged. A layer is a set of pixels represented as \(L_{i}\) where \(i\) is the city-block distance from the active set. The layer \(L_{0}\) represents the active set, and \(L_{\pm 1}\) reprsents pixels adjacent to the active set on both sides. Using linked lists to represents the layers and arrays (matrices) to represent distance values makes the algorithm very efficient. 
+
+The sparse field algorithm is based on an important approximation, it assumes that points adjacent to the active points undergoes the same change in value as their nearby active set neighbors. But despite this, the errors introduced by the sparse field algorithm are no worse than many other level set algorithms. 
+
+
+
+Since only those grid points whose values are changing (the active points and their neighbors) are visited at each time step the growth computation time is \(d^{n-1}\), where d is the number of pixels along one dimension of the image (er dette rett?). This is the same as for parameterized models where the computation times increase with the resolution of the domain, rather than the range. 
+
+Since we only do calculations on pixels in the active set and the neighbouring layers, the computation time increases with the size of the interface rather than the range of the domain.
+
+%CUTOUTS FRA INTRODUCTION:
+
+%The points (immediately?) adjacent to the level set are called active points, and all of them together are referred to as the active set. At each iteration only a thin %layer of points near the active set are visited and updated. 
+
 
 \section{Overwiew of the Sparse Field method}
 
-Like described in section (INSERT UP_WINDING SCHEME SECTION NUMBER HERE), the Up-Winding scheme gives the curvature in an area surrounding a point in the active set. This scheme uses both first and second order derivatives, and to calculte them it needs a 3x3x3(3D) grid of points surrounding the point for which it is calculating the speed. This creates a lower limit for the number of layers surrounding the active set. In addition to the active set which is stored in \(L{0}\) we need 
+Like described in section (link to up-winding), the Up-Winding scheme gives the curvature in an area surrounding a point in the active set. This scheme uses both first and second order derivatives, and to calculte them it needs a 3x3x3(3D) grid of points surrounding the one for which it is calculating the speed. This creates a lower limit for the number of layers surrounding the active set. In addition to the active set which is stored in \(L{0}\) we need four lists,\(L_{1}\)  \(L_{2}\) \(L_{-1}\) \(L_{-2}\). These lists keeps track of where the points of computational significance are located at any time during execution. Like the other aproaches to the level set method, the datastructure that tracks the evolution of the interface is a grid with the same dimensions as the problem domain. 
+
+
+The lists are only used to keep track of which points are in the active set and their neighbours. They have no effect on the actual computations. 
+However they make it possible for the algorithm to calculate the propagation of the interface and the aproximated distance to its neighbours in each iteration without having to calculate it for the entire grid. Like stated in the section above, this makes the time complexity of this approach scale with the size of the interface rather than the size of the problem domain.
+
+The method starts by defining a seed interface. The initialization process of the interface is fairly straight forward. The values of the active set is set to zero, and their neighbours are initialized to have distance 1 from each other and the active set. This is the signed distance aproximation that is used in  every iteration. 
+
+
+
+
 
 
 
