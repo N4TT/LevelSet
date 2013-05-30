@@ -54,10 +54,9 @@ By looking closer at table \ref{rangeTab1} it can be seen that Lz has a slightly
 	\label{rangeTab2}
 \end{table}
 
-
 \section{Om koden vår}
 \subsection{Datastructures and types used - elr noe lignende}
-In addition to the five lists representing the as five layers, two arrays of equal size and dimension as the image to be segmented are used. One of them is the $label$ image described above, which is used to track where the pixels containing the different layers are on the domain. Given a pixel, to find out which layer (if any) that pixel is a member of, a simple lookup to the $label$ is enough. Another excellent feature of the $label$ array is that it can be used to verify that all the layers are correclty aligned and if there are any pixels of any layers that are poorly placed. The $label$ image can thus be used to find artifacts that might have resulted from code errors. An example of a $label$ image (zoomed in) which clearly states that there is something wrong with how the layers are handled in the code is shown in figure \ref{labelFailedEx}. How the $label$ label image actually should have been is illustrated in figure \ref{labelOkEx}.
+In addition to the five lists representing the as five layers, two arrays of equal size and dimension as the image to be segmented are used. One of them is the $label$ image described above, which is used to track where the pixels containing the different layers are on the domain. Given a pixel, to find out which layer (if any) that pixel is a member of, a simple lookup to the $label$ is enough. Another excellent feature of the $label$ array is that it can be used to verify that all the layers are correclty aligned and if there are any pixels of any layers that are poorly placed. The $label$ image can thus be used to find artifacts that might have resulted from code errors. An example of a $label$ image (zoomed in to be able to clearly see the artifacts) which clearly states that there is something wrong with how the layers are handled in the code is shown in figure \ref{labelFailedEx}. How the $label$ label image actually should have been is illustrated in figure \ref{labelOkEx}.
 
 \begin{figure}[h!]
 \centering
@@ -65,7 +64,6 @@ In addition to the five lists representing the as five layers, two arrays of equ
 \caption{A label image with pixels in places they should not be.}
 \label{labelFailedEx}
 \end{figure}
-
 
 \begin{figure}[h!]
 \centering
@@ -86,12 +84,24 @@ Before explaining what this means, a brief look into how the pixels are pushed t
 The code is seperated into two C++ files, main.cpp and update.cpp, and two corresponding header files. The update.cpp file consist of everything that happens at each iteration, this icnludes calculating the speed function, updating the $\phi$ - array with the speed, updating the $label$ array and update the lists. The main.cpp file consist of actions that are executed before and after the actual segmentation, such as initializing everything, handle input and reading/writing to/from the input image and segmentation result. 
 
 \subsection{Input and initialization}
-TODO skriv om input
-An array of same size as $label$ and the $\phi$ - array is used to initialize $label$, the $\phi$ - array and Lz. This array, called init, is initialized to zero elements at start, and then filled with 1's given the x,y (and z in 3D) coordinates along with a radius given as input. These input values creates a circle of 1's in the init array that represents the seed point. Multiple coodrinates and radiuses can be given as input to create multiple seed points. Based on the values in init the two arrays $label$ and $\phi$ are initialized. All pixels in $label$ and $\phi$ corresponding with the ones in init with value 1 are set to -3 to indicate that they are inside the segmentation object. All other pixels in $label$ and $\phi$ are set to 3 indicating that they are outside the object. Then the corresponding pixels to all values in init that are 1 but have 0 valued neighbours are set to 0, indicating that they are part of the zero level set. Then these pixels are added to Lz as initial zero level set values. Then $Ln1$, $Lp1$, $Ln2$ and $Lp2$ are filled according to their definitions, and the $label$ and $\phi$ arrays are updated to refelct these changes. After these initializing actions are finished the segmentation process can start.
+TODO skriv om input\\
+An array of same size as $label$ and the $\phi$ - arrays is used to initialize $label$, the $\phi$ - array and Lz. This array, called init, is initialized to zero valued elements at start, and then filled with 1's given the x,y (and z in 3D) coordinates along with a radius given as input. These input values creates a circle (or sphere if 3D) of 1's in the init array that represents the seed points. Multiple coodrinates and radiuses can be given as input to create multiple seed points. Based on the values in init the two arrays $label$ and $\phi$ are initialized. All pixels in $label$ and $\phi$ corresponding with the ones in init with value 1 are set to -3 to indicate that they are inside the segmentation object. All other pixels in $label$ and $\phi$ are set to 3 indicating that they are outside the object. Then the corresponding pixels to all values in init that are 1 but have 0 valued neighbours are set to 0, indicating that they are part of the zero level set. Then these pixels are added to Lz as initial zero level set values. Then $Ln1$, $Lp1$, $Ln2$ and $Lp2$ are filled according to their definitions, and the $label$ and $\phi$ arrays are updated to refelct these changes. After these initializing actions are finished the segmentation process can start. 
 The $\phi$ - array is initialized by the using the x,y (and z in 3D) coordinates along with the radius to create a circle. This circle is 
 
+\subsection{Speed function explained}
+The speed function is implemented in a seperate methods that takes in the coordinates of the pixel to calculate the speed chnage and returns this value which thwn is added to thr previous value. Two speed functions are implemented, the one explained in chapter \label{GHJHGHGHJGFDJHFGDJHFGJDHGFJHF} and a much more simple one.
+
 \section{Problems met}
-...
+As previously mentioned, when looking at figure \ref{labelFailedEx} it can be clearly seen that something is wrong with how the lists (the layers) are arranged. This becomes even more clear when looking at figure \ref{failedZeroEx} which shows only the zero level set.
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.90\textwidth]{implemented/failedZeroEx}
+\caption{Zero level set corresponding to the label image in figure \ref{labelFailedEx}.}
+\label{labelOkEx}
+\end{figure}
+The zero level set in figure \ref{failedZeroEx} is the segmentation result (zoomed in) that corresponds to the label image in figure \ref{labelFailedEx}. The zero level set is supposed to be a one pixel wide continous line, but un this case that is not true. Several problems and bugs in the code combined were reasons were for this result. Much time and effort was used to debug this and to fix these problems. In addition to creating artifacts in the results, the bugs also made the program run much slower which made the debugging process even more time consuming. The problems: at speed funksjonen kunne returnere >1 og <-1. At det på et sted ble pushet fra Sp1 til Sn2 når det egentlig skulle pushes til Sp2. MER??\\ TODO fortsett her etter subsection{Speed function explained} er ferdig.
+
+
 Figures X2 and X3 depicts the segmentation result of the same original input image with equal number of iterations completed, with the ranges from table  \ref{rangeTab1} and \ref{rangeTab2} used resprectively. Som vi ser så ser X3 mye bedre ut blabalba, pga endringene in the ranges of the lists
 ....
 
