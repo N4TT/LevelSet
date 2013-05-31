@@ -89,7 +89,15 @@ An array of same size as $label$ and the $\phi$ - arrays is used to initialize $
 The $\phi$ - array is initialized by the using the x,y (and z in 3D) coordinates along with the radius to create a circle. This circle is 
 
 \subsection{Speed function explained}
-The speed function is implemented in a seperate methods that takes in the coordinates of the pixel to calculate the speed chnage and returns this value which thwn is added to thr previous value. Two speed functions are implemented, the one explained in chapter \label{GHJHGHGHJGFDJHFGDJHFGJDHGFJHF} and a much more simple one.
+Two different speed functions are implemented. These are seperatly implemented in their own methods, and a speed function is only referenced in one place in the code. This makes it easy to implement new speed functions, and to change between which of them to use when running the program. The speed function methods takes in as parameters the coordinates of the pixel to calculate the speed chnage on, and returns a value which then is added to the speed from the last iteration. The two speed functions are implemented are the one explained in chapter \label{levelSetChap} and a much more simple one based on the Chan-Vese energy. Simply put, the Chan-Vese energy ($E^{CV}$) is defined as 
+\begin{equation}
+E^{CV}(c_1,c_2,C) = \int_{inside(C)} (\mu (x,y) - c_1)^2 \, dx \, dy \, + \, \int_{outside(C)} (\mu (x,y) - c_2)^2 \, dx \, dy \, \cite{wang10} %\, = whitespace
+\end{equation}
+where $\mu$ is the image, and C is a closed segmentation curve which in this case is the curve defined by the zero level set. The constants $c_1$ and $c_2$ are the average greyscale intensity values inside and outside of C, respectively. Discretizing this energy function, and writing it as a pixelwise function gives
+\begin{equation}
+E^{CV}(x,y) = (\mu (x,y) - c_1)^2 - (\mu (x,y) - c_2)^2
+\end{equation}
+TODO forklar litt om hvordan denne speed funksjonen virker
 
 \section{Problems met}
 As previously mentioned, when looking at figure \ref{labelFailedEx} it can be clearly seen that something is wrong with how the lists (the layers) are arranged. This becomes even more clear when looking at figure \ref{failedZeroEx} which shows only the zero level set.
