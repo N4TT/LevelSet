@@ -25,25 +25,6 @@ list<float> minMaxList;
 
 float result;
 float minMax(Pixel p, short greaterOrLess, short checkAgainst){//returns max if greaterOrLess =">=", 
-	/*
-	if(greaterOrLess == 1){
-		for (int i = -1; i<2; i++){
-			for (int j = -1; j<2; j++){
-				for ( int k = -1; k<2; k++){
-					if (i == 0 || j == 0 || k == 0){
-						continue;
-					}
-					else{
-						if(label[p.x+1][p.y] >= checkAgainst){
-							minMaxList.push_back(phi[p.x+1][p.y]);
-						}		
-					}
-				}
-			}
-		}
-		result = *max_element(minMaxList.begin(), minMaxList.end());
-	}
-	*/
 	if(greaterOrLess == 1){
 		if(label[p.x+1][p.y][p.z] >= checkAgainst){
 			minMaxList.push_back(phi[p.x+1][p.y][p.z]);
@@ -92,8 +73,6 @@ float minMax(Pixel p, short greaterOrLess, short checkAgainst){//returns max if 
 		}
 		result = *min_element(minMaxList.begin(), minMaxList.end());
 	}
-	
-	//printf("%f, %i, %i \n", result, greaterOrLess, checkAgainst);
 	minMaxList.clear();
 	return result;
 	
@@ -104,7 +83,6 @@ void calculateMu(float threshold){
 	int numInside = 0;
 	float muTempOutside = 0;
 	int numOutside = 0;
-	printf("\nthresold is %f\n", threshold);
 	for(int i = 0; i<HEIGHT; i++){
 		for(int j = 0; j<WIDTH; j++){
 			for (int k = 0; k<DEPTH; k++){
@@ -113,7 +91,6 @@ void calculateMu(float threshold){
 					numInside++;
 				}
 				else if(image[i][j][k] < threshold){
-					//printf("%f \n", image[i][j]);
 					muTempOutside += image[i][j][k];
 					numOutside++;
 				}
@@ -128,13 +105,10 @@ void calculateMu(float threshold){
 	if(numOutside == 0){
 		muOutside = 0;
 	}
-	//muOutside = 0.29;
-	//muInside = 0.52;
 	printf("muInside: %f, muOutside: %f \n", muInside, muOutside); 
 }
 
-double speedFunctionOld(short x, short y, short z){
-	//printf("speed %f \n", (((image[x][y][z] - muInside)*(image[x][y][z] - muInside)) - ((image[x][y][z] - muOutside)*(image[x][y][z] - muOutside)))/2);
+double speedFunctionChanVese(short x, short y, short z){
 	return (((image[x][y][z] - muInside)*(image[x][y][z] - muInside)) - ((image[x][y][z] - muOutside)*(image[x][y][z] - muOutside)))/2; 
 }
 
@@ -164,7 +138,7 @@ float speedFunction(short i, short j, short k){
 	if(speed < -1){
 		speed = -1;
 	}
-	return speed;//the speed function F 
+	return speed;
 }
 
 float M;

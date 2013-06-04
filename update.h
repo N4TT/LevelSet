@@ -1,10 +1,9 @@
 #include <cmath>
 
 extern float image[HEIGHT][WIDTH][DEPTH]; //image to be segmented
-extern short init[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER]; //mask with seed points
-//extern short* init[(HEIGHT+BORDER)*(WIDTH+BORDER)*(DEPTH+BORDER)];
-extern float phi[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER]; //representation of the zero level set interface
-extern short label[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER];//contains only integer values between -3 and 3
+extern short init[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER]; //binary mask with seed points
+extern float phi[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER]; //level set
+extern short label[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER];//contains info about the layers
 extern float F[HEIGHT][WIDTH][DEPTH];
 
 extern list<Pixel> lz; // zero level set

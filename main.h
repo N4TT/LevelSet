@@ -1,7 +1,5 @@
 #include <list>
-#include <string>
 using namespace std;
-
 
 #define HEIGHT 320
 #define WIDTH 220
