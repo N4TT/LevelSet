@@ -1,6 +1,7 @@
 \chapter{Sparse Field - Implemented code}
 \section{Introduction}
-The sparse field level set method was implemented in C++ for the project, and the implemented code is mainly based on the pseudocode in \cite{lankton09}, which again is based on Whitaker's introduction to the sparse field method in \cite{whitaker89}. The implemented code can be found in appendix B, and its pseudocode can be found in appendix A. In this chapter the pseudocode in \cite{lankton09} will be explained first, along with how it works. Secondly, the differences between Lankton's pseudocodes in \cite{lankton09} and the implemented code will be described. And finally there will be a detailed explanation of the implemented code.
+The sparse field level set method was implemented in C++ for the project, and the implemented code is mainly based on the pseudocode in \cite{lankton09}, which again is based on Whitaker's introduction to the sparse field method in \cite{whitaker89}. 
+The sparse field was first implemented in 2D and after bugfixing and some test-runs it was extended to 3D, which is executed in the exact same was as the 2D version. Both the 2D and 3D versions of the implemented code can be found in appendix B, and the pseudocode (only in 2D) can be found in appendix A. In this chapter the pseudocode in \cite{lankton09} will be explained first, along with how it works. Secondly, the differences between Lankton's pseudocodes in \cite{lankton09} and the implemented code will be described. And finally there will be a detailed explanation of the implemented code.
 
 \section{TODO}
 As previously mentioned, the sparse field method can be implemented using linked lists to hold the pixels being used in the calculations. Pixels in this context does not mean the pixels in the original or segmented image, but the points in the matrix that represents the $\phi$. These pixels are seperated into five layers, each represented by a linked list. One of the lists holds the active points, i.e the zero level set, and is referred to as the Lz list. The rest of the needed pixels are seperated according to their closeness to the pixels in Lz and which side of the Lz pixels they are located. The Ln1 list contains the pixels that are adjacent to Lz pixels on the inside of the object being segmented. Similarly Lp1 contains pixels that are adjacent, but on the outside. All pixels that are adjacent to those in Ln1 except for those in Lz are elements in the Ln2 list, and similarly the ones adjacent to Lp1 on the opposite side of Lz are part of Lp2. This becomes more clear when looking at table \ref{rangeTab1} and figure \ref{labelExample}. 
@@ -97,7 +98,8 @@ where $\mu$ is the image, and C is a closed segmentation curve which in this cas
 \begin{equation}
 E^{CV}(x,y) = (\mu (x,y) - c_1)^2 - (\mu (x,y) - c_2)^2
 \end{equation}
-TODO forklar litt om hvordan denne speed funksjonen virker
+TODO forklar litt om hvordan denne speed funksjonen virker\\
+Husk også å nevne at return verdien må være i intervallet <-1,1> og hvorfor.
 
 \section{Problems met}
 As previously mentioned, when looking at figure \ref{labelFailedEx} it can be clearly seen that something is wrong with how the lists (the layers) are arranged. This becomes even more clear when looking at figure \ref{failedZeroEx} which shows only the zero level set.
@@ -107,13 +109,63 @@ As previously mentioned, when looking at figure \ref{labelFailedEx} it can be cl
 \caption{Zero level set corresponding to the label image in figure \ref{labelFailedEx}.}
 \label{labelOkEx}
 \end{figure}
-The zero level set in figure \ref{failedZeroEx} is the segmentation result (zoomed in) that corresponds to the label image in figure \ref{labelFailedEx}. The zero level set is supposed to be a one pixel wide continous line, but un this case that is not true. Several problems and bugs in the code combined were reasons were for this result. Much time and effort was used to debug this and to fix these problems. In addition to creating artifacts in the results, the bugs also made the program run much slower which made the debugging process even more time consuming. The problems: at speed funksjonen kunne returnere >1 og <-1. At det på et sted ble pushet fra Sp1 til Sn2 når det egentlig skulle pushes til Sp2. MER??\\ TODO fortsett her etter subsection{Speed function explained} er ferdig.
+The zero level set in figure \ref{failedZeroEx} is the segmentation result (zoomed in) that corresponds to the label image in figure \ref{labelFailedEx}. The zero level set is supposed to be a one pixel wide continous line, but in this case that is not true. Several problems and bugs in the code combined were reasons were for this result. Much time and effort was used to debug this and to fix these problems. In addition to creating artifacts in the results, the bugs also made the program run much slower which made the debugging process even more time consuming. The main problem was that the speed function was not normalized to be within the range $<-1,1>$, which triggered the problems mentioned in the previous section(TODO: Husk å skrive om problemene i Speed function explained subsectionen). Another thing that caused problems was a bug in the code that in some cases moved a pixel from $Lp1$ to $Ln2$ when it was supposed to move to $Lp2$. This bug occured only in the 3D implementation and only under certain circumstances, which made the debugging process more complicated and cumbersome. MER??
 
 
 Figures X2 and X3 depicts the segmentation result of the same original input image with equal number of iterations completed, with the ranges from table  \ref{rangeTab1} and \ref{rangeTab2} used resprectively. Som vi ser så ser X3 mye bedre ut blabalba, pga endringene in the ranges of the lists
 ....
 
 \section{Performance}
-Nevn at vi først brukte vector i 2D versjonen, men at det gikk veldig tregt i 3D versjonen. Forskjellige ting ble brukt for å minske farten, deriblant å bruke float istedenfor double, noe som senket økte farten med X. Vi brukte også OpenMP som en midlertidig løsning for speedup da vi testet koden på forskjellige datasett. Grunnen til at vi brukte OpenMP da, og ikke CUDA var fordi vi var midt i implementasjonen og vi ville ikke komplisere ting enda mer ved å utvide en halvferdig kode til CUDA. Dessuten er OpenMP enkelt å btuke, bare noen få linjer med koder var nødvendig for å paralellisere de delene vil ville. Grunnen til at vi brukte vector var fordi det var nevnt i \cite{lankton09} på en måte alik at det kunne misforstås å være linked-list. Ved begynnelsen av implementeringen ble det ikke tenkt gjennom at vector kanskje ikke var den beste løsningen å bruke. Men siden en full segmentering av et 512*512*265 bilde tok over 20min begynte vi å se nærmere på hva som kan endres på. Fant da ut at det er stor forskjell mellom vector og list i C++. (Nevn noen av de største forskjellene her.) Endret så til å bruke list istedenfor vector, og fikk en speed increase på en faktor av 10 i 3D. MER!! (Nevn CUDA også hvis det blir implementert.. burde vel ha eget kapittel elr section for det.) 
+Both C++ and Matlab were candidates languuages to implement the level set function in. The adavatage of using Matlab is the simple syntax used for mathematical operations and the ease of loading/writing and displaying images in both 2D and 3D. But ultimately C++ was chosen because of its advantages in speed and the possibility of parallelization.
+Several improvements to increase the performance were made after a working 3D version was complete, some which gave insignificant or small performance increases, and a few which greatly improved runtime. One of the changes made to achieve significantly improved runtime was as simple as changing all structures defined as $double$ to $float$. In many cases this change may seem insignificant, but in this case with data structures of sizes as big as $256^3$ and several linked-lists with hundreds of pixels being pushed and popped each itereation, the change reduced the runtime by ???? in 2D and ??? in 3D. (TODO finn ut hvor raskere segmenteringen kjørte etter double til float endringen) A chance that imroved the runtime even more significanly was the replacement of the C++ datastructure $std::vector$ with the datastructure $std::list$. When the implementation process started $std::vector$ was chosen as the container for the elements in the different layers, without considering any other candidates. The runtime in 2D using $vwctor$ was not considered slow, hence vector was also used for 3D. But due to the slow speed of the 3D version (when using $vector$) changes were needed. One improvement was the above-mentioned double to float change, and using $list$ instead of $vector$ was the second significant change. Some of the advantages and disadvantages of using the $std::list$ and $std::vector$ are summarized in table \ref{vectorTab} and \ref{listTab}.
+
+\begin{table}[h!]
+	\begin{tabular}{| p{5.5cm} | p{5.5cm} |} 
+	\hline
+	\multicolumn{2}{|c|}{Vector} \\
+	\hline
+	Advantages & Disadvantages \\
+	\hline
+	Efficient accessing of its elements & Cannot access element $m$ ($1<m<n$) directly: must iterate through 1 to $m-1$ to get to $m$. \\
+	Insertion/erasure from the end uses constant time &  Insertion/erasure from other than end is costly (O(n)) \\
+	\hline
+	\end{tabular}
+	\caption{Advantages and disadvantages of C++ $std::vector$}
+	\label{vectorTab}
+\end{table}
+
+\begin{table}[h!]
+	\begin{tabular}{| p{5.5cm} | p{5.5cm} |} 
+	\hline
+	\multicolumn{2}{|c|}{List} \\
+	\hline
+	Advantages & Disadvantages \\
+	\hline
+	Fast insertion, extraction and moving of elements in any position & Consume some extra memory to keep the linking information associated to each element \\
+	\hline
+	\end{tabular}
+	\caption{Advantages and disadvantages of C++ $std::list$}
+	\label{listTab}
+\end{table}
+The reason for the drastical inmprovement in performance when changing from $vector$ to $list$ is because of the overhead when using $vector$ associated with inserteion and erasure of elements not at the end. After the first few iterations, these two actions happens hundreds of times per iteration, and by changing to $list$ this overhead along with the smaller $log(n)$ overhead when increasing the size of the vector is eliminated, which improves performance and speed. The speedup gained by changing the element types from using double to float and the speedup aquired when replacing $vector$ with $list$ is shown in table \ref{speedUps}.
+
+\begin{table}[h!]
+	\begin{tabular}{ c | c | c | c | c |} 
+	\cline{2-5}
+	 & \multicolumn{2}{|c|}{double \rightarrow float} & \multicolumn{2}{|c|}{vector \rightarrow list}\\
+	\cline{2-5}
+	 & 100 iteration & full segmentation & 100 iteration & full segmentation  \\
+	\hline
+	\multicolumn{1}{ |c| } {2D} & TODO & X2 & X3 & X4  \\
+	\hline
+	\multicolumn{1}{ |c| }{3D} & X1 & X2 & X3 & X4  \\
+	\hline
+	\end{tabular}
+	\caption{Runtime improvements in 2D and 3D.}
+	\label{speedUps}
+\end{table}
+
+To speed up the process even more some parts of the code were run in parallel by using OpenMP. OpenMP is an API that supports shared memory multiprocessing in C, C++ and Fortran. OpenMP was used even before $vector$ was replaced with $list$, and was chosen because it only reguires a few well placed lines of code. OpenMP was implemented right after the first 3D version was completed, and was used to speed up the process when different datasets were used as input to compare the results against each other (TODO: Dette avsnittet må forbedres).
+Another change that was considered but later dropped, was to replace the use of $list$ with $std::forward_list$. This structure was considered due to its slightly less overhead when inserting and removing elements which makes it more efficient than $list$. But this improvement in insertion and deletion time over $list$ comes as a consequence of the fact that $forward_list$ is a single linked list, and is thus not able to point to the previous element in the list. The sparse field level set methd can be implemented using single-linked lists instead of double-linked lists, but the implementation in this project depends on the lists being double-linked, so to being able to use single linked lists a complete makeover of the code is necessary, which due to the scope of time was not an option.
 
 
