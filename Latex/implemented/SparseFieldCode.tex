@@ -35,7 +35,7 @@ Figure \ref{labelExample} represents the 5 different layers with different color
 
 \section{Forskjeller fra vår kode og pseudokoden til lankton}
 Some improvements and changes from Lankton's pseudocode were made
-By looking closer at table \ref{rangeTab1} it can be seen that Lz has a slightly wider ramge than the other lists. This range of exactly 1 causes in some cases huge problems that lead to disortions and artifacts in the segmentation. What these problems are will be discussed in LINK TIL DET HER. To overcome these problems the ranges of the lists were slightly changed to make all the lists equal in range. The range-corrected lists are shown in table \ref{rangeTab2}, and even though the change seems insignificant it actually does change the result significantly (as will be discussed in SAMME LINKEN HER).
+By looking closer at table \ref{rangeTab1} it can be seen that Lz has a slightly wider ramge than the other lists. This range of exactly 1 does in some cases cause huge problems that lead to disortions and artifacts in the segmentation. What these problems are will be discussed in \ref{ProblemsMet}. To overcome these problems the ranges of the lists were slightly changed to make all the lists equal in range. The range-corrected lists are shown in table \ref{rangeTab2}, and even though the change seems insignificant it actually does change the result significantly (as will be discussed in \ref{ProblemsMet}).
 
 \begin{table}[h] %h = here
 	\begin{tabular}{| c | c |} 
@@ -99,21 +99,30 @@ where $\mu$ is the image, and C is a closed segmentation curve which in this cas
 E^{CV}(x,y) = (\mu (x,y) - c_1)^2 - (\mu (x,y) - c_2)^2
 \end{equation}
 TODO forklar litt om hvordan denne speed funksjonen virker\\
-Husk også å nevne at return verdien må være i intervallet <-1,1> og hvorfor.
+New speed functions can be implemented and easily mergeed with the rest of the code, but an importatnt factor that must be remembered is that the value returned from the speed function must be in the range $<-1,1>$, because of the range of the layers. Another important factor is that the lists representing the layers must support equal sized range-width ($<1$) because the speed function is calculated the exact same way for all elements regardless of which layer it is a member of. \\
+TODO: Husk å skrive om hvorfor vi clamper verdiene mellom -1 og 1, istedenfor å normalisere (altså bare dele alt på dn høyeste mulige returnverdien)
 
 \section{Problems met}
+\label{ProblemsMet}
 As previously mentioned, when looking at figure \ref{labelFailedEx} it can be clearly seen that something is wrong with how the lists (the layers) are arranged. This becomes even more clear when looking at figure \ref{failedZeroEx} which shows only the zero level set.
 \begin{figure}[h!]
 \centering
 \includegraphics[width=0.90\textwidth]{implemented/failedZeroEx}
 \caption{Zero level set corresponding to the label image in figure \ref{labelFailedEx}.}
-\label{labelOkEx}
+\label{failedZeroEx}
 \end{figure}
-The zero level set in figure \ref{failedZeroEx} is the segmentation result (zoomed in) that corresponds to the label image in figure \ref{labelFailedEx}. The zero level set is supposed to be a one pixel wide continous line, but in this case that is not true. Several problems and bugs in the code combined were reasons were for this result. Much time and effort was used to debug this and to fix these problems. In addition to creating artifacts in the results, the bugs also made the program run much slower which made the debugging process even more time consuming. The main problem was that the speed function was not normalized to be within the range $<-1,1>$, which triggered the problems mentioned in the previous section(TODO: Husk å skrive om problemene i Speed function explained subsectionen). Another thing that caused problems was a bug in the code that in some cases moved a pixel from $Lp1$ to $Ln2$ when it was supposed to move to $Lp2$. This bug occured only in the 3D implementation and only under certain circumstances, which made the debugging process more complicated and cumbersome. MER??
+The zero level set in figure \ref{failedZeroEx} is the segmentation result (zoomed in) that corresponds to the label image in figure \ref{labelFailedEx}. The zero level set is supposed to be a one pixel wide continous line, but in this case that is not true. Several problems and bugs in the code combined were reasons were for this result. Much time and effort was used to debug this and to fix these problems. In addition to creating artifacts in the results, the bugs also made the program run much slower which made the debugging process even more time consuming. The main problem was that the layers were not of equal range-width and that the speed function was not normalized to be within the range $<\!-1,1\!>$, which will now be explained in more detail.
+When an element in any of the five layers is updated by the speed function the new value may not reflect the range at which is allowed for the layer it is part of. In that case it have to be moved to another layer or in case the value is not in the allowed range of any of the layers removed from its current layer and not added to any other. The problem caused by the value returned by the speed function not being normalized was that elements in any layer was able to be transferred from its previous layer to a layer that is not a neihbouring layer. For example, transferring a pixel from Ln1 is restricted to the neighbouring layers of Ln1, namely Ln2 and Lz. But if a pixel $A$ in Ln1 with value -0.65 had its value increased by 1.2, its new value of 0.55 would indicate that it should be moved to Lp1, jumping over Lz. 
+As can be seen in table \ref{rangeTab2} all the lists have the exact same range-width of $<1$, which is not the case in table \ref{rangeTab1}. If the ranges in table \ref{rangeTab1} is used it will disort the segmentation process. This happens for example when an element in Lz have the value -0.5 and is increased by 1 by the speed function. A result from the speed functin with value 1 (or -1) indicates fast movement and that element should be moved to Lp1 (or Ln1). But according to table \ref{rangeTab1} that will not happen in Lz when the value is -o.5, even if a change in 1 (or -1) of an element in any other layer would definetly move it out of that layer. But even if an element that should be removed is not removed, an element from either Ln1 or Lp1 is moved into Lz (which is correct behaviour), hence the Lz becomes two pixels wide. An example layer image of this is illustrated in figure \ref{doubleLzLayer}. To clearly illustrate how the double Lz looks like, this figure was sampled after the normalization of the speed function results was implemented.
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.80\textwidth]{implemented/doubleLzLayer}
+\caption{Layer image with Lz two pixels wide.}
+\label{doubleLzLayer}
+\end{figure}
 
+Another thing that caused problems was a bug in the code that in some cases moved a pixel from $Lp1$ to $Ln2$ when it was supposed to move to $Lp2$. This bug occured only in the 3D implementation and only under certain circumstances, which made the debugging process more complicated and cumbersome. MER??
 
-Figures X2 and X3 depicts the segmentation result of the same original input image with equal number of iterations completed, with the ranges from table  \ref{rangeTab1} and \ref{rangeTab2} used resprectively. Som vi ser så ser X3 mye bedre ut blabalba, pga endringene in the ranges of the lists
-....
 
 \section{Performance}
 Both C++ and Matlab were candidates languuages to implement the level set function in. The adavatage of using Matlab is the simple syntax used for mathematical operations and the ease of loading/writing and displaying images in both 2D and 3D. But ultimately C++ was chosen because of its advantages in speed and the possibility of parallelization.
@@ -152,7 +161,7 @@ The reason for the drastical inmprovement in performance when changing from $vec
 \begin{table}[h!]
 	\begin{tabular}{ c | c | c | c | c |} 
 	\cline{2-5}
-	 & \multicolumn{2}{|c|}{double \rightarrow float} & \multicolumn{2}{|c|}{vector \rightarrow list}\\
+	 & \multicolumn{2}{|c|}{double $\rightarrow$ float} & \multicolumn{2}{|c|}{vector $\rightarrow$ list}\\
 	\cline{2-5}
 	 & 100 iteration & full segmentation & 100 iteration & full segmentation  \\
 	\hline
