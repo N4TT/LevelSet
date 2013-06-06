@@ -13,12 +13,9 @@
 #include <ctime>  //to calculate runtime
 clock_t start;
 double duration;
-
 using namespace std;
 using namespace SIPL;
 
-float maxCurvature = 0;
-float minCurvature = 0;
 float image[HEIGHT][WIDTH][DEPTH] = {0}; //input
 float phi[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER] = {0};  //level set
 short init[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER] = {0}; //binary mask with seed points
@@ -272,8 +269,7 @@ int main(){
 	int3 n(x,y,z);	
 		v3->set(x,y,z, (uchar)zeroLevelSet[x][y][z]);
 	}}}
-	printf("\n maxCurvature: %f,  minCurvature: %f \n",maxCurvature, minCurvature);
-	printf("%i, %i, %i, %i, %i\n", lz.size(), ln1.size(), lp1.size(), ln2.size(), lp2.size());
+
 	v3->save("1000iters.raw");
 	printf("file stored\n");
 	

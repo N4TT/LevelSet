@@ -4,8 +4,8 @@
 using namespace std;
 
 
-#define HEIGHT 217
-#define WIDTH 181
+#define HEIGHT 512
+#define WIDTH 512
 #define BORDER 2
 
 struct Pixel{

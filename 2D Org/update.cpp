@@ -85,44 +85,24 @@ void calculateMu(){
 }
 
 float speedFunctionOld(int x, int y){
-	//printf("sp: %f \n", (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2);
 	return (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2; 
 }
 
-
-float nPlus, nMinus; //må flyttes in i metoden hvis det skal paralelliseres
-float deltaPhi, curvature;
-void dPhiMin(D1 d1){
-float dPhiX, dPhiY;
-	dPhiX = pow(max(d1.dxPlus,0.0f),2.0f) + pow(max(-d1.dxMinus,0.0f),2.0f);
-	dPhiY = pow(max(d1.dyPlus,0.0f),2.0f) + pow(max(-d1.dyMinus,0.0f),2.0f);
-	deltaPhi = sqrt(dPhiX + dPhiY);
-}
-
-void dPhiMax(D1 d1){
-float dPhiX, dPhiY;
-	dPhiX = pow(min(d1.dxPlus,0.0f),2.0f) + pow(min(-d1.dxMinus,0.0f),2.0f);
-	dPhiY = pow(min(d1.dyPlus,0.0f),2.0f) + pow(min(-d1.dyMinus,0.0f),2.0f);
-	deltaPhi = sqrt(dPhiX + dPhiY);  //istede for å ta roten av dPhiX og dPhiY for så å opphøye de i andre før de legges sammen i denne linjen,
-}          //skipper vi roten og legger de heller kun sammen når vi skal finne lengden på vektoren
-
+float curvature;
 float speedFunction(short i, short j){
 	float data = epsilon - abs(image[i][j] - treshold); //the data term (based on pixel intensity)
 	D1 d1 = D1(i, j); //calculates the first order derivatives
 	D2 d2 = D2(i, j); //calculates the second order derivatives
 	Normal n = Normal(d1, d2); //calculates the normals
 	curvature = (n.nPlusX - n.nMinusX) + (n.nPlusY - n.nMinusY); //the curvature
-	float F = 1*alpha*data + (1-alpha)*curvature; //kanskje det første leddet ikke skal ganges med -1
-	
-	if (F<0){
-		dPhiMin(d1);
+	float speed = -alpha*data + (1-alpha)*(curvature/4); //kanskje det første leddet ikke skal ganges med -1
+	if(speed > 1){
+		speed = 1;
 	}
-	else{
-		dPhiMax(d1);
+	if(speed < -1){
+		speed = -1;
 	}
-	float ret = F;//*deltaPhi;
-	//printf("speed: %f\n", ret);
-	return ret; 
+	return speed;
 }
 
 list<Pixel>::iterator it;

@@ -19,6 +19,7 @@ short label[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
 float F[HEIGHT][WIDTH] = { 0 };
 short zeroLevelSet[HEIGHT][WIDTH] = { 0 }; //output
 float treshold, alpha, epsilon;
+float maxC=0;float minC =0;
 
 list<Pixel> lz;
 list<Pixel> lp1;
@@ -99,21 +100,7 @@ void pushAndStuff(Pixel p, short level){//støtter Pixel struct
 	}
 }
 
-void setLevels(Pixel p, short level){//støtter Pixel Struct
-
-	/*for(int i = p.x-1; i<=p.x+1; i++){
-		for(int j = p.y-1; j<=p.y+1; j++){
-			if(i != p.x && j != p.y){
-				if(label[i][j] == 3){
-					pushAndStuff(Pixel(i, j), level);
-				}
-				else if(label[i][j] == -3){
-					pushAndStuff(Pixel(i, j), -level);
-				}
-			}
-		}
-	}
-*/
+void setLevels(Pixel p, short level){
 	if(label[p.x+1][p.y] == 3){
 		pushAndStuff(Pixel(p.x+1, p.y), level);
 	}
@@ -138,7 +125,6 @@ void setLevels(Pixel p, short level){//støtter Pixel Struct
 	if(label[p.x][p.y-1] == -3){
 		pushAndStuff(Pixel(p.x, p.y-1), -level);
 	}
-
 }	
 
 void initialization(){
@@ -200,7 +186,7 @@ void writeFile(BMP img, int id){//, int it){
 				img(i,j)->Blue = (label[i][j] +3)*42;
 			}
 		}
-		img.WriteToFile("output label.bmp");
+		img.WriteToFile("1output label.bmp");
 	}
 	else if(id == 2){ //phi
 		for (short i =0; i<HEIGHT; i++){
@@ -210,7 +196,7 @@ void writeFile(BMP img, int id){//, int it){
 				img(i,j)->Blue = (phi[i][j] +3)*42;
 			}
 		}
-		img.WriteToFile("output phi.bmp");
+		img.WriteToFile("1output phi.bmp");
 	}
 	else{ //zeroLevelSet
 		for (short i =0; i<HEIGHT; i++){
@@ -220,7 +206,7 @@ void writeFile(BMP img, int id){//, int it){
 				img(i,j)->Blue = zeroLevelSet[i][j]; 
 			}
 		}
-		img.WriteToFile("output zero.bmp");
+		img.WriteToFile("1output zero.bmp");
 	}
 	
 }
@@ -228,11 +214,11 @@ void writeFile(BMP img, int id){//, int it){
 int main(){
 	//read file
 	BMP img;
-	img.ReadFromFile("brain.bmp");
+	img.ReadFromFile("q.bmp");
 	readFile(img);
 	
 	try{
-		fillInit(123, 114, 143, 127);
+		fillInit(225, 225, 250, 250);
 		printf("init filled\n");
 	}catch(int e){
 		if(e == -1){
@@ -252,15 +238,15 @@ int main(){
 
 	//treshold = 0.6; epsilon = 0.05; alpha = 0.97;
 	//treshold = 0.5; epsilon = 0.06; alpha = 0.90;
-	treshold = 0.5; epsilon = 0.06; alpha = 0.96;
+	treshold = 0.95; epsilon = 0.05; alpha = 0.55;
 	//treshold = 0.7; epsilon = 0.10; alpha = 0.96;
 
 	printf("starting main loop\n");
-	int iterations = 1500;
+	int iterations = 15;
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		updateLevelSets();
-		if(i%10 == 0){
+		if(i%100 == 0){
 			printf("\niteration: %i\n", i);
 		}
 		if(i == (iterations-1)){ //copy the zero level set pixels to zeroLevelSet
@@ -271,8 +257,8 @@ int main(){
 			//writeFile(img, 1, i);
 		}
 	}
-	printf("\nmain loop finished");
-
+	printf("\nmain loop finished %f  %f", minC, maxC);
+	
 	writeFile(img, 3);
 	writeFile(img, 1);
 	printf("\noutput successfully stored\n");

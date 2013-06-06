@@ -121,16 +121,7 @@ float speedFunction(short i, short j, short k){
 	D2 d2 = D2(i, j, k); //calculates the second order derivatives
 	Normal n = Normal(d1, d2); //calculates the normals
 	curvature = (n.nPlusX - n.nMinusX) + (n.nPlusY - n.nMinusY) + (n.nPlusZ - n.nMinusZ); //the curvature
-	//printf("curvature: %f,  speed: %f \n", curvature, alpha*data + (1-alpha)*curvature);
-	//if(abs(data) > 0.1f || abs(curvature) > 0.1f){
-	//printf("data: %f, curvature: %f\n", data, curvature);
-	//}
-	if(maxCurvature < data){
-		maxCurvature = curvature;
-	}
-	if(minCurvature > data){
-		minCurvature = curvature;
-	}
+
 	float speed = -alpha*data + (1-alpha)*(curvature/8);
 	if(speed > 1){
 		speed = 1;
