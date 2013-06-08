@@ -11,13 +11,13 @@ As previously mentioned, the sparse field method can be implemented using linked
 	% l = left-justified columns, alternatives are: r (right) and c (center)
 	% | = vertical line, \hline = horizontal line
 	\hline
-	List Name & Range\\
+	List Name & Range\\ 
 	\hline
-	Lz & [-0.5, 0.5]\\
-	Ln1 & [-1.5, -0.5>\\
-	Lp1 & <0.5, 1.5]\\
-	Ln2 & [-2.5, -1.5>\\
-	Lp2 & <1.5, 2.5]\\
+	Lz & $[-0.5, 0.5]$\\
+	Ln1 & $[-1.5, -0.5\}$\\
+	Lp1 & $[0.5, 1.5]$\\
+	Ln2 & $[-2.5, -1.5\}$\\
+	Lp2 & $\{1.5, 2.5]$\\
 	\hline
 	\end{tabular}
 	\caption{Range of lists used in \cite{lankton09}}
@@ -35,7 +35,7 @@ Figure \ref{labelExample} represents the 5 different layers with different color
 
 \section{Forskjeller fra vår kode og pseudokoden til lankton}
 Some improvements and changes from Lankton's pseudocode were made
-By looking closer at table \ref{rangeTab1} it can be seen that Lz has a slightly wider ramge than the other lists. This range of exactly 1 does in some cases cause huge problems that lead to disortions and artifacts in the segmentation. What these problems are will be discussed in \ref{ProblemsMet}. To overcome these problems the ranges of the lists were slightly changed to make all the lists equal in range. The range-corrected lists are shown in table \ref{rangeTab2}, and even though the change seems insignificant it actually does change the result significantly (as will be discussed in \ref{ProblemsMet}).
+By looking closer at table \ref{rangeTab1} it can be seen that Lz has a slightly wider ramge than the other lists. This range of exactly 1 does in some cases cause problems that lead to disortions and artifacts in the segmentation. What these problems are will be discussed in \ref{ProblemsMet}. To overcome these problems the ranges of the lists were slightly changed to make all the lists equal in range. The range-corrected lists are shown in table \ref{rangeTab2}, and even though the change seems insignificant it improves the result significantly (as will be discussed in \ref{ProblemsMet}).
 
 \begin{table}[h] %h = here
 	\begin{tabular}{| c | c |} 
@@ -44,11 +44,11 @@ By looking closer at table \ref{rangeTab1} it can be seen that Lz has a slightly
 	\hline
 	List name & Range\\
 	\hline
-	Lz & [-0.5, 0.5>\\
-	Ln1 & [-1.5, -0.5>\\
-	Lp1 & [0.5, 1.5>\\
-	Ln2 & [-2.5, -1.5>\\
-	Lp2 & [1.5, 2.5>\\
+	Lz & [-0.5, 0.5\}\\
+	Ln1 & [-1.5, -0.5\}\\
+	Lp1 & [0.5, 1.5\}\\
+	Ln2 & [-2.5, -1.5\}\\
+	Lp2 & [1.5, 2.5\}\\
 	\hline
 	\end{tabular}
 	\caption{Range of lists used in the implementation}
@@ -57,7 +57,7 @@ By looking closer at table \ref{rangeTab1} it can be seen that Lz has a slightly
 
 \section{Om koden vår}
 \subsection{Datastructures and types used - elr noe lignende}
-In addition to the five lists representing the as five layers, two arrays of equal size and dimension as the image to be segmented are used. One of them is the $label$ image described above, which is used to track where the pixels containing the different layers are on the domain. Given a pixel, to find out which layer (if any) that pixel is a member of, a simple lookup to the $label$ is enough. Another excellent feature of the $label$ array is that it can be used to verify that all the layers are correclty aligned and if there are any pixels of any layers that are poorly placed. The $label$ image can thus be used to find artifacts that might have resulted from code errors. An example of a $label$ image (zoomed in to be able to clearly see the artifacts) which clearly states that there is something wrong with how the layers are handled in the code is shown in figure \ref{labelFailedEx}. How the $label$ label image actually should have been is illustrated in figure \ref{labelOkEx}.
+In addition to the five lists representing the as five layers, two arrays of equal size and dimension as the image to be segmented are used. One of them is the $label$ image described above, which is used to track where the pixels containing the different layers are on the domain. Given a pixel, to find out which layer (if any) that pixel is a member of, a simple lookup to the $label$ is enough. Another excellent feature of the $label$ array is that it can be used to verify that all the layers are correclty aligned and if there are any pixels of any layers that are poorly placed. The $label$ image can thus be used to find artifacts that might have resulted from code errors. An example of a $label$ image (zoomed in to be able to clearly see the artifacts) which clearly states that there is something wrong with how the layers are handled in the code is shown in figure \ref{labelFailedEx}. How the $label$ image actually should have been is illustrated in figure \ref{labelOkEx}.
 
 \begin{figure}[h!]
 \centering
@@ -74,12 +74,161 @@ In addition to the five lists representing the as five layers, two arrays of equ
 \end{figure}
 
 The other array used is the $\phi$ - array, which contains the actual $\phi$ values of each pixel in the domain. The range of the values is exactly the same as in the $label$ image, but while the $label$ image only contains integer values describing which layer a pixel is part of, the $\phi$ image contains the actual values (floating point numbers) of the level set. The images represented by the $label$ and $\phi$ arrays would thus be very similar (though small differences may be seen) when looking at, but they do have different tasks. The $label$ is as mentioned used as a lookup table, while the $\phi$ array determines which layer a pixel belongs to after its pixels have been updated with the speed function.
+To correctly move pixels between the layers some temporary lists have to be used, one for each layer. By using these temporary lists, called Sn2, Sn1, Sz, Sp2 and Sp2, elements in the corresponding Ln1, Ln1, Lz, Lp1 and Lp2 lists are prevented from being moved in the wrong direction or more than one step at a single iteration. All pixels that are moving into Lz are kept in Sz, (and similarly for the other lists), then all pixels that are neighbours to Lz but not still in Sz is added to Sz, before finally adding all pixels in Sz to Lz. So the main reason to use these temporary lists is to keep the layers continuous when evolving. An example of how a $layer$ image would look like if this did not happen is illustrated in figure \ref{labelWithNoEdge}
 
-To correctly move pixels between the layers some temporary lists have to be used, one for each layer. By using these temporary lists, called Sn2, Sn1, Sz, Sp2 and Sp2, pixels are prevented from being moved more than 1 layer at a single iteration. Assume that pixel $A$ is in Ln1 and has two neighbours in Lz. These two neighbours will be updated by the speed function and may move out of Lz into either Ln1 or Lp1. If both these pixels are moved out of Lz, pixel $A$ will no longer have any neighbours in Lz and will in most cases be incorrectly moved to Ln2. This is only of of many possible mistakes that could happen when not using temporary lists, an another example is that a pixel could be moved to a list and then back to where it came from within the same iteration. Using temporary lists prevent such problems by adding the pixels that are to change layer into them, removing the pixels from the original lists, and finally when all temporary lists are filled with pixels to be moved and all the original lists have the pixels moving out of them removed, then the original lists are filled with those in the temporary lists. And then the temporary lists are emptied before the next iteration starts.
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.90\textwidth]{implemented/labelWithNoEdge}
+\caption{$Label$ image with the layers not continous in the corner \ref{labelWithNoEdge}.}
+\label{labelWithNoEdge}
+\end{figure}
 
+Figure \ref{labelWithNoEdge} illustrates the problem with not adding neighbouring pixels of pixel $A$ ($A \in$ any of the five layers) that is not part of any layer to the (correct) neighbouring layer of $A$'s layer. In that case the segmentation process would go completely wrong. Figure \ref{labelWithNoEdge} is not an actual $label$ image output, but a manually edited version of figure \ref{labelExample} that illustrates this problem. Algorithm \ref{prepareUpdates} shows how $Lz$ is updated by the speed function and how the $Ln2$, $Ln1$, $Lp1$ and $Lp2$ reflects this change. It also shows how the temporary lists are filled by pixels that are moving from one layer to another. How the temporary lists are filled further by pixels that previously not were in any layers can be seen in algorithm \ref{updateLevelSets}, along with how the $label$ and $\phi$ images are updated.
+Before taking a look at the pseudocode a brief explanation of how the speed function affect the different layers is needed. First the speed function is calculated for each pixel in Lz (will be explained in more detail in LINK TIL DER SPEED FUNCTION BLIR FORKLART). Then the four remaining lists are updated, but not using the speed function as with the Lz pixels. Since Ln1 and Lp1 are defined to be neighbours to Lz on each side, and Lp2 and Ln2 as neighbour to Lp1 Ln1 respectively, there is no need to use computation time to calculate their speed function. They will follow Lz, e.g. if Lz moves one step to the right, then its neighbours at each side (Ln1 and Lp1) will also move a step to the right. Similarly Ln2 and Lp2 will follwow Ln1 and Lp1 respectively. How this actually is implemented can be seen in algorithm \ref{prepareUpdates}. Alogrithm \ref{prepareUpdates} and \ref{updateLevelSets} is the pseudocode of the actions executed in each iteration of the segmentation process.
 
-FLYTT dette vekk til et annet sted...................
-Before explaining what this means, a brief look into how the pixels are pushed to and popped from the different lists is needed. First the speed function is calculated for each pixel in Lz (will be explained in more detail in LINK TIL DER SPEED FUNCTION BLIR FORKLART). Then the four remaining lists are updated, but not using the speed function as with the Lz pixels. Since Ln1 and Lp1 are defined to be neighbours to Lz on each side, and Lp2 and Ln2 as neighbour to Lp1 Ln1 respectively, there is no need to use computation time to calculate their speed function. They will follow Lz, e.g. if a pixel in Lz moves to the right, then its neighbours (in Ln1 and Lp1) at each side will also move a step to the right. Similarly Ln2 and Lp2 pixels will follwow Ln1 and Lp1 respectively. How this actually is implemented is described in LINK HER
+\begin{algorithm}[h!]
+\begin{algorithmic}[1] %[n] means numbering of the n'th lines, so [1] means numbering of each line
+\ForAll{$e \in Lz)$}
+	\State $e = e + speedFucntion(e.x, e.y)$
+	\If{$phi(e.x, e.y) \geq 0.5$} \Comment{$phi = \phi$}
+		\State sp1.add(e)
+		\State Lz.remove(e)
+	\ElsIf{$phi(e.x, e.y) < -0.5$}
+		\State Sn1.add(e)
+		\State Lz.remove(e)
+	\EndIf
+\EndFor
+
+\ForAll{$e \in Ln1)$}
+	\If{$e$ has no neighbour that is part of Lz}
+		\State Sn2.add(e)
+		\State Ln1.remove(e)
+	\Else
+		\State $M =$ Greatest value from $N(e)$ with $N(e) \geq 0$ 
+		\Statex \Comment{$N(e) = neighbour $ pixels of e in $label$}
+		\State $phi(e.x, e.y) = M-1$
+		\If{$phi(e.x, e.y) \geq -0.5$}
+			\State Sz.add(e)
+			\State Ln1.remove(e)
+		\ElsIf{$phi(e.x, e.y) < -1.5$}
+			\State Sn2.add(e)
+			\State Ln1.remove(e)
+		\EndIf
+	\EndIf
+\EndFor
+			
+\ForAll{$e \in Lp1)$}
+	\If{$e$ has no neighbour that is part of Lz}
+		\State Sp2.add(e)
+		\State Lp1.remove(e)
+	\Else
+		\State $M =$ Smallest value from $N(e)$ with $N(e) \leq 0$ 
+		\State $phi(e.x, e.y) = M+1$
+		\If{$phi(e.x, e.y) < 0.5$}
+			\State Sz.add(e)
+			\State Lp1.remove(e)
+		\ElsIf{$phi(e.x, e.y) \geq 1.5$}
+			\State Sp2.add(e)
+			\State Lp1.remove(e)
+		\EndIf
+	\EndIf
+\EndFor
+\end{algorithmic}
+\caption{TODO Finn på et passende navn.}
+\label{prepareUpdates}
+\end{algorithm}
+
+\begin{algorithm}[h!]
+\begin{algorithmic}[1] %[n] means numbering of the n'th lines, so [1] means numbering of each line
+\ForAll{$e \in Ln2)$}
+	\If{$e$ has no neighbour that is part of Ln1}
+		\State $label(e.x, e.y) = -3$
+		\State $phi(e.x, e.y) = -3$
+		\State Ln2.remove(e)
+	\Else
+		\State $M =$ Greatest value from $N(e)$ with $N(e) \geq -1$ 
+		\State $phi(e.x, e.y) = M-1$
+		\If{$phi(e.x, e.y) \geq -1.5$}
+			\State Sn1.add(e)
+			\State Ln2.remove(e)
+		\ElsIf{$phi(e.x, e.y) < -2.5$}
+			\State $label(e.x, e.y) = -3$
+			\State $phi(e.x, e.y) = -3$
+			\State Ln2.remove(e)
+		\EndIf
+	\EndIf
+\EndFor
+
+\ForAll{$e \in Lp2)$}
+	\If{$e$ has no neighbour that is part of Lp1}
+		\State $label(e.x, e.y) = 3$
+		\State $phi(e.x, e.y) = 3$
+		\State Lp2.remove(e)
+	\Else
+		\State $M =$ Smallest value from $N(e)$ with $N(e) \leq 1$ 
+		\State $phi(e.x, e.y) = M+1$
+		\If{$phi(e.x, e.y) < 1.5$}
+			\State Sp1.add(e)
+			\State Lp2.remove(e)
+		\ElsIf{$phi(e.x, e.y) \geq 2.5$}
+			\State $label(e.x, e.y) = 3$
+			\State $phi(e.x, e.y) = 3$
+			\State Lp2.remove(e)
+		\EndIf
+	\EndIf
+\EndFor
+
+\end{algorithmic}
+\caption{TODO Finn på et passende navn (continued).}
+\label{prepareUpdates2}
+\end{algorithm}
+
+\begin{algorithm}[h!]
+\begin{algorithmic}[1]
+	\ForAll{$e \in Sz)$}
+		\State $label(e.x, e.y) = 0$
+		\State Lz.add(e)
+	\EndFor
+	\State Reset Sz
+	
+	\ForAll{$e \in Sn1)$}
+		\State $label(e.x, e.y) = -1$
+		\State Ln1.add(e)
+		\ForAll{$ne \in N(e)$} \Comment{The four neighbouring pixels: over, under, left and right}
+			\If{$phi(ne.x, ne.y) == -3$}
+				\State Sn2.add(ne)
+			\EndIf
+		\EndFor
+	\EndFor
+	\State Reset Sn1
+	
+	\ForAll{$e \in Sp1)$}
+		\State $label(e.x, e.y) = 1$
+		\State Lp1.add(e)
+		\ForAll{$ne \in N(e)$}
+			\If{$phi(ne.x, ne.y) == 3$}
+				\State Sp2.add(ne)
+			\EndIf
+		\EndFor
+	\EndFor
+	\State Reset Sp1
+	
+	\ForAll{$e \in Sn2)$}
+		\State $label(e.x, e.y) = -2$
+		\State Ln2.add(e)
+	\EndFor
+	\State Reset Sn2
+	
+	\ForAll{$e \in Sp2)$}
+		\State $label(e.x, e.y) = 2$
+		\State Lp2.add(e)
+	\EndFor
+	\State Reset Sp2
+\end{algorithmic}
+\caption{TODO Finn på et passende navn her også.}
+\label{updateLevelSets}
+\end{algorithm}
+\clearpage
 
 \subsection{Code structure}
 The code is seperated into two C++ files, main.cpp and update.cpp, and two corresponding header files. The update.cpp file consist of everything that happens at each iteration, this icnludes calculating the speed function, updating the $\phi$ - array with the speed, updating the $label$ array and update the lists. The main.cpp file consist of actions that are executed before and after the actual segmentation, such as initializing everything, handle input and reading/writing to/from the input image and segmentation result. 
@@ -129,14 +278,14 @@ Both C++ and Matlab were candidates languuages to implement the level set functi
 Several improvements to increase the performance were made after a working 3D version was complete, some which gave insignificant or small performance increases, and a few which greatly improved runtime. One of the changes made to achieve significantly improved runtime was as simple as changing all structures defined as $double$ to $float$. In many cases this change may seem insignificant, but in this case with data structures of sizes as big as $256^3$ and several linked-lists with hundreds of pixels being pushed and popped each itereation, the change reduced the runtime by ???? in 2D and ??? in 3D. (TODO finn ut hvor raskere segmenteringen kjørte etter double til float endringen) A chance that imroved the runtime even more significanly was the replacement of the C++ datastructure $std::vector$ with the datastructure $std::list$. When the implementation process started $std::vector$ was chosen as the container for the elements in the different layers, without considering any other candidates. The runtime in 2D using $vwctor$ was not considered slow, hence vector was also used for 3D. But due to the slow speed of the 3D version (when using $vector$) changes were needed. One improvement was the above-mentioned double to float change, and using $list$ instead of $vector$ was the second significant change. Some of the advantages and disadvantages of using the $std::list$ and $std::vector$ are summarized in table \ref{vectorTab} and \ref{listTab}.
 
 \begin{table}[h!]
-	\begin{tabular}{| p{5.5cm} | p{5.5cm} |} 
+	\begin{tabular}{| p{5.85cm} | p{5.85cm} |} 
 	\hline
 	\multicolumn{2}{|c|}{Vector} \\
 	\hline
 	Advantages & Disadvantages \\
 	\hline
-	Efficient accessing of its elements & Cannot access element $m$ ($1<m<n$) directly: must iterate through 1 to $m-1$ to get to $m$. \\
-	Insertion/erasure from the end uses constant time &  Insertion/erasure from other than end is costly (O(n)) \\
+	Insertion/erasure from the end uses constant time. &  Insertion/erasure from other than end is costly (O(n)). \\
+	Efficient accessing of its elements. & \\
 	\hline
 	\end{tabular}
 	\caption{Advantages and disadvantages of C++ $std::vector$}
@@ -144,13 +293,14 @@ Several improvements to increase the performance were made after a working 3D ve
 \end{table}
 
 \begin{table}[h!]
-	\begin{tabular}{| p{5.5cm} | p{5.5cm} |} 
+	\begin{tabular}{| p{5.85cm} | p{5.85cm} |} 
 	\hline
 	\multicolumn{2}{|c|}{List} \\
 	\hline
 	Advantages & Disadvantages \\
 	\hline
-	Fast insertion, extraction and moving of elements in any position & Consume some extra memory to keep the linking information associated to each element \\
+	Fast insertion, extraction and moving of elements in any position. & Consume some extra memory to keep the linking information associated to each element. \\
+	 & Cannot access elements by their position. \\
 	\hline
 	\end{tabular}
 	\caption{Advantages and disadvantages of C++ $std::list$}
@@ -174,7 +324,7 @@ The reason for the drastical inmprovement in performance when changing from $vec
 	\label{speedUps}
 \end{table}
 
-To speed up the process even more some parts of the code were run in parallel by using OpenMP. OpenMP is an API that supports shared memory multiprocessing in C, C++ and Fortran. OpenMP was used even before $vector$ was replaced with $list$, and was chosen because it only reguires a few well placed lines of code. OpenMP was implemented right after the first 3D version was completed, and was used to speed up the process when different datasets were used as input to compare the results against each other (TODO: Dette avsnittet må forbedres).
+To speed up the process even more some parts of the code were run in parallel by using OpenMP. OpenMP is an API that supports shared memory multiprocessing in C, C++ and Fortran. OpenMP was used even before $vector$ was replaced with $list$, and was chosen only because it reguires a few well placed lines of code. OpenMP was implemented right after the first 3D version was completed, and was used to speed up the process when different datasets were used as input to compare the results against each other (TODO: Dette avsnittet må forbedres).
 Another change that was considered but later dropped, was to replace the use of $list$ with $std::forward_list$. This structure was considered due to its slightly less overhead when inserting and removing elements which makes it more efficient than $list$. But this improvement in insertion and deletion time over $list$ comes as a consequence of the fact that $forward_list$ is a single linked list, and is thus not able to point to the previous element in the list. The sparse field level set methd can be implemented using single-linked lists instead of double-linked lists, but the implementation in this project depends on the lists being double-linked, so to being able to use single linked lists a complete makeover of the code is necessary, which due to the scope of time was not an option.
 
 
