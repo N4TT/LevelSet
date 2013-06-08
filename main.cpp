@@ -16,10 +16,10 @@ double duration;
 using namespace std;
 using namespace SIPL;
 
-float image[HEIGHT][WIDTH][DEPTH] = {0}; //input
+float image[HEIGHT][WIDTH][DEPTH] = {0}; //input -> data to be segmented
 float phi[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER] = {0};  //level set
 short init[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER] = {0}; //binary mask with seed points
-short label[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER] = {0};//contains info about the layers
+short label[HEIGHT+BORDER][WIDTH+BORDER][DEPTH+BORDER] = {0}; //contains info about the layers
 short zeroLevelSet[HEIGHT][WIDTH][DEPTH] = {0}; //output
 float treshold, alpha, epsilon;
 
@@ -145,7 +145,6 @@ void setLevels(Pixel p, short level){
 }	
 
 void initialization(){
-
 	list<Pixel>::iterator it;
 
 	for (int i = 0; i<HEIGHT+BORDER; i++){
@@ -184,7 +183,6 @@ void initialization(){
 	for (it = ln1.begin(); it != ln1.end(); it++){
 		setLevels(*it, 2);
 	}
-
 }
 
 void displayVolume(Volume<ushort> * V, int3 seed, int display){ 
