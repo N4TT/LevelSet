@@ -1,25 +1,21 @@
-//#include "SIPL/Core.hpp"
-//#include <gtk/gtk.h>
 #include "EasyBMP.h"
 #include <iostream>
 #include <stdio.h>
 #include <list>
 #include <exception>
 #include <stdlib.h>
-//#include <string.h>
 #include "main.h"
 #include "update.h"
 
 using namespace std;
 
-float image[HEIGHT][WIDTH] = { 0 };//{ {0.1,0.2,0.1,0.3,0.4},{0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}, {0.1,0.2,0.1,0.3,0.4}  };
-float phi[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
-short init[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
-short label[HEIGHT+BORDER][WIDTH+BORDER] = { 0 };
-float F[HEIGHT][WIDTH] = { 0 };
+float image[HEIGHT][WIDTH] = { 0 }; //input -> image to be segmented
+float phi[HEIGHT+BORDER][WIDTH+BORDER] = { 0 }; //level set
+short init[HEIGHT+BORDER][WIDTH+BORDER] = { 0 }; //binary mask with seed points
+short label[HEIGHT+BORDER][WIDTH+BORDER] = { 0 }; //contains info about the layers
 short zeroLevelSet[HEIGHT][WIDTH] = { 0 }; //output
+
 float treshold, alpha, epsilon;
-float maxC=0;float minC =0;
 
 list<Pixel> lz;
 list<Pixel> lp1;
@@ -70,7 +66,6 @@ bool checkMaskNeighbours(int i, int j, int id, short res){ //res er verdien som 
 			return true;
 		else if(label[i][j-1] == res)
 			return true;
-		
 	}
 	return false;
 }
@@ -128,7 +123,6 @@ void setLevels(Pixel p, short level){
 }	
 
 void initialization(){
-
 	list<Pixel>::iterator it;
 
 	for (int i = 0; i<HEIGHT+BORDER; i++){
@@ -152,18 +146,15 @@ void initialization(){
 			}
 		}
 	}
-	
 	for (it = lz.begin(); it != lz.end(); it++){
 		setLevels(*it, 1);//second levelSet (level 1)			
 	}
-	
 	for (it = lp1.begin(); it != lp1.end(); it++){
 		setLevels(*it, 2);
 	}
 	for (it = ln1.begin(); it != ln1.end(); it++){
 		setLevels(*it, 2);
 	}
-	
 }
 
 void readFile(BMP img){
@@ -208,13 +199,12 @@ void writeFile(BMP img, int id){//, int it){
 		}
 		img.WriteToFile("1output zero.bmp");
 	}
-	
 }
 
 int main(){
 	//read file
 	BMP img;
-	img.ReadFromFile("q.bmp");
+	img.ReadFromFile("qq.bmp");
 	readFile(img);
 	
 	try{
@@ -236,13 +226,10 @@ int main(){
 	
 	list<Pixel>::iterator itt;
 
-	//treshold = 0.6; epsilon = 0.05; alpha = 0.97;
-	//treshold = 0.5; epsilon = 0.06; alpha = 0.90;
-	treshold = 0.95; epsilon = 0.05; alpha = 0.55;
-	//treshold = 0.7; epsilon = 0.10; alpha = 0.96;
+	treshold = 0.99; epsilon = 0.05; alpha = 0.90;
 
 	printf("starting main loop\n");
-	int iterations = 15;
+	int iterations = 15000;
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		updateLevelSets();
@@ -257,7 +244,7 @@ int main(){
 			//writeFile(img, 1, i);
 		}
 	}
-	printf("\nmain loop finished %f  %f", minC, maxC);
+	printf("\nmain loop finished");
 	
 	writeFile(img, 3);
 	writeFile(img, 1);

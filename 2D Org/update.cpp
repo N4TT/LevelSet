@@ -1,7 +1,6 @@
 #include <iostream>
 #include <stdio.h>
 #include <cmath>
-//#include <vector>
 #include <list>
 #include <exception>
 #include <algorithm>
@@ -13,9 +12,10 @@ float muOutside;
 float muInside;
 
 list<float> minMaxList;
-
-float minMax(Pixel p, short greaterOrLess, short checkAgainst){//returns max if greaterOrLess =">=", 
-	float result;
+float minMaxRes;
+//Returns either max or min (based on greaterOrLess) of the neighbours, with values less or greater than checkAgainst
+float minMax(Pixel p, short greaterOrLess, short checkAgainst){
+	minMaxList.push_back(checkAgainst); //because max_element and min_element returns 0 if the list is empty
 	if(greaterOrLess == 1){
 		if(label[p.x+1][p.y] >= checkAgainst){
 			minMaxList.push_back(phi[p.x+1][p.y]);
@@ -32,7 +32,7 @@ float minMax(Pixel p, short greaterOrLess, short checkAgainst){//returns max if 
 		if(minMaxList.size() == 0){
 			printf("minMaxList is empty");
 		}
-		result = *max_element(minMaxList.begin(), minMaxList.end());
+		minMaxRes = *max_element(minMaxList.begin(), minMaxList.end());
 	}
 	else if(greaterOrLess == -1){
 		if(label[p.x+1][p.y] <= checkAgainst){
@@ -50,12 +50,10 @@ float minMax(Pixel p, short greaterOrLess, short checkAgainst){//returns max if 
 		if(minMaxList.size() == 0){
 			printf("minMaxList is empty");
 		}
-		result = *min_element(minMaxList.begin(), minMaxList.end());
+		minMaxRes = *min_element(minMaxList.begin(), minMaxList.end());
 	}
-	//printf("%f, %i, %i \n", result, greaterOrLess, checkAgainst);
 	minMaxList.clear();
-	return result;
-	
+	return minMaxRes;
 }
 
 void calculateMu(){
@@ -71,7 +69,6 @@ void calculateMu(){
 				numInside++;
 			}
 			else if(image[i][j] < threshold){
-				//printf("%f \n", image[i][j]);
 				muTempOutside += image[i][j];
 				numOutside++;
 			}
@@ -79,12 +76,15 @@ void calculateMu(){
 	}
 	muOutside = muTempOutside / numOutside;
 	muInside = muTempInside / numInside;
-	//muOutside = 0.29;
-	//muInside = 0.52;
-	printf("muInside: %f, muOutside: %f \n", muInside, muOutside); 
+	if(numInside == 0){
+		muInside = 1;
+	}
+	if(numOutside == 0){
+		muOutside = 0;
+	}
 }
 
-float speedFunctionOld(int x, int y){
+float speedFunctionChanVese(int x, int y){
 	return (((image[x][y] - muInside)*(image[x][y] - muInside)) - ((image[x][y] - muOutside)*(image[x][y] - muOutside)))/2; 
 }
 
@@ -95,7 +95,7 @@ float speedFunction(short i, short j){
 	D2 d2 = D2(i, j); //calculates the second order derivatives
 	Normal n = Normal(d1, d2); //calculates the normals
 	curvature = (n.nPlusX - n.nMinusX) + (n.nPlusY - n.nMinusY); //the curvature
-	float speed = -alpha*data + (1-alpha)*(curvature/4); //kanskje det første leddet ikke skal ganges med -1
+	float speed = -alpha*data + (1-alpha)*(curvature/4);
 	if(speed > 1){
 		speed = 1;
 	}
@@ -108,23 +108,20 @@ float speedFunction(short i, short j){
 list<Pixel>::iterator it;
 float M = 0;
 void prepareUpdates(){
-	//printf("\nsize prepare: %i ", sz.size());
-	for(it = lz.begin(); it != lz.end(); it++){//find pixels that are moving out of lz
+	for(it = lz.begin(); it != lz.end(); it++){
 		it->f = speedFunction(it->x, it->y);
 	}
 	for(it = lz.begin(); it != lz.end();){//find pixels that are moving out of lz
 		phi[it->x][it->y] += it->f;
 		if(phi[it->x][it->y] >= 0.5){
 			sp1.push_back(*it);
-			//printf("\nsize prepare: %i ", lz.size());
-			it = lz.erase(it);		//erases elements at index i and j
+			it = lz.erase(it);
 		}
 		else if(phi[it->x][it->y] < -0.5){
 			sn1.push_back(*it);
 			it = lz.erase(it);
 		}
 		else{
-			//printf("\nphi[%i][%i] = %f ",it->x, it->y, phi[it->x][it->y]);
 			it++;
 		}
 	}
@@ -217,7 +214,6 @@ void prepareUpdates(){
 			}
 		}
 	}
-	//printf("   size prepareeee: %i ", sz.size());
 }
 
 void updateLevelSets(){	
