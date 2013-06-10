@@ -8,6 +8,9 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{caption} %to be able to do linebreak inside captions, and more
 \usepackage[bottom]{footmisc}
+\usepackage{algorithm} %pseudocode
+\usepackage{algpseudocode} %pseudocode
+\usepackage{listings} %source code
 
 \newcommand{\indentitem}{\setlength\itemindent{25pt}} 
 %instead of writing {\setlength\itemindent{25pt} to indent an item inside the itemize envirnment, {\indentitem} can now be used..see last section in the chapter about level set method
@@ -41,11 +44,10 @@
 
 %input each chapter
 \input{Introduction/Introduction}
-\input{segmentation/Segmentation}
-\input{levelset/Levelset}
-\input{narrowband/Narrowband}
-\input{sparseField/SparseField}
+\input{backgroundTheory/BackgroundTheory}
 \input{implemented/SparseFieldCode}
+\input{results/Results}
+\input{discussion/Discussion}
 \input{references/references}
 
 \appendix

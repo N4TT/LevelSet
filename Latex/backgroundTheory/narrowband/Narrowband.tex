@@ -1,12 +1,12 @@
-\chapter{Narrow Band - for lite?}
-\section{Introduction}
+\section{Narrow Band - for lite?}
+\subsection{Introduction}
 When working with the level set of a single interface a huge drawback with the originally proposed level set method is the computional inefficiency due to computing over the whole domain of \(\phi\). As a solution to this problem Adalstein and Sethian proposed the narrow band method in 1994\cite{adalsteinsson94}. The narrow band looks at the interface of a single level set instead of the whole domain, and thereby decreases the computational labor of the standard level set method for propagating interfaces considerably. Another reason the narrow band was proposed are problems where the velocity field is only given on the interface. In such cases the construction of an appropriate speed funcion for the entire domain made use of the classical level set method a significant modeling problem.
 
-\section{Overview of the Narrow Band method}
+\subsection{Overview of the Narrow Band method}
 Unlike the original level set method, which describe the evolution of an embedded family of contours, the narrow band works with only a single surface model\cite{whitaker89}. That is, instead if calculating $\phi$ over the whole domain it focuses only on a small part surrounding the surface. There are many cases in which the description of the evolution of only one surface in the domain is needed, and in such cases the narrow band method operates much faster while delivering the same results. The method ignores points that are far away from the zero level set at each iteration and only looks at the points within a narrow band. This is possible because points far away from the zero level set do not have any influence on the result. That is, only the area of $\phi$ where \(\phi \approx 0\) is important for accurate representation of the level set. The narrow band method restrict the computation to a thin band of points by extending out approximately k points from the zero level set (shown in figure \ref{narrowBand}), and an embedding of the evolving interface is constructed via a signed distance transform. All points outside the band is set to constant values to indicate that they are not within the band and thus should not be used in the computation. This reduces the number of operations at each iteration from \(O(n^{d+1})\) to \(O(nk^{d})\) \cite{adalsteinsson94} where d is the number of dimensions and n is the (average) number of points in one dimension. 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=.5\textwidth]{levelset/narrowBand}
+\includegraphics[width=.5\textwidth]{backgroundTheory/levelset/narrowBand}
 \caption{The narrow band extending out with a width of k from the level set.}
 \label{narrowBand}
 \end{figure}

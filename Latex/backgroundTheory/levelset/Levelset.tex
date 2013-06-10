@@ -1,18 +1,18 @@
-\chapter{Level Set Method}
+\section{Level Set Method}
 \label{levelSetChap}
-\section{Introduction}
+\subsection{Introduction}
 Surfaces that evolves over time can be difficult to represent. Taking the surface in figure \ref{interface} as an example, assume that the red surface is heat and the arrows on the interface as the direction of its movement, which is normal to the interface itself. One way to represent the propagation of this interface is by the function $y = f(x,t)$, where $t$ represents time and $x,y$ are coordinates. The problem with this representation is that it cannot represent every concievable shape of the interface. If for instance the shape
 of the inerface has more y coordinates for a particular x coordinate (which is true for all closed interfaces), the intercane cannot be correctly represented using this notion.
 \begin{figure}[h!]
 \centering
-\includegraphics[width=.5\textwidth]{levelset/interface}
+\includegraphics[width=.5\textwidth]{backgroundTheory/levelset/interface}
 \caption{Interface of a moving surface.}
 \label{interface}
 \end{figure}
 A better alternative is to use a parametric equation. The problem mentioned above would then be solved because the interface would only depend on the time variable t. But parametric representation of evolving interfaces have its own difficulties. When a surface evolves, the model have to be reparemeterized, which, due to the computional overhead (especially in 3D) add limitations to what kind of shapes a parameterical model can represent effectively. Topological changes, such as splitting or merging parts during the propagation is difficult to represent using parametric models. Sharp corners, distant edges blending together and the complexity of representing boundaries in higher dimensions are some other reasons why an evolving surface is difficult to represent parametrically. A simple example is shown in figure \ref{problematicEvo}, the two interfaces have to be represented as a single parametric function when merging and as two seperate againg when they split, and some sort of collison detection must be used to discover when the interfaces merge/split.
 \begin{figure}[h!]
 \centering
-\includegraphics[width=.5\textwidth]{levelset/twoCircles}
+\includegraphics[width=.5\textwidth]{backgroundTheory/levelset/twoCircles}
 \caption{Interface evolution difficult to represent parametrically.}
 \label{problematicEvo}
 \end{figure}
@@ -31,13 +31,13 @@ The initial curve is at the xy-plane, that is, at \(\phi(x,y,0)\). As an example
 \centering
 \begin{minipage}{.4\textwidth}
 \begin{tabular}{c}
-\includegraphics[height=.3\textheight]{levelset/f1a} \\
+\includegraphics[height=.3\textheight]{backgroundTheory/levelset/f1a} \\
 (a)
 \end{tabular}
 \end{minipage}
 \begin{minipage}{.4\textwidth}
 \begin{tabular}{c}
-\includegraphics[height=.3\textheight]{levelset/f1b} \\
+\includegraphics[height=.3\textheight]{backgroundTheory/levelset/f1b} \\
 (b)
 \end{tabular}
 \end{minipage}
@@ -66,7 +66,7 @@ Here \(T\) is the central intensity value of the region to be segmented, and \(\
 
 The level set algorithm is initialized by placing a set of seed points that represents a part inside the region to be segmented. These seed points are represented by a binary mask of the same size as the image to be segmented. This mask is used to compute the signed distance function which \(\phi\) will be initialized to. 
 
-\section{Signed Distance Transform}
+\subsection{Signed Distance Transform}
 A distance function \(D: \mathbb{R}^3 \rightarrow \mathbb{R}\) for a set S is defined as 
 \begin{equation}
 D(r,S) = min(r-S) \quad for \ all \ r \in{\mathbb{R}^3}
@@ -77,19 +77,19 @@ If a binary image have one or more objects, a distance function can be used to a
 \centering
 \begin{minipage}{.45\textwidth}
 \begin{tabular}{c}
-\includegraphics[width=.9\textwidth]{levelset/orgNew} \\
+\includegraphics[width=.9\textwidth]{backgroundTheory/levelset/orgNew} \\
 (a)
 \end{tabular}
 \end{minipage}
 \begin{minipage}{.45\textwidth}
 \begin{tabular}{c}
-\includegraphics[width=.9\textwidth]{levelset/manhattan} \\
+\includegraphics[width=.9\textwidth]{backgroundTheory/levelset/manhattan} \\
 (b)
 \end{tabular}
 \end{minipage}
 \\
 \begin{tabular}{c}
-\includegraphics[width=.5\textwidth]{levelset/euclidean} \\
+\includegraphics[width=.5\textwidth]{backgroundTheory/levelset/euclidean} \\
 (c)
 \end{tabular}
 \caption{(a): Binary image, (b): SDT based on city-block distance, (c): SDT based on euclidean distance}
@@ -98,14 +98,15 @@ If a binary image have one or more objects, a distance function can be used to a
 
 As can be seen from the figures above, using different kind of functions for the SDT can result in different distances. These differences effects the accuracy of the level set function, which may leads to different end-results of the segmentation, hence, the function used to represent the distance have to be carfully chosen. However, sometimes a less accurate SDT have to be used as a tradeoff for faster computation time.
 
-\section{Sparse Field}
-The narrow band  method assumes that the computation of the SDT is so slow that it cannot be computed for every iteration (time step). The sparse field method introduced in \cite{whitaker89} uses a fast approximation of the distance transform that makes it feasible to compute the neighborhood of the level set model for each iteration. In the sparse field method the idea of using a thin band is taken to the extreme by working on a band that is only one point wide. The points adjacent to the level set are called active points, and all of them together are referred to as the active set. At each iteration only a thin layer of points near the active set are visited and updated. Using only the active points to compute the derivatives would not give sufficient accuracy. Because of this, the method extends out from the active points in small layers to create a neighborhood that is precisely the width needed to calculate the derivatives needed. 
+%\subsection{Sparse Field}
+%The narrow band  method assumes that the computation of the SDT is so slow that it cannot be computed for every iteration (time step). The sparse field method introduced in \cite{whitaker89} uses a fast approximation of the distance transform that makes it feasible to compute the neighborhood of the level set model for each iteration. In the sparse field method the idea of using a thin band is taken to the extreme by working on a band that is only one point wide. The points adjacent to the level set are called active points, and all of them together are referred to as the active set. At each iteration only a thin layer of points near the active set are visited and updated. Using only the active points to compute the derivatives would not give sufficient accuracy. Because of this, the method extends out from the active points in small layers to create a neighborhood that is precisely the width needed to calculate the derivatives needed. 
 
-Several advantages to this approach are mentioned in \cite{whitaker89}. No more than the precise number of calculations to find the next position of the zero level set surface is used. The number of points being computed is so small that a linked-list can be used to keep track of them. This also results in that only those points whose values control the position of the zero level set surface are visited at each iteration. A disadvantage of the narrow band method is that the stability at the boundaries of the band have to be maintained (e.g. by smoothing) since some points are undergoing the evolution while other neighbouring points remain fixed. The sparse field method avoid this by not letting any point entering or leaving the active set affecting its value. A point enters the active set if it is adjacent to the model. As the model evolves, points in the active set that are no longer adjacent to the model are removed from the active set. This is done by defining the neighborhoods of the active set in layers and keeping the values of points entering or leaving the active set unchanged. A layer is a set of pixels represented as \(L_{i}\) where \(i\) is the city-block distance from the active set. The layer \(L_{0}\) represents the active set, and \(L_{\pm 1}\) reprsents pixels adjacent to the active set on both sides. Using linked lists to represents the layers and arrays (matrices) to represent distance values makes the algorithm very efficient. The exact steps of the sparse field algorithm can be found in \cite{whitaker89}.
+%Several advantages to this approach are mentioned in \cite{whitaker89}. No more than the precise number of calculations to find the next position of the zero level set surface is used. The number of points being computed is so small that a linked-list can be used to keep track of them. This also results in that only those points whose values control the position of the zero level set surface are visited at each iteration. A disadvantage of the narrow band method is that the stability at the boundaries of the band have to be maintained (e.g. by smoothing) since some points are undergoing the evolution while other neighbouring points remain fixed. The sparse field method avoid this by not letting any point entering or leaving the active set affecting its value. A point enters the active set if it is adjacent to the model. As the model evolves, points in the active set that are no longer adjacent to the model are removed from the active set. This is done by defining the neighborhoods of the active set in layers and keeping the values of points entering or leaving the active set unchanged. A layer is a set of pixels represented as \(L_{i}\) where \(i\) is the city-block distance from the active set. The layer \(L_{0}\) represents the active set, and \(L_{\pm 1}\) reprsents pixels adjacent to the active set on both sides. Using linked lists to represents the layers and arrays (matrices) to represent distance values makes the algorithm very efficient. The exact steps of the sparse field algorithm can be found in \cite{whitaker89}.
 
-The sparse field algorithm is based on an important approximation, it assumes that points adjacent to the active points undergoes the same change in value as their nearby active set neighbors. But despite this, the errors introduced by the sparse field algorithm are no worse than many other level set algorithms. Since only those grid points whose values are changing (the active points and their neighbors) are visited at each time step the growth computation time is \(d^{n-1}\), where d is the number of pixels in along one dimension of the image. This is the same as for parameterized models where the computation times increase with the resolution of the domain, rather than the range.
+%The sparse field algorithm is based on an important approximation, it assumes that points adjacent to the active points undergoes the same change in value as their nearby active set neighbors. But despite this, the errors introduced by the sparse field algorithm are no worse than many other level set algorithms. Since only those grid points whose values are changing (the active points and their neighbors) are visited at each time step the growth computation time is \(d^{n-1}\), where d is the number of pixels in along one dimension of the image. This is the same as for parameterized models where the computation times increase with the resolution of the domain, rather than the range.
 
-\section{Discretization by upwinding and difference of normals}
+\subsection{Discretization by upwinding and difference of normals}
+\label{upwinding}
 To use the level set method in image processing it have to be discretized, but simple forward finite difference schemes cannot be used because such schemes tends to overshoot and are unstable. To overcome this problem the up-winding scheme was proposed in \cite{osher88}. To avoid the overshooting problems associated with forward finite differences the up-winding scheme uses one-sided derivatives that looks in the up-wind direction of the moving interface. Let \(\phi^n\) and \(F^n\) represent the values of \(\phi\) and \(F\) at some point in time \(t^n\). The updating process consist of finding new values for \(\phi\) at each point after a time interval \(\Delta t\). The forward Euler method is used to get a first-order accurate method for the time discretization of equation \ref{levelSetEq}, given by (from \cite{osher02})
 \begin{equation}
 \frac{\phi^{n+1}-\phi^n}{\Delta t} + F^n \cdot \nabla \phi^n = 0
@@ -213,6 +214,3 @@ Finally, the level set equation is updated as
 \begin{equation}
 \phi(t + \Delta t) = \phi(t) + \Delta tF|\nabla \phi|.
 \end{equation}
-
-\section{Parallel implementation in GPU}
-A huge disadvantage with the level set method for segmentation is that it is very slow when working with big data volumes in 3D space. Implementations of level set algorithms for 3D in the graphical processing unit (GPU) parallelizes the level set method and makes it much faster. One of the first GPU based 3D implementations of the level set method was by Lefohn et al. in \cite{cates03} in 2003. In this paper a modified sparse field level set method was implemented for the GPU using graphic APIs such as OpenGL and DirectX. In the past few years general purpose GPUs have made implementing level set methods and other non-graphical tasks in GPUs much easier. In \cite{panlei08} some simple medical segmentation algorithms was implemented using NVIDIAs CUDA technology, and in \cite{Packer10} CUDA was used to implement the level set method.
