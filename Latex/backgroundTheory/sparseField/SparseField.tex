@@ -1,6 +1,6 @@
-\chapter{Sparse Field}
+\section{Sparse Field}
 
-\section{Introduction}
+\subsection{Introduction}
 
 The narrow band  method assumes that the computation of the SDT is so slow that it cannot be computed for every iteration. The sparse field method introduced in \cite{whitaker89} uses a fast approximation of the distance transform that makes it feasible to compute the neighborhood of the level set model for each iteration. In the sparse field method the idea of using a thin band is taken to the extreme by working on a band that is only one point wide. The band is kept track of by defining the points nearest the level set as active points. Combining them gives us the active set. (dette må muligens forandres igjen. stusser veldig på hvordan dette skal skrives)
 
@@ -8,7 +8,6 @@ Using only the active points to compute the derivatives would not give sufficien
 
 
 Several advantages to this approach are mentioned in \cite{whitaker89}. Like stated above, no more than the precise number of calculations to find the next position of the zero level set surface is used. This also results in that only those points whose values control the position of the zero level set surface are visited at each iteration, which minimizes the calculations necessary. The number of points being computed is so small that a linked-list can be used to keep track of them. \\
-
 
 %This approach ensures that no unnecessary calculations are performed. 
 
@@ -30,9 +29,9 @@ Since we only do calculations on pixels in the active set and the neighbouring l
 %The points (immediately?) adjacent to the level set are called active points, and all of them together are referred to as the active set. At each iteration only a thin %layer of points near the active set are visited and updated. 
 
 
-\section{Overwiew of the Sparse Field method}
+\subsection{Overwiew of the Sparse Field method}
 
-Like described in section \ref{sec:upwinding} (link to up-winding), the Up-Winding scheme gives the curvature in an area surrounding a point in the active set. This scheme uses both first and second order derivatives, and to calculte them it needs a 3x3x3(3D) grid of points surrounding the active point whose speed is being calculated. This creates a lower limit for the number of layers surrounding the active set. In addition to the active set which is stored in \(L{0}\) we need four lists,\(L_{1}\)  \(L_{2}\) \(L_{-1}\) \(L_{-2}\). These lists keeps track of where the points of computational significance are located at any time during execution. Like the other aproaches to the level set method, the datastructure that tracks the evolution of the interface is an array with the same dimensions as the problem domain. (kan vi skrive dette litt mer profft kanskje? for eksempel med en formel som viser at array dimension med stor R equals Image dimensions)
+Like described in section \ref{upwinding} (link to up-winding), the Up-Winding scheme gives the curvature in an area surrounding a point in the active set. This scheme uses both first and second order derivatives, and to calculte them it needs a 3x3x3(3D) grid of points surrounding the active point whose speed is being calculated. This creates a lower limit for the number of layers surrounding the active set. In addition to the active set which is stored in \(L{0}\) we need four lists,\(L_{1}\)  \(L_{2}\) \(L_{-1}\) \(L_{-2}\). These lists keeps track of where the points of computational significance are located at any time during execution. Like the other aproaches to the level set method, the datastructure that tracks the evolution of the interface is an array with the same dimensions as the problem domain. (kan vi skrive dette litt mer profft kanskje? for eksempel med en formel som viser at array dimension med stor R equals Image dimensions)
 
 Its important to note that the lists are used to keep track of which points are in the active set and their neighbours, and are a redundant datastructure, separate from phi. Thus tracking the layers has no effect on the accuracy of the end result.(skriver dette fordi narrow band har et problem i interfacen, stemmer det?)
 

@@ -1,32 +1,42 @@
-\BOOKMARK [0][-]{chapter.1}{Segmentation}{}% 1
-\BOOKMARK [1][-]{section.1.1}{Histogram-based segmentation methods}{chapter.1}% 2
-\BOOKMARK [2][-]{subsection.1.1.1}{Thresholding}{section.1.1}% 3
-\BOOKMARK [2][-]{subsection.1.1.2}{Otsu's thresholding method}{section.1.1}% 4
-\BOOKMARK [1][-]{section.1.2}{Region based segmentation}{chapter.1}% 5
-\BOOKMARK [2][-]{subsection.1.2.1}{Region growing}{section.1.2}% 6
-\BOOKMARK [2][-]{subsection.1.2.2}{Region splitting}{section.1.2}% 7
-\BOOKMARK [1][-]{section.1.3}{Edge based segmentation}{chapter.1}% 8
-\BOOKMARK [2][-]{subsection.1.3.1}{First and second order operators}{section.1.3}% 9
-\BOOKMARK [2][-]{subsection.1.3.2}{Canny edge detector}{section.1.3}% 10
-\BOOKMARK [0][-]{chapter.2}{Level Set Method}{}% 11
-\BOOKMARK [1][-]{section.2.1}{Introduction}{chapter.2}% 12
-\BOOKMARK [1][-]{section.2.2}{Signed Distance Transform}{chapter.2}% 13
-\BOOKMARK [1][-]{section.2.3}{Sparse Field}{chapter.2}% 14
-\BOOKMARK [1][-]{section.2.4}{Discretization by upwinding and difference of normals}{chapter.2}% 15
-\BOOKMARK [1][-]{section.2.5}{Parallel implementation in GPU}{chapter.2}% 16
-\BOOKMARK [0][-]{chapter.3}{Narrow Band - for lite?}{}% 17
-\BOOKMARK [1][-]{section.3.1}{Introduction}{chapter.3}% 18
-\BOOKMARK [1][-]{section.3.2}{Overview of the Narrow Band method}{chapter.3}% 19
-\BOOKMARK [0][-]{chapter.4}{Sparse Field}{}% 20
-\BOOKMARK [1][-]{section.4.1}{Theory}{chapter.4}% 21
-\BOOKMARK [1][-]{section.4.2}{Implementation}{chapter.4}% 22
-\BOOKMARK [0][-]{chapter.5}{Sparse Field - Implemented code}{}% 23
-\BOOKMARK [1][-]{section.5.1}{Introduction}{chapter.5}% 24
-\BOOKMARK [1][-]{section.5.2}{TODO}{chapter.5}% 25
-\BOOKMARK [2][-]{subsection.5.2.1}{Datastructures and types used - elr noe lignende}{section.5.2}% 26
-\BOOKMARK [1][-]{section.5.3}{Forskjeller fra vår kode og pseudokoden til lankton}{chapter.5}% 27
-\BOOKMARK [1][-]{section.5.4}{Om koden vår}{chapter.5}% 28
-\BOOKMARK [1][-]{section.5.5}{Problems met}{chapter.5}% 29
-\BOOKMARK [1][-]{section.5.6}{Performance}{chapter.5}% 30
-\BOOKMARK [0][-]{appendix.A}{Sparse Field - Pseudocode}{}% 31
-\BOOKMARK [0][-]{appendix.B}{Implemented Sparse field method}{}% 32
+\BOOKMARK [0][-]{chapter.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.1.1}{Background}{chapter.1}% 2
+\BOOKMARK [1][-]{section.1.2}{Project Goals}{chapter.1}% 3
+\BOOKMARK [1][-]{section.1.3}{Outline}{chapter.1}% 4
+\BOOKMARK [0][-]{chapter.2}{Background Theory}{}% 5
+\BOOKMARK [1][-]{section.2.1}{Segmentation}{chapter.2}% 6
+\BOOKMARK [2][-]{subsection.2.1.1}{Histogram-based segmentation methods}{section.2.1}% 7
+\BOOKMARK [2][-]{subsection.2.1.2}{Region based segmentation}{section.2.1}% 8
+\BOOKMARK [2][-]{subsection.2.1.3}{Edge based segmentation}{section.2.1}% 9
+\BOOKMARK [1][-]{section.2.2}{Level Set Method}{chapter.2}% 10
+\BOOKMARK [2][-]{subsection.2.2.1}{Introduction}{section.2.2}% 11
+\BOOKMARK [2][-]{subsection.2.2.2}{Signed Distance Transform}{section.2.2}% 12
+\BOOKMARK [2][-]{subsection.2.2.3}{Discretization by upwinding and difference of normals}{section.2.2}% 13
+\BOOKMARK [1][-]{section.2.3}{Narrow Band - for lite?}{chapter.2}% 14
+\BOOKMARK [2][-]{subsection.2.3.1}{Introduction}{section.2.3}% 15
+\BOOKMARK [2][-]{subsection.2.3.2}{Overview of the Narrow Band method}{section.2.3}% 16
+\BOOKMARK [1][-]{section.2.4}{Sparse Field}{chapter.2}% 17
+\BOOKMARK [2][-]{subsection.2.4.1}{Introduction}{section.2.4}% 18
+\BOOKMARK [2][-]{subsection.2.4.2}{Overwiew of the Sparse Field method}{section.2.4}% 19
+\BOOKMARK [1][-]{section.2.5}{Parallel computing in GPU}{chapter.2}% 20
+\BOOKMARK [2][-]{subsection.2.5.1}{Data and task parallelism}{section.2.5}% 21
+\BOOKMARK [2][-]{subsection.2.5.2}{Central processing unit}{section.2.5}% 22
+\BOOKMARK [2][-]{subsection.2.5.3}{Flynn's taxonomy of computer architectures}{section.2.5}% 23
+\BOOKMARK [2][-]{subsection.2.5.4}{Graphics processing unit}{section.2.5}% 24
+\BOOKMARK [2][-]{subsection.2.5.5}{OpenMP}{section.2.5}% 25
+\BOOKMARK [2][-]{subsection.2.5.6}{General Purpose GPU}{section.2.5}% 26
+\BOOKMARK [2][-]{subsection.2.5.7}{CUDA}{section.2.5}% 27
+\BOOKMARK [0][-]{chapter.3}{Sparse Field - Implemented code}{}% 28
+\BOOKMARK [1][-]{section.3.1}{Introduction}{chapter.3}% 29
+\BOOKMARK [1][-]{section.3.2}{TODO}{chapter.3}% 30
+\BOOKMARK [1][-]{section.3.3}{Forskjeller fra vår kode og pseudokoden til lankton}{chapter.3}% 31
+\BOOKMARK [1][-]{section.3.4}{Om koden vår}{chapter.3}% 32
+\BOOKMARK [2][-]{subsection.3.4.1}{Datastructures and types used - elr noe lignende}{section.3.4}% 33
+\BOOKMARK [2][-]{subsection.3.4.2}{Code structure}{section.3.4}% 34
+\BOOKMARK [2][-]{subsection.3.4.3}{Input and initialization}{section.3.4}% 35
+\BOOKMARK [2][-]{subsection.3.4.4}{Speed function explained}{section.3.4}% 36
+\BOOKMARK [1][-]{section.3.5}{Problems met}{chapter.3}% 37
+\BOOKMARK [1][-]{section.3.6}{Performance}{chapter.3}% 38
+\BOOKMARK [0][-]{chapter.4}{Results}{}% 39
+\BOOKMARK [0][-]{chapter.5}{Results}{}% 40
+\BOOKMARK [0][-]{appendix.A}{Sparse Field - Pseudocode}{}% 41
+\BOOKMARK [0][-]{appendix.B}{Appendix A - Source Code}{}% 42
