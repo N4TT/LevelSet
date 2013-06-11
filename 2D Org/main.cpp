@@ -4,6 +4,7 @@
 #include <list>
 #include <exception>
 #include <stdlib.h>
+#include <sstream> //to concatenate string and int when writing multiple files in a single run
 #include "main.h"
 #include "update.h"
 
@@ -29,21 +30,46 @@ list<Pixel> sn1;
 list<Pixel> sp2;
 list<Pixel> sn2;
 
-void fillInit(short minX, short minY, short maxX, short maxY){
-	if(maxX - minX <= 0){
-		throw -1;
+//fills init with the seed points, returns 1 if success
+int fillSphere(int seedX, int seedY, int radius){
+	if(seedX < 0 || seedX > HEIGHT || seedY < 0 || seedY > WIDTH){
+		printf("Wrong input to create a circular seed\n");
+		printf("Coordinates out of range\n");
+		return 0;
 	}
-	else if(maxY - minY <= 0){
-		throw -1;
+	else if(radius < 1 || radius > HEIGHT/2 || radius > WIDTH/2){
+		printf("Wrong input to create a circular seed\n");
+		printf("Radius must be a positive integer less than min(width, height)/2\n");
+		return 0;
 	}
-	else if(minX < 0 || maxX > HEIGHT || minY < 0 || maxY > WIDTH){
-		throw 1;
+	for(int i = seedX - radius; i < seedX + radius; i++){
+		for(int j = seedY - radius; j < seedY + radius; j++){
+			if(sqrt((float)((seedX-i)*(seedX-i)+(seedY-j)*(seedY-j))) < radius){
+				init[i][j] = 1;
+			}
+		}
+	}
+	return 1;
+}
+
+//can replace fillSphere() if a rectangular seed point is wanted
+int fillInit(short minX, short minY, short maxX, short maxY){
+	if(maxX - minX <= 0 || maxY - minY <= 0){
+		printf("Wrong input to create a rectangular seed\n");
+		printf("Input must be in this order minX minY maxX maxY\n");
+		return 0;
+	}
+	else if(minX < 0 || maxX >= HEIGHT || minY < 0 || maxY >= WIDTH){
+		printf("Wrong input to create a rectangular seed\n");
+		printf("Input out of range\n");
+		return 0;
 	}
 	for (int i = minY+1; i<maxY+1; i++){
 		for (int j = minX+1; j<maxX+1; j++){
 			init[i][j] = 1;
 		}
 	}
+	return 1;
 }
 
 bool checkMaskNeighbours(int i, int j, int id, short res){ //res er verdien som vi sjekker opp mot, kriteriet for success
@@ -165,10 +191,13 @@ void readFile(BMP img){
 			image[i][j] /= 255;
 		}
 	}
-	printf("image filled \n");
 }
 
-void writeFile(BMP img, int id){//, int it){
+
+void writeFile(BMP img, int id, int iter){
+	string name;
+	stringstream sstm;
+	
 	if(id == 1){ //label
 		for (short i =0; i<HEIGHT; i++){
 			for (short j = 0; j<WIDTH; j++){
@@ -177,7 +206,9 @@ void writeFile(BMP img, int id){//, int it){
 				img(i,j)->Blue = (label[i][j] +3)*42;
 			}
 		}
-		img.WriteToFile("1output label.bmp");
+		sstm << "label" << iter <<".bmp";
+		name = sstm.str();
+		img.WriteToFile(name.c_str());
 	}
 	else if(id == 2){ //phi
 		for (short i =0; i<HEIGHT; i++){
@@ -197,57 +228,78 @@ void writeFile(BMP img, int id){//, int it){
 				img(i,j)->Blue = zeroLevelSet[i][j]; 
 			}
 		}
-		img.WriteToFile("1output zero.bmp");
+		sstm << "zero" << iter <<".bmp";
+		name = sstm.str();
+		img.WriteToFile(name.c_str());
 	}
 }
 
-int main(){
+int main(int argc, char *argv[]){
+	int iterations;
+	if(argc != 2){
+		printf("Need one input: number of iterations\n");
+		system("pause");
+		return 0;
+	}
+
+	if (sscanf (argv[1], "%i", &iterations)!=1 || iterations<1) { 
+		printf("first input must be a positive integer: number of iterations\n"); 
+		system("pause");
+		return 0;
+	}
+
 	//read file
 	BMP img;
-	img.ReadFromFile("qq.bmp");
+	img.ReadFromFile("img.bmp");
 	readFile(img);
 	
-	try{
-		fillInit(225, 225, 250, 250);
-		printf("init filled\n");
-	}catch(int e){
-		if(e == -1){
-			printf("minX er større enn maxX eller minY er større enn maxY\n");
-			system("pause");
+	/*if(fillInit(150, 150, 250, 250) == 0){
+		system("pause");
+		return 0;
+	}*/
 
-		}
-		else if(e == 1){
-			printf("masken kan ikke være utenfor eller større enn bildet\n");
-			system("pause");
-		}
+	if(fillSphere(50, 50, 10) == 0){
+		system("pause");
+		return 0;
 	}
+	
 	initialization();
-	calculateMu();
+	calculateMu(); //only needed if the Chan Vese speed function is used
 	
 	list<Pixel>::iterator itt;
 
-	treshold = 0.99; epsilon = 0.05; alpha = 0.90;
+	treshold = 0.99; epsilon = 0.15; alpha = 0.80;
 
 	printf("starting main loop\n");
-	int iterations = 15000;
+	
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		updateLevelSets();
-		if(i%100 == 0){
+		/*if(i%100 == 0){
 			printf("\niteration: %i\n", i);
-		}
+			printf("\nwriting to zeroLevelSet");
+			for(itt = lz.begin(); itt != lz.end(); itt++){
+				zeroLevelSet[itt->x][itt->y] = 255;
+			}
+			writeFile(img, 3, i);
+			writeFile(img, 1, i);
+			for(itt = lz.begin(); itt != lz.end(); itt++){
+				zeroLevelSet[itt->x][itt->y] = 0;
+			}
+		}*/
 		if(i == (iterations-1)){ //copy the zero level set pixels to zeroLevelSet
 			printf("\nwriting to zeroLevelSet");
 			for(itt = lz.begin(); itt != lz.end(); itt++){
 				zeroLevelSet[itt->x][itt->y] = 255;
 			}
-			//writeFile(img, 1, i);
+			writeFile(img, 3, i);
+			writeFile(img, 1, i);
 		}
 	}
 	printf("\nmain loop finished");
 	
-	writeFile(img, 3);
-	writeFile(img, 1);
+	//writeFile(img, 3, iterations);
+	//writeFile(img, 1, iterations);
 	printf("\noutput successfully stored\n");
 
 	system("pause");
