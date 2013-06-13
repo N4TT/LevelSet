@@ -24,56 +24,48 @@ float minMaxRes;
 //Returns either max or min (based on greaterOrLess) of the neighbours, with values less or greater than checkAgainst
 float minMax(Pixel p, short greaterOrLess, short checkAgainst){
 	minMaxList.push_back(checkAgainst); //because max_element and min_element returns 0 if the list is empty
+	float minMax = checkAgainst;
 	if(greaterOrLess == 1){
-		if(label[p.x+1][p.y][p.z] >= checkAgainst){
-			minMaxList.push_back(phi[p.x+1][p.y][p.z]);
+		if(label[p.x+1][p.y][p.z] > checkAgainst){
+			minMax = phi[p.x+1][p.y][p.z];
 		}
-		if(label[p.x][p.y+1][p.z] >= checkAgainst){
-			minMaxList.push_back(phi[p.x][p.y+1][p.z]);
+		if(label[p.x][p.y+1][p.z] > checkAgainst){
+			minMax = phi[p.x][p.y+1][p.z];		
 		}
-		if(label[p.x][p.y][p.z+1] >= checkAgainst){
-			minMaxList.push_back(phi[p.x][p.y][p.z+1]);		
+		if(label[p.x][p.y][p.z+1] > checkAgainst){
+			minMax = phi[p.x][p.y][p.z+1];		
 		}
-		if(label[p.x-1][p.y][p.z] >= checkAgainst){
-			minMaxList.push_back(phi[p.x-1][p.y][p.z]);
+		if(label[p.x-1][p.y][p.z] > checkAgainst){
+			minMax = phi[p.x-1][p.y][p.z];
 		}
-		if(label[p.x][p.y-1][p.z] >= checkAgainst){
-			minMaxList.push_back(phi[p.x][p.y-1][p.z]);
+		if(label[p.x][p.y-1][p.z] > checkAgainst){
+			minMax = phi[p.x][p.y-1][p.z];
 		}
-		if(label[p.x][p.y][p.z-1] >= checkAgainst){
-			minMaxList.push_back(phi[p.x][p.y][p.z-1]);		
+		if(label[p.x][p.y][p.z-1] > checkAgainst){
+			minMax = phi[p.x][p.y][p.z-1];
 		}
-		if(minMaxList.size() == 0){
-			printf("minMaxList is empty");
-		}
-		minMaxRes = *max_element(minMaxList.begin(), minMaxList.end());
 	}
 	else if(greaterOrLess == -1){
-		if(label[p.x+1][p.y][p.z] <= checkAgainst){
-			minMaxList.push_back(phi[p.x+1][p.y][p.z]);
+		if(label[p.x+1][p.y][p.z] < checkAgainst){
+			minMax = phi[p.x+1][p.y][p.z];
 		}
-		if(label[p.x][p.y+1][p.z] <= checkAgainst){
-			minMaxList.push_back(phi[p.x][p.y+1][p.z]);
+		if(label[p.x][p.y+1][p.z] < checkAgainst){
+			minMax = phi[p.x][p.y+1][p.z];		
 		}
-		if(label[p.x][p.y][p.z+1] <= checkAgainst){
-			minMaxList.push_back(phi[p.x][p.y][p.z+1]);	
+		if(label[p.x][p.y][p.z+1] < checkAgainst){
+			minMax = phi[p.x][p.y][p.z+1];		
 		}
-		if(label[p.x-1][p.y][p.z] <= checkAgainst){
-			minMaxList.push_back(phi[p.x-1][p.y][p.z]);
+		if(label[p.x-1][p.y][p.z] < checkAgainst){
+			minMax = phi[p.x-1][p.y][p.z];
 		}
-		if(label[p.x][p.y-1][p.z] <= checkAgainst){
-			minMaxList.push_back(phi[p.x][p.y-1][p.z]);
+		if(label[p.x][p.y-1][p.z] < checkAgainst){
+			minMax = phi[p.x][p.y-1][p.z];
 		}
-		if(label[p.x][p.y][p.z-1] <= checkAgainst){
-			minMaxList.push_back(phi[p.x][p.y][p.z-1]);		
+		if(label[p.x][p.y][p.z-1] < checkAgainst){
+			minMax = phi[p.x][p.y][p.z-1];
 		}
-		if(minMaxList.size() == 0){
-			printf("minMaxList is empty");
-		}
-		minMaxRes = *min_element(minMaxList.begin(), minMaxList.end());
 	}
-	minMaxList.clear();
-	return minMaxRes;
+	return minMax;
 }
 
 void calculateMu(float threshold){
@@ -110,6 +102,7 @@ double speedFunctionChanVese(short x, short y, short z){
 float nPlus, nMinus, curvature; //må flyttes in i metoden hvis det skal paralelliseres
 extern float maxCurvature;
 extern float minCurvature;
+
 float speedFunction(short i, short j, short k){
 	float data = epsilon - abs(image[i][j][k] - treshold); //the data term (based on pixel intensity)
 	D1 d1 = D1(i, j, k); //calculates the first order derivatives
