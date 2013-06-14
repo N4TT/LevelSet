@@ -9,7 +9,7 @@ hjernebildet med chan-vese -> sammenlign med hjernebilde av vanlig speed funksjo
 First a simple binary image of size 512x512 of a circle shown in figure \ref{circle} was segmented. Values used: threshold ($T$) = 0.99, $\epsilon$ = 0.15 and $\alpha$ = 0.80. Since this image is binary the $T \pm \epsilon$ would not affect the end result of a full segmentation, as long as $T - \epsilon < 1 < T + \epsilon$. This also assumes that $T - \epsilon$ is not too close to 0, which would (also depending on $\alpha$) either stop the surface evolution midways or collaps it. The advantage of using higher values of $\epsilon$ within these limits is that higher values of $\epsilon$ makes the segmentation process faster by needing less iterations to achieve full segmentation. The reason is that the data term $D(I)$ (see \ref{dataFunction}) in the speed function is gradual, as mentioned when describing the speed function in chapter \ref{levelSetChap}.
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.65\textwidth]{results/circle}
+\includegraphics[width=0.65\textwidth]{results/2D/circle}
 \caption{Input: simple binary image}
 \label{circle}
 \end{figure} 
@@ -17,7 +17,7 @@ First a simple binary image of size 512x512 of a circle shown in figure \ref{cir
 Figure \ref{circleZero0} illustrates the zero level set (and a zoomed in version in the top-right corner) right after its initialization where a circular zero level set was created with center in coordinate (235,235) and with radius = 10. 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.65\textwidth]{results/circleZero0}
+\includegraphics[width=0.65\textwidth]{results/2D/circleZero0}
 \caption{Zero level set right after initialization}
 \label{circleZero0}
 \end{figure} 
@@ -28,33 +28,33 @@ Figures \ref{circleZeroMany} a, b and c represents the zero level set after 700,
 \centering
 \begin{minipage}{.49\textwidth}
 \begin{tabular}{c}
-\includegraphics[width=.9\textwidth]{results/circleZero700} \\
+\includegraphics[width=.9\textwidth]{results/2D/circleZero700} \\
 (a)
 \end{tabular}
 \end{minipage}
 \begin{minipage}{.49\textwidth}
 \begin{tabular}{c}
-\includegraphics[width=.9\textwidth]{results/circleZero1200} \\
+\includegraphics[width=.9\textwidth]{results/2D/circleZero1200} \\
 (b)
 \end{tabular}
 \end{minipage}
 \\
 \begin{minipage}{.49\textwidth}
 \begin{tabular}{c}
-\includegraphics[width=.9\textwidth]{results/circleZero1600} \\
+\includegraphics[width=.9\textwidth]{results/2D/circleZero1600} \\
 (c)
 \end{tabular}
 \end{minipage}
 \begin{minipage}{.49\textwidth}
 \begin{tabular}{c}
-\includegraphics[width=.9\textwidth]{results/circleZero2200_full} \\
+\includegraphics[width=.9\textwidth]{results/2D/circleZero2200_full} \\
 (d)
 \end{tabular}
 \end{minipage}
 \\
 \begin{minipage}{.49\textwidth}
 \begin{tabular}{c}
-\includegraphics[width=.9\textwidth]{results/circleEps005} \\
+\includegraphics[width=.9\textwidth]{results/2D/circleEps005} \\
 (e)
 \end{tabular}
 \end{minipage}
@@ -68,26 +68,26 @@ To test if the program works as it should when parts of the seed point is outsid
 \centering
 \begin{minipage}{.49\textwidth}
 \begin{tabular}{c}
-\includegraphics[width=.9\textwidth]{results/circleSeedPartlyOutside} \\
+\includegraphics[width=.9\textwidth]{results/2D/circleSeedPartlyOutside} \\
 (a)
 \end{tabular}
 \end{minipage}
 \begin{minipage}{.49\textwidth}
 \begin{tabular}{c}
-\includegraphics[width=.9\textwidth]{results/circleSeedPartlyOutside300} \\
+\includegraphics[width=.9\textwidth]{results/2D/circleSeedPartlyOutside300} \\
 (b)
 \end{tabular}
 \end{minipage}
 \\
 \begin{minipage}{.49\textwidth}
 \begin{tabular}{c}
-\includegraphics[width=.9\textwidth]{results/circleSeedPartlyOutside800} \\
+\includegraphics[width=.9\textwidth]{results/2D/circleSeedPartlyOutside800} \\
 (c)
 \end{tabular}
 \end{minipage}
 \begin{minipage}{.49\textwidth}
 \begin{tabular}{c}
-\includegraphics[width=.9\textwidth]{results/circleSeedPartlyOutside1300} \\
+\includegraphics[width=.9\textwidth]{results/2D/circleSeedPartlyOutside1300} \\
 (d)
 \end{tabular}
 \end{minipage}
@@ -100,20 +100,20 @@ To further test the robustness of the program and to illustrate the effect $\alp
 \centering
 \begin{minipage}{.49\textwidth}
 \begin{tabular}{c}
-\includegraphics[width=.9\textwidth]{results/randOrgWSeed} \\
+\includegraphics[width=.9\textwidth]{results/2D/randOrgWSeed} \\
 (a)
 \end{tabular}
 \end{minipage}
 \\
 \begin{minipage}{.49\textwidth}
 \begin{tabular}{c}
-\includegraphics[width=.9\textwidth]{results/randOrgWSeeda080} \\
+\includegraphics[width=.9\textwidth]{results/2D/randOrgWSeeda080} \\
 (b)
 \end{tabular}
 \end{minipage}
 \begin{minipage}{.49\textwidth}
 \begin{tabular}{c}
-\includegraphics[width=.9\textwidth]{results/randOrgWSeeda090} \\
+\includegraphics[width=.9\textwidth]{results/2D/randOrgWSeeda090} \\
 (c)
 \end{tabular}
 \end{minipage}
@@ -125,13 +125,13 @@ As explained in chapter \ref{levelSetChap}, $\alpha$ restricts how much the inte
 \centering
 \begin{minipage}{.39\textwidth}
 \begin{tabular}{c}
-\includegraphics[width=.9\textwidth]{results/starZero} \\
+\includegraphics[width=.9\textwidth]{results/2D/starZero} \\
 (a)
 \end{tabular}
 \end{minipage}
 \begin{minipage}{.39\textwidth}
 \begin{tabular}{c}
-\includegraphics[width=.9\textwidth]{results/starZeroFullSeg} \\
+\includegraphics[width=.9\textwidth]{results/2D/starZeroFullSeg} \\
 (b)
 \end{tabular}
 \end{minipage}
@@ -140,7 +140,16 @@ As explained in chapter \ref{levelSetChap}, $\alpha$ restricts how much the inte
 \end{figure}
 
 \section{3D}
-TODO
+%\begin{figure}[h!]
+%\centering
+%\includegraphics[width=.9\textwidth]{results/3D/} \\
+First volume to be segmented  was a volume of an aneurism in a semi segmented brain volume. 
+The goal was to segment the aneurism itself as well as adjacent arteries (veins?) without expanding into insignificant parts of the volume. In figure (insert figure of aneurism raw før segmentering) we can see a MIP(trengs forklaring på mip?) of the unsegmented volume. The part we want to segment is the aneurism (utposningen) on the blood vessel which is located inside the brain (not shown in the picture) and adjacent arteries(hva er egentig terminologien her?). Not only is the segmentation here used to extract the important features of the aneurism in order to help surgeons make decisions as to how to operate on it. By also adding sections of the connecting veins, registration can be performed by tryin to find a one to one correspondence between the model and samples of the patient on the table, which is then used as a reference frame during computer aided surgery. 
+
+Figure 2 shows how segmentation of the image looks like after 500 iterations. The values of T, $\epsilon$, and $\alpha$ used is T = 1.0, $\epsilon$ = 0.3 and $\alpha$ = 0.75. The aneurism volume has dimensions 512x512x235. In theory this would mean that we only need about half the number of iterations as the biggest image dimension (assuming the seed point is located near the center of the volume) to achieve a full segmentation, given that the speed is close to 1. Since this is not the case in a volume with a range of values and because the curvature term slows down expansions in narrow regions (which is abundant in a volume of blood vessels) the expansion is infact much more slow. It turns out that to achieve a satisfying result given the input parameters stated above, about 3000 iterations is needed. Figure 3 shows the segmentated volume after 500, 1000 and 1500 iterations of the volume. The white part of the structure is the volume segmented after 500 iterations. The light blue colored part shows the segmentation after 1000 iterations and the darker blue shows the segmented volume after 1500 iterations. The figure shows how stable the algorithm is throughout the run. The area along the walls of the arteries covered after 500 iterations is not retracting at a later point, nor is it expanding further. This is shown by observing how well the 500 iterations volume and the 1500 iterations volume overlap.
+
+Next we have the segmented volume after 2000 and 3000 iterations in figure 4, which has colors red and green respectively. The overlapping areas are indicated in yellow. As we can see the last 1000 iterations is not a huge improvement, but the volume is definitely not at equilibrium after 2000 iterations. 
+
 
 \section{Performance}
 TODO 
