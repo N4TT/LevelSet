@@ -1,9 +1,9 @@
 #include <list>
 using namespace std;
 
-#define HEIGHT 512
-#define WIDTH 512
-#define DEPTH 235
+#define HEIGHT 320
+#define WIDTH 220
+#define DEPTH 72
 #define BORDER 2
 
 struct Pixel{

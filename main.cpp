@@ -261,24 +261,68 @@ void displayShortVolume(Volume<short> * V, int3 seed, int display){
 }
 
 
+void displayUshortVolume(Volume<ushort> * V, int3 seed, int display){ 
+	//display == 0 -> display the input mhd data, display == 1 -> display the segmentation result
+	Volume<float2> * v2 = new Volume<float2>(V->getSize());
+	if(display == 0){ //display input data
+		for(int x = 0; x < V->getWidth(); x++) {
+		for(int y = 0; y < V->getHeight(); y++) {
+		for(int z = 0; z < V->getDepth(); z++) {
+			float2 list;
+			list.x = (float)V->get(x,y,z) / 1000.0f;		//even tho the input can have any value allowed by short, its known to be between -1000 and 1000
+			int3 n(x,y,z);	
+			image[x][y][z] = (int)V->get(x,y,z) / 1000.0f;
+			if(sqrt((float)((seed.x-n.x)*(seed.x-n.x)+(seed.y-n.y)*(seed.y-n.y)+(seed.z-n.z)*(seed.z-n.z))) < 5.0f){
+				list.y = 1.0f;
+			}
+			v2->set(n, list);
+		}}}
+		//v2->showMIP();
+		v2->show();
+	}
+	else{ //display segmentation result
+		for(int x = 0; x < V->getWidth(); x++) {
+		for(int y = 0; y < V->getHeight(); y++) {
+		for(int z = 0; z < V->getDepth(); z++) {
+			float2 list;
+			list.x = (float)zeroLevelSet[x][y][z] / 255.0f;
+			int3 n(x,y,z);	
+			if(sqrt((float)((seed.x-n.x)*(seed.x-n.x)+(seed.y-n.y)*(seed.y-n.y)+(seed.z-n.z)*(seed.z-n.z))) < 5.0f){
+			//if(seed.distance(n) < 5.0f) {
+				list.y = 1.0f;
+			}
+			v2->set(n, list);
+		}}}
+		//v2->showMIP();
+		v2->show();
+	}
+}
+
+
+
+
 
 int main(){
+	printf("ohlol123456\n");
 	//Volume<uchar> * V = new Volume<uchar>("C:/Users/N4TT/Documents/Visual Studio 2012/Projects/LevelSetProject/LevelSet/aneurism.mhd");
-	Volume<short> * V = new Volume<short>("C:/Users/N4TT/Documents/Visual Studio 2012/Projects/LevelSetProject/LevelSet/normalized_abdomen.mhd");
-	//Volume<uchar> * V = new Volume<uchar>("circle_with_values_245.mhd");
+	//Volume<short> * V = new Volume<short>("C:/Users/N4TT/Documents/Visual Studio 2012/Projects/LevelSetProject/LevelSet/normalized_abdomen.mhd");
+	Volume<ushort> * V = new Volume<ushort>("C:/Users/N4TT/Dropbox/Master stuff/LevelSet data/Pas01/191211-MRT1-Liver.mhd");
 	//Volume<uchar> * V = new Volume<uchar>("rectangle.mhd");
 	
+
+	int3 seed(76, 122, 45);		//funker bra med LIVER CT dataen
 	//int3 seed(110, 107, 162);		//seed posisjon for aneurism bildet
-	int3 seed(189, 97, 51);		//regner med dette er et godt seed point for lever volumet
-	displayShortVolume(V, seed, 0); //display input
+	//int3 seed(189, 97, 51);		//regner med dette er et godt seed point for abdomen volumet
+	displayUshortVolume(V, seed, 0); //display input
 
 	fillSphere(seed, 5); //set seed point with radius 5
 	initialization();
 	//calculateMu(treshold); //only needed if Chan-Vese speed function is used
 
 	list<Pixel>::iterator itt;
-	//treshold = 1.0; epsilon = 0.3; alpha = 0.75; //Virker bra med aneurism bildet
-	treshold = 0.557; epsilon = 0.05; alpha = 0.75;
+	//treshold = 1.0; epsilon = 0.3; alpha = 0.75;		//Virker bra med aneurism bildet
+	treshold = 0.30; epsilon = 0.1; alpha = 1.0;		//bør virke bra med liver ct volumet
+	//treshold = 0.557; epsilon = 0.05; alpha = 0.75; //bør virke bra med abdomen volumet
 	printf("starting main loop\n");
 	int iterations = 1000;
 	start = std::clock();
@@ -299,7 +343,7 @@ int main(){
 	printf("\nmain loop finished\n");
 	printf("\n time used: %f", duration);
 
-	displayShortVolume(V, seed, 1); //display result
+	displayUshortVolume(V, seed, 1); //display result
 	
 	//write and store output data
 	Volume<uchar> * v3 = new Volume<uchar>(V->getSize());
@@ -310,7 +354,7 @@ int main(){
 		v3->set(x,y,z, (uchar)zeroLevelSet[x][y][z]);
 	}}}
 
-	v3->save("normalized_abdomen_1000_iterations.raw");
+	v3->save("liver_1000_iterations.raw");
 	printf("file stored\n");
 	
 	system("pause");
