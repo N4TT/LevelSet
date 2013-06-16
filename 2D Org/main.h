@@ -10,7 +10,6 @@ using namespace std;
 
 struct Pixel{
 	short x, y;
-	float f;
 	Pixel(short k, short g):x(k), y(g){};
 };
 
