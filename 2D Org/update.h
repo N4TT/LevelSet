@@ -1,7 +1,7 @@
 extern float image[HEIGHT][WIDTH]; //image to be segmented
 extern short init[HEIGHT+BORDER][WIDTH+BORDER]; //mask with seed points
 extern float phi[HEIGHT+BORDER][WIDTH+BORDER]; //representation of the zero level set interface
-extern short label[HEIGHT+BORDER][WIDTH+BORDER];//contains only integer values between -3 and 3
+extern int label[HEIGHT+BORDER][WIDTH+BORDER];//contains only integer values between -3 and 3
 extern float F[HEIGHT][WIDTH];
 
 extern list<Pixel> lz; // zero level set
@@ -10,7 +10,7 @@ extern list<Pixel> ln1;
 extern list<Pixel> lp2;
 extern list<Pixel> ln2;
 
-extern float treshold, alpha, epsilon;
+extern float threshold, alpha, epsilon;
 
 //temp values
 extern list<Pixel> sz; //values in sz are to be moved to lz

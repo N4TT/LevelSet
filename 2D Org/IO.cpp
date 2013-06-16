@@ -18,7 +18,7 @@ void readFile(BMP img){
 	}
 }
 
-void writeFile(BMP img, int id){//, int it){
+void writeFile(BMP img, int id){
 	if(id == 1){ //label
 		for (int i =0; i<HEIGHT; i++){
 			for (int j = 0; j<WIDTH; j++){
@@ -33,6 +33,7 @@ void writeFile(BMP img, int id){//, int it){
 	else{ //zeroLevelSet
 		for (int i =0; i<HEIGHT; i++){
 			for (int j = 0; j<WIDTH; j++){
+				//printf(" (%i,%i) ", i, j);
 				img(i,j)->Red = zeroLevelSet[i][j]; 
 				img(i,j)->Green = zeroLevelSet[i][j]; 
 				img(i,j)->Blue = zeroLevelSet[i][j]; 

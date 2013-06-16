@@ -1,13 +1,7 @@
 #define HEIGHT 512
 #define WIDTH 512
-/*
-struct Pixel{
-	int place; 
-	Pixel():place(0){};
-};
-*/
-/*int place:
-	- two digit number 
+/*int layer[][]:
+	- array with two digit numbers 
 	- first digit: 
 		- 1: corresponding to being in any of the layers Ln2, Ln1, Lz, Lp1, Lp2
 		- 2: corresponding to being in any of the layers Sn2, Sn1, Sz, Sp1, Sp2 

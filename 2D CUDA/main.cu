@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <cuda.h>
 #include "main.h"
-#include "update.h"
-#include "EasyBMP.h"
-#include "IO.h"
+#include "update.h" //levelset process happens here
+#include "EasyBMP.h" //library for reading bmp files
+#include "IO.h" //handles input and stores output
 #include <cstdio> //to calculate runtime
 #include <ctime>  //to calculate runtime
 using namespace std;
@@ -15,7 +15,7 @@ float phi[HEIGHT][WIDTH] = { 0 };
 int init[HEIGHT][WIDTH] = { 0 };
 int label[HEIGHT][WIDTH] = { 0 };
 int zeroLevelSet[HEIGHT][WIDTH] = { 0 }; //output
-int layer[HEIGHT][WIDTH];
+int layer[HEIGHT][WIDTH]; //-> see main.h for details
 
 int iterations;
 float threshold, alpha, epsilon;
@@ -32,7 +32,7 @@ float *imageD;
 
 __device__ float thresholdD, alphaD, epsilonD;
 
-//fills init with the seed points, returns 1 if success
+//fills init with circular seed point, returns 1 if success
 int fillSphere(int seedX, int seedY, int radius){
 	if(seedX < 0 || seedX > HEIGHT || seedY < 0 || seedY > WIDTH){
 		printf("Wrong input to create a circular seed\n");
@@ -54,7 +54,9 @@ int fillSphere(int seedX, int seedY, int radius){
 	return 1;
 }
 
-bool checkMaskNeighbours(int i, int j, int res){ //res er verdien som vi sjekker opp mot, kriteriet for success
+/* returns true if any neighbour of coordinates (i,j) in either
+   init[][] (id = 1) or label[][] (id = 2) equals res */
+bool checkMaskNeighbours(int i, int j, int res){
 	if(init[i+1][j] == res)
 		return true;
 	else if(init[i-1][j] == res)
@@ -66,7 +68,8 @@ bool checkMaskNeighbours(int i, int j, int res){ //res er verdien som vi sjekker
 	return false;
 }
 
-void pushAndStuff(int i, int j, int level){
+//add pixels to lists according to their label
+void assignLabel(int i, int j, int level){
 	switch(level){
 	case 1:
 		layer[i][j] = 16; //add to lp1
@@ -93,32 +96,33 @@ void pushAndStuff(int i, int j, int level){
 
 void setLevels(int i, int j, int level){
 	if(label[i+1][j] == 3){
-		pushAndStuff(i+1, j, level);
+		assignLabel(i+1, j, level);
 	}
 	if(label[i][j+1] == 3){
-		pushAndStuff(i, j+1, level);
+		assignLabel(i, j+1, level);
 	}
 	if(label[i-1][j] == 3){
-		pushAndStuff(i-1, j, level);
+		assignLabel(i-1, j, level);
 	}
 	if(label[i][j-1] == 3){
-		pushAndStuff(i, j-1, level);
+		assignLabel(i, j-1, level);
 	}
 	
 	if(label[i+1][j] == -3){
-		pushAndStuff(i+1, j, -level);
+		assignLabel(i+1, j, -level);
 	}
 	if(label[i][j+1] == -3){
-		pushAndStuff(i, j+1, -level);
+		assignLabel(i, j+1, -level);
 	}
 	if(label[i-1][j] == -3){
-		pushAndStuff(i-1, j, -level);
+		assignLabel(i-1, j, -level);
 	}
 	if(label[i][j-1] == -3){
-		pushAndStuff(i, j-1, -level);
+		assignLabel(i, j-1, -level);
 	}
 }	
 
+//initializes Ln2, Ln1, Lz, Lp1, Lp2 based on seed point(s)
 void initialization(){
 	for (int i = 0; i<HEIGHT; i++){
 		for (int j = 0; j<WIDTH; j++){
@@ -164,6 +168,7 @@ void initialization(){
 	}
 }
 
+//allocate and copy data to device
 void setUpDeviceArrays(){
 	int err;
 	const size_t arrSize = size_t(HEIGHT*WIDTH);
@@ -219,17 +224,17 @@ int main(int argc, char *argv[]){	printf("1");
 	}
 	
 	initialization();
-	setUpDeviceArrays(); //copy over arrays to device
+	setUpDeviceArrays(); //copy over data to device
 	setVariablesInDevice<<<1,1>>>(threshold, epsilon, alpha, image);
 	
 	const dim3 BlockDim(16,16);
     dim3 GridDim;
     GridDim.x = (WIDTH + BlockDim.x - 1) / BlockDim.x;
     GridDim.y = (HEIGHT + BlockDim.y - 1) / BlockDim.y;
-	printf("5");
+	
 	printf("starting main loop\n");
 	start = std::clock();
-	for(int i=0; i<iterations; i++){
+	for(int i=0; i<iterations+1; i++){
 		if(i%100 == 0){
 			printf("iteration: %i\n", i);
 		}
@@ -239,24 +244,22 @@ int main(int argc, char *argv[]){	printf("1");
 		prepareUpdates4<<<GridDim, BlockDim>>>(phiD, layerD, labelD);
 		updateLevelSets1<<<GridDim, BlockDim>>>(phiD, layerD, labelD);
 		updateLevelSets2<<<GridDim, BlockDim>>>(layerD, labelD);
-		
-		if(i == (iterations-1)){ //copy the zero level set pixels to zeroLevelSet
-			int err = cudaMemcpy(label, labelD, sizeof(int)*(HEIGHT)*(WIDTH), cudaMemcpyDeviceToHost);
-			if(err != cudaSuccess){
-				printf("cudaMemcpy error when writing to zeroLevelset: %d\n", err);
-			}
-			for (int i = 1; i<HEIGHT; i++){
-				for (int j = 1; j<WIDTH; j++){
-					if(label[i][j] == 0){ //lz
-						zeroLevelSet[i][j] = 255;
-					}
-				}
-			}
-		}
 	}
 	duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
 	printf("\nmain loop finished\n");
-	printf("\n time used: %f\n", duration);
+	printf("\ntime used: %f\n", duration);
+	
+	int err = cudaMemcpy(label, labelD, sizeof(int)*(HEIGHT)*(WIDTH), cudaMemcpyDeviceToHost);
+	if(err != cudaSuccess){
+		printf("cudaMemcpy error when writing to zeroLevelset: %d\n", err);
+	}
+	for (int i = 1; i<HEIGHT; i++){
+		for (int j = 1; j<WIDTH; j++){
+			if(label[i][j] == 0){ //lz
+				zeroLevelSet[i][j] = 255;
+			}
+		}
+	}
 	
 	writeFile(img, 1); //store label as image
 	writeFile(img, 2); //store zerolevel set as image
