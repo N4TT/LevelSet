@@ -102,11 +102,8 @@ float speedFunction(short i, short j){
 list<Pixel>::iterator it;
 float M = 0;
 void prepareUpdates(){
-	for(it = lz.begin(); it != lz.end(); it++){
-		it->f = speedFunction(it->x, it->y);
-	}
 	for(it = lz.begin(); it != lz.end();){ //Lz
-		phi[it->x][it->y] += it->f;
+		phi[it->x][it->y] += speedFunction(it->x, it->y);
 		if(phi[it->x][it->y] >= 0.5){
 			sp1.push_back(*it);
 			it = lz.erase(it);
