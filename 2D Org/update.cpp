@@ -13,39 +13,39 @@ only used if the Chan-Vese speedfunciton is used*/
 float muOutside; 
 float muInside;
 
-float minMaxRes;
+float fResult;
 //Returns either max or min (based on greaterOrLess) of the neighbours, with values less or greater than checkAgainst
-float minMax(Pixel p, short greaterOrLess, short checkAgainst){
-	minMaxRes = checkAgainst;
+float follow(Pixel p, short greaterOrLess, short checkAgainst){
+	fResult = checkAgainst;
 	if(greaterOrLess == 1){
-		if(label[p.x+1][p.y] >= minMaxRes){
-			minMaxRes = phi[p.x+1][p.y];
+		if(label[p.x+1][p.y] >= fResult){
+			fResult = phi[p.x+1][p.y];
 		}
-		if(label[p.x][p.y+1] >= minMaxRes){
-			minMaxRes = phi[p.x][p.y+1];
+		if(label[p.x][p.y+1] >= fResult){
+			fResult = phi[p.x][p.y+1];
 		}
-		if(label[p.x-1][p.y] >= minMaxRes){
-			minMaxRes = phi[p.x-1][p.y];
+		if(label[p.x-1][p.y] >= fResult){
+			fResult = phi[p.x-1][p.y];
 		}
-		if(label[p.x][p.y-1] >= minMaxRes){
-			minMaxRes = phi[p.x][p.y-1];
+		if(label[p.x][p.y-1] >= fResult){
+			fResult = phi[p.x][p.y-1];
 		}
 	}
 	else if(greaterOrLess == -1){
-		if(label[p.x+1][p.y] <= minMaxRes){
-			minMaxRes = phi[p.x+1][p.y];
+		if(label[p.x+1][p.y] <= fResult){
+			fResult = phi[p.x+1][p.y];
 		}
-		if(label[p.x][p.y+1] <= minMaxRes){
-			minMaxRes = phi[p.x][p.y+1];
+		if(label[p.x][p.y+1] <= fResult){
+			fResult = phi[p.x][p.y+1];
 		}
-		if(label[p.x-1][p.y] <= minMaxRes){
-			minMaxRes = phi[p.x-1][p.y];
+		if(label[p.x-1][p.y] <= fResult){
+			fResult = phi[p.x-1][p.y];
 		}
-		if(label[p.x][p.y-1] <= minMaxRes){
-			minMaxRes = phi[p.x][p.y-1];
+		if(label[p.x][p.y-1] <= fResult){
+			fResult = phi[p.x][p.y-1];
 		}
 	}
-	return minMaxRes;
+	return fResult;
 }
 
 /*calculates the average back- and foreground values
@@ -124,7 +124,7 @@ void prepareUpdates(){
 			it = ln1.erase(it);
 		}
 		else{
-			M = minMax(*it, 1, 0);
+			M = follow(*it, 1, 0);
 			phi[it->x][it->y] = M-1;
 			if(phi[it->x][it->y] >= -0.5){ //moving from ln1 to sz
 				sz.push_back(*it);
@@ -146,7 +146,7 @@ void prepareUpdates(){
 			it = lp1.erase(it);
 		}
 		else{
-			M = minMax(*it, -1, 0);
+			M = follow(*it, -1, 0);
 			phi[it->x][it->y] = M+1;
 			if(phi[it->x][it->y] < 0.5){ 
 				sz.push_back(*it);
@@ -169,7 +169,7 @@ void prepareUpdates(){
 			it = ln2.erase(it);
 		}
 		else{
-			M = minMax(*it, 1, -1);
+			M = follow(*it, 1, -1);
 			phi[it->x][it->y] = M-1;
 			if(phi[it->x][it->y] >= -1.5){ 
 				sn1.push_back(*it);
@@ -193,7 +193,7 @@ void prepareUpdates(){
 			it = lp2.erase(it);
 		}
 		else{
-			M = minMax(*it, -1, 1);
+			M = follow(*it, -1, 1);
 			phi[it->x][it->y] = M+1;
 			if(phi[it->x][it->y] < 1.5){
 				sp1.push_back(*it);

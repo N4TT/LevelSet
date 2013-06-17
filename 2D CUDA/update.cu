@@ -23,37 +23,37 @@ void __global__ setVariablesInDevice(float threshold, float epsilon, float alpha
 //nvcc --machine 32 -arch sm_20 main.cu update.cu IO.cu EasyBMP.cpp 
 
 //Returns either max or min (based on greaterOrLess) of the neighbours, with values less or greater than checkAgainst
-__device__ float minMax(int i, int j, int greaterOrLess, int checkAgainst, float *phiD, int *labelD){
-	float minMaxRes = checkAgainst;
+__device__ float follow(int i, int j, int greaterOrLess, int checkAgainst, float *phiD, int *labelD){
+	float fResult = checkAgainst;
 	if(greaterOrLess == 1){
-		if(labelD[(i+1)*WIDTH+j] >= minMaxRes){
-			minMaxRes = phiD[(i+1)*WIDTH+j];
+		if(labelD[(i+1)*WIDTH+j] >= fResult){
+			fResult = phiD[(i+1)*WIDTH+j];
 		}
-		if(labelD[i*WIDTH+(j+1)] >= minMaxRes){
-			minMaxRes = phiD[i*WIDTH + (j+1)];
+		if(labelD[i*WIDTH+(j+1)] >= fResult){
+			fResult = phiD[i*WIDTH + (j+1)];
 		}
-		if(labelD[(i-1)*WIDTH + j] >= minMaxRes){
-			minMaxRes = phiD[(i-1)*WIDTH+j];
+		if(labelD[(i-1)*WIDTH + j] >= fResult){
+			fResult = phiD[(i-1)*WIDTH+j];
 		}
-		if(labelD[i*WIDTH+(j-1)] >= minMaxRes){
-			minMaxRes = phiD[i*WIDTH+(j-1)];
+		if(labelD[i*WIDTH+(j-1)] >= fResult){
+			fResult = phiD[i*WIDTH+(j-1)];
 		}
 	}
 	else if(greaterOrLess == -1){
-		if(labelD[(i+1)*WIDTH+j] <= minMaxRes){
-			minMaxRes = phiD[(i+1)*WIDTH+j];
+		if(labelD[(i+1)*WIDTH+j] <= fResult){
+			fResult = phiD[(i+1)*WIDTH+j];
 		}
-		if(labelD[i*WIDTH+(j+1)] <= minMaxRes){
-			minMaxRes = phiD[i*WIDTH+(j+1)];
+		if(labelD[i*WIDTH+(j+1)] <= fResult){
+			fResult = phiD[i*WIDTH+(j+1)];
 		}
-		if(labelD[(i-1)*WIDTH+j] <= minMaxRes){
-			minMaxRes = phiD[(i-1)*WIDTH+j];
+		if(labelD[(i-1)*WIDTH+j] <= fResult){
+			fResult = phiD[(i-1)*WIDTH+j];
 		}
-		if(labelD[i*WIDTH+(j-1)] <= minMaxRes){
-			minMaxRes= phiD[i*WIDTH+(j-1)];
+		if(labelD[i*WIDTH+(j-1)] <= fResult){
+			fResult= phiD[i*WIDTH+(j-1)];
 		}
 	}
-	return minMaxRes;	
+	return fResult;	
 }
 
 __device__ bool checkMaskNeighbours2(int i, int j, short res, int *labelD){
@@ -127,7 +127,7 @@ __global__ void prepareUpdates2(float *phiD, int *layerD, int *labelD){
 				layerD[i*WIDTH+j] = 23; //add to sn2
 			}
 			else{
-				M = minMax(i, j, 1, 0, phiD, labelD);
+				M = follow(i, j, 1, 0, phiD, labelD);
 				phiD[i*WIDTH+j] = M-1;
 				if(phiD[i*WIDTH+j] >= -0.5){
 					layerD[i*WIDTH+j] = 25; //add to sz
@@ -150,7 +150,7 @@ __global__ void prepareUpdates3(float *phiD, int *layerD, int *labelD){
 				layerD[i*WIDTH+j] = 27; //add to sp2
 			}
 			else{
-				M = minMax(i, j, -1, 0, phiD, labelD);
+				M = follow(i, j, -1, 0, phiD, labelD);
 				phiD[i*WIDTH+j] = M+1;
 				if(phiD[i*WIDTH+j] < 0.5){
 					layerD[i*WIDTH+j] = 25; //add to sz
@@ -175,7 +175,7 @@ __global__ void prepareUpdates4(float *phiD, int *layerD, int *labelD){
 				layerD[i*WIDTH+j] = 0; //no longer part of ln2
 			}
 			else{
-				M = minMax(i, j, 1, -1, phiD, labelD);
+				M = follow(i, j, 1, -1, phiD, labelD);
 				phiD[i*WIDTH+j] = M-1;
 				if(phiD[i*WIDTH+j] >= -1.5){
 					layerD[i*WIDTH+j] = 24; //add to sn1
@@ -195,7 +195,7 @@ __global__ void prepareUpdates4(float *phiD, int *layerD, int *labelD){
 				layerD[i*WIDTH+j] = 0; //no longer part of lp2
 			}
 			else{
-				M = minMax(i, j, -1, 1, phiD, labelD);
+				M = follow(i, j, -1, 1, phiD, labelD);
 				phiD[i*WIDTH+j] = M+1;
 				if(phiD[i*WIDTH+j] < 1.5){
 					layerD[i*WIDTH+j] = 26; //add to sp1
