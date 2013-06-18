@@ -18,56 +18,114 @@ using namespace SIPL;
 float muOutside;
 float muInside;
 
+
 list<float> minMaxList;
 
 float minMaxRes;
 //Returns either max or min (based on greaterOrLess) of the neighbours, with values less or greater than checkAgainst
 float minMax(Pixel p, short greaterOrLess, short checkAgainst){
 	minMaxList.push_back(checkAgainst); //because max_element and min_element returns 0 if the list is empty
-	float minMax = checkAgainst;
+	if(greaterOrLess == 1){
+		if(label[p.x+1][p.y][p.z] >= checkAgainst){
+			minMaxList.push_back(phi[p.x+1][p.y][p.z]);
+		}
+		if(label[p.x][p.y+1][p.z] >= checkAgainst){
+			minMaxList.push_back(phi[p.x][p.y+1][p.z]);
+		}
+		if(label[p.x][p.y][p.z+1] >= checkAgainst){
+			minMaxList.push_back(phi[p.x][p.y][p.z+1]);	
+		}
+		if(label[p.x-1][p.y][p.z] >= checkAgainst){
+			minMaxList.push_back(phi[p.x-1][p.y][p.z]);
+		}
+		if(label[p.x][p.y-1][p.z] >= checkAgainst){
+			minMaxList.push_back(phi[p.x][p.y-1][p.z]);
+		}
+		if(label[p.x][p.y][p.z-1] >= checkAgainst){
+			minMaxList.push_back(phi[p.x][p.y][p.z-1]);	
+		}
+		if(minMaxList.size() == 0){
+			printf("minMaxList is empty");
+		}
+		minMaxRes = *max_element(minMaxList.begin(), minMaxList.end());
+	}
+	else if(greaterOrLess == -1){
+		if(label[p.x+1][p.y][p.z] <= checkAgainst){
+			minMaxList.push_back(phi[p.x+1][p.y][p.z]);
+		}
+		if(label[p.x][p.y+1][p.z] <= checkAgainst){
+			minMaxList.push_back(phi[p.x][p.y+1][p.z]);
+		}
+		if(label[p.x][p.y][p.z+1] <= checkAgainst){
+			minMaxList.push_back(phi[p.x][p.y][p.z+1]);	
+		}
+		if(label[p.x-1][p.y][p.z] <= checkAgainst){
+			minMaxList.push_back(phi[p.x-1][p.y][p.z]);
+		}
+		if(label[p.x][p.y-1][p.z] <= checkAgainst){
+			minMaxList.push_back(phi[p.x][p.y-1][p.z]);
+		}
+		if(label[p.x][p.y][p.z-1] <= checkAgainst){
+			minMaxList.push_back(phi[p.x][p.y][p.z-1]);	
+		}
+		if(minMaxList.size() == 0){
+			printf("minMaxList is empty");
+		}
+		minMaxRes = *min_element(minMaxList.begin(), minMaxList.end());
+	}
+	minMaxList.clear();
+	return minMaxRes;
+}
+
+
+/*
+float minMaxRes;
+//Returns either max or min (based on greaterOrLess) of the neighbours, with values less or greater than checkAgainst
+float minMax(Pixel p, short greaterOrLess, short checkAgainst){
+	minMaxRes = checkAgainst;
 	if(greaterOrLess == 1){
 		if(label[p.x+1][p.y][p.z] > checkAgainst){
-			minMax = phi[p.x+1][p.y][p.z];
+			minMaxRes = phi[p.x+1][p.y][p.z];
 		}
 		if(label[p.x][p.y+1][p.z] > checkAgainst){
-			minMax = phi[p.x][p.y+1][p.z];		
+			minMaxRes = phi[p.x][p.y+1][p.z];		
 		}
 		if(label[p.x][p.y][p.z+1] > checkAgainst){
-			minMax = phi[p.x][p.y][p.z+1];		
+			minMaxRes = phi[p.x][p.y][p.z+1];		
 		}
 		if(label[p.x-1][p.y][p.z] > checkAgainst){
-			minMax = phi[p.x-1][p.y][p.z];
+			minMaxRes = phi[p.x-1][p.y][p.z];
 		}
 		if(label[p.x][p.y-1][p.z] > checkAgainst){
-			minMax = phi[p.x][p.y-1][p.z];
+			minMaxRes = phi[p.x][p.y-1][p.z];
 		}
 		if(label[p.x][p.y][p.z-1] > checkAgainst){
-			minMax = phi[p.x][p.y][p.z-1];
+			minMaxRes = phi[p.x][p.y][p.z-1];
 		}
 	}
 	else if(greaterOrLess == -1){
 		if(label[p.x+1][p.y][p.z] < checkAgainst){
-			minMax = phi[p.x+1][p.y][p.z];
+			minMaxRes = phi[p.x+1][p.y][p.z];
 		}
 		if(label[p.x][p.y+1][p.z] < checkAgainst){
-			minMax = phi[p.x][p.y+1][p.z];		
+			minMaxRes = phi[p.x][p.y+1][p.z];		
 		}
 		if(label[p.x][p.y][p.z+1] < checkAgainst){
-			minMax = phi[p.x][p.y][p.z+1];		
+			minMaxRes = phi[p.x][p.y][p.z+1];		
 		}
 		if(label[p.x-1][p.y][p.z] < checkAgainst){
-			minMax = phi[p.x-1][p.y][p.z];
+			minMaxRes = phi[p.x-1][p.y][p.z];
 		}
 		if(label[p.x][p.y-1][p.z] < checkAgainst){
-			minMax = phi[p.x][p.y-1][p.z];
+			minMaxRes = phi[p.x][p.y-1][p.z];
 		}
 		if(label[p.x][p.y][p.z-1] < checkAgainst){
-			minMax = phi[p.x][p.y][p.z-1];
+			minMaxRes = phi[p.x][p.y][p.z-1];
 		}
 	}
-	return minMax;
+	return minMaxRes;
 }
-
+*/
 void calculateMu(float threshold){
 	float muTempInside = 0;
 	int numInside = 0;
