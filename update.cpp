@@ -162,7 +162,13 @@ extern float maxCurvature;
 extern float minCurvature;
 
 float speedFunction(short i, short j, short k){
+	
 	float data = epsilon - abs(image[i][j][k] - treshold); //the data term (based on pixel intensity)
+	if (data < 0){
+		data/=(epsilon-1);
+	}else if(data > 0){
+		data/=epsilon;
+	}
 	D1 d1 = D1(i, j, k); //calculates the first order derivatives
 	D2 d2 = D2(i, j, k); //calculates the second order derivatives
 	Normal n = Normal(d1, d2); //calculates the normals

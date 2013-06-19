@@ -334,22 +334,22 @@ int main(){
 	//calculateMu(treshold); //only needed if Chan-Vese speed function is used
 
 	list<Pixel>::iterator itt;
-	treshold = 0.24; epsilon = 0.09; alpha = 0.65;		//Virker bra med ventrikkel bildet
+	treshold = 0.25; epsilon = 0.03; alpha = 0.8;		//Virker bra med ventrikkel bildet
 	//treshold = 1.0; epsilon = 0.3; alpha = 0.75;		//Virker bra med aneurism bildet
 	//treshold = 0.28; epsilon = 0.06; alpha = 0.75;		//bør virke bra med liver ct volumet
 	//treshold = 0.557; epsilon = 0.05; alpha = 0.75; //bør virke bra med abdomen volumet
 	printf("starting main loop\n");
-	int iterations = 4000;
+	int iterations = 300;
 	start = std::clock();
 	for(int i=0; i<iterations; i++){
 		prepareUpdates();
 		updateLevelSets();
-/*		if(i%100 == 0){
+		if(i%10 == 0){
 			printf("\nloop %i done", i);
-		}*/
+		}
 	}
 
-	duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+	duration = (( std::clock() - start ) / (double) CLOCKS_PER_SEC)/60;
 	for(itt = lz.begin(); itt != lz.end(); itt++){
 		zeroLevelSet[itt->x][itt->y][itt->z] = 255; //copy the zero level set pixels to zeroLevelSet
 	}
@@ -369,7 +369,7 @@ int main(){
 	}}}
 	
 	//v3->save("new_brain_4000_its_t024e009a065.raw");
-	printf("file stored\n");
+	//printf("file stored\n");
 	
 	system("pause");
 	return 0;
