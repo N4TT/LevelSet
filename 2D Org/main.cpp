@@ -1,22 +1,29 @@
-#include "EasyBMP.h"
 #include <iostream>
 #include <stdio.h>
-#include <list>
-#include <exception>
 #include <stdlib.h>
-#include <sstream> //to concatenate string and int when writing multiple files in a single run
 #include "main.h"
-#include "update.h"
+#include <list>
+#include "EasyBMP.h" //library for reading bmp files
+#include "update.h" //levelset process happens here
+//#include "IO.h" //handles input and stores output
+#include <cstdio> //to calculate runtime
+#include <ctime>  //to calculate runtime
 
+#include <sstream> 
 using namespace std;
+
+//to calculate runtime
+clock_t start;
+double duration;
 
 float image[HEIGHT][WIDTH] = { 0 }; //input -> image to be segmented
 float phi[HEIGHT+BORDER][WIDTH+BORDER] = { 0 }; //level set
 short init[HEIGHT+BORDER][WIDTH+BORDER] = { 0 }; //binary mask with seed points
-short label[HEIGHT+BORDER][WIDTH+BORDER] = { 0 }; //contains info about the layers
-short zeroLevelSet[HEIGHT][WIDTH] = { 0 }; //output
+int label[HEIGHT+BORDER][WIDTH+BORDER] = { 0 }; //contains info about the layers
+int zeroLevelSet[HEIGHT][WIDTH] = { 0 }; //output
 
-float treshold, alpha, epsilon;
+int iterations;
+float threshold, alpha, epsilon;
 
 list<Pixel> lz;
 list<Pixel> lp1;
@@ -30,8 +37,9 @@ list<Pixel> sn1;
 list<Pixel> sp2;
 list<Pixel> sn2;
 
-//fills init with the seed points, returns 1 if success
+//fills init with circular seed point, returns 1 if success
 int fillSphere(int seedX, int seedY, int radius){
+	//(seedX, seedY) -> coordinates - center of seed point
 	if(seedX < 0 || seedX > HEIGHT || seedY < 0 || seedY > WIDTH){
 		printf("Wrong input to create a circular seed\n");
 		printf("Coordinates out of range\n");
@@ -54,6 +62,8 @@ int fillSphere(int seedX, int seedY, int radius){
 
 //can replace fillSphere() if a rectangular seed point is wanted
 int fillInit(short minX, short minY, short maxX, short maxY){
+	//(minX, minY) -> upper left corner
+	//(maxX, maxY) -> lower right corner
 	if(maxX - minX <= 0 || maxY - minY <= 0){
 		printf("Wrong input to create a rectangular seed\n");
 		printf("Input must be in this order minX minY maxX maxY\n");
@@ -72,7 +82,9 @@ int fillInit(short minX, short minY, short maxX, short maxY){
 	return 1;
 }
 
-bool checkMaskNeighbours(int i, int j, int id, short res){ //res er verdien som vi sjekker opp mot, kriteriet for success
+/* returns true if any neighbour of coordinates (i,j) in either
+   init[][] (id = 1) or label[][] (id = 2) equals res */
+bool checkMaskNeighbours(short i, short j, int id, short res){
 	if(id == 1){ //id == 1 -> init
 		if(init[i+1][j] == res)
 			return true;
@@ -96,7 +108,8 @@ bool checkMaskNeighbours(int i, int j, int id, short res){ //res er verdien som 
 	return false;
 }
 
-void pushAndStuff(Pixel p, short level){//støtter Pixel struct
+//add pixels to lists according to their label
+void assignLabel(Pixel p, short level){
 	switch(level){
 	case 1:
 		lp1.push_back(p);
@@ -123,31 +136,32 @@ void pushAndStuff(Pixel p, short level){//støtter Pixel struct
 
 void setLevels(Pixel p, short level){
 	if(label[p.x+1][p.y] == 3){
-		pushAndStuff(Pixel(p.x+1, p.y), level);
+		assignLabel(Pixel(p.x+1, p.y), level);
 	}
 	if(label[p.x][p.y+1] == 3){
-		pushAndStuff(Pixel(p.x, p.y+1), level);
+		assignLabel(Pixel(p.x, p.y+1), level);
 	}
 	if(label[p.x-1][p.y] == 3){
-		pushAndStuff(Pixel(p.x-1, p.y), level);
+		assignLabel(Pixel(p.x-1, p.y), level);
 	}
 	if(label[p.x][p.y-1] == 3){
-		pushAndStuff(Pixel(p.x, p.y-1), level);
+		assignLabel(Pixel(p.x, p.y-1), level);
 	}
 	if(label[p.x+1][p.y] == -3){
-		pushAndStuff(Pixel(p.x+1, p.y), -level);
+		assignLabel(Pixel(p.x+1, p.y), -level);
 	}
 	if(label[p.x][p.y+1] == -3){
-		pushAndStuff(Pixel(p.x, p.y+1), -level);
+		assignLabel(Pixel(p.x, p.y+1), -level);
 	}
 	if(label[p.x-1][p.y] == -3){
-		pushAndStuff(Pixel(p.x-1, p.y), -level);
+		assignLabel(Pixel(p.x-1, p.y), -level);
 	}
 	if(label[p.x][p.y-1] == -3){
-		pushAndStuff(Pixel(p.x, p.y-1), -level);
+		assignLabel(Pixel(p.x, p.y-1), -level);
 	}
 }	
 
+//initializes Ln2, Ln1, Lz, Lp1, Lp2 based on seed point(s)
 void initialization(){
 	list<Pixel>::iterator it;
 
@@ -173,32 +187,32 @@ void initialization(){
 		}
 	}
 	for (it = lz.begin(); it != lz.end(); it++){
-		setLevels(*it, 1);//second levelSet (level 1)			
+		setLevels(*it, 1); //add to either Lp1 or Ln1		
 	}
 	for (it = lp1.begin(); it != lp1.end(); it++){
-		setLevels(*it, 2);
+		setLevels(*it, 2); //add to either Lp2
 	}
 	for (it = ln1.begin(); it != ln1.end(); it++){
-		setLevels(*it, 2);
+		setLevels(*it, 2); //add to either Ln2
 	}
 }
 
+//read input file
 void readFile(BMP img){
 	//copy input data (img) to image[][] and normalize to [0, 1]
-	for (short i =0; i<HEIGHT; i++){
-		for (short j = 0; j<WIDTH; j++){
+	for (int i =0; i<HEIGHT; i++){
+		for (int j = 0; j<WIDTH; j++){
 			image[i][j] = (img(i,j)->Red + img(i,j)->Green + img(i,j)->Blue) / 3;
 			image[i][j] /= 255;
 		}
 	}
 }
 
-
+//store output data to disk
 void writeFile(BMP img, int id, int iter){
 	string name;
 	stringstream sstm;
-	
-	if(id == 1){ //label
+	if(id==1){
 		for (short i =0; i<HEIGHT; i++){
 			for (short j = 0; j<WIDTH; j++){
 				img(i,j)->Red = (label[i][j] +3)*42; //normalize to [0, 255]
@@ -206,19 +220,11 @@ void writeFile(BMP img, int id, int iter){
 				img(i,j)->Blue = (label[i][j] +3)*42;
 			}
 		}
-		sstm << "label" << iter <<".bmp";
+		
+		sstm << iter << "label" <<".bmp";
 		name = sstm.str();
 		img.WriteToFile(name.c_str());
-	}
-	else if(id == 2){ //phi
-		for (short i =0; i<HEIGHT; i++){
-			for (short j = 0; j<WIDTH; j++){
-				img(i,j)->Red = (phi[i][j] +3)*42; //normalize to [0, 255]
-				img(i,j)->Green = (phi[i][j] +3)*42;
-				img(i,j)->Blue = (phi[i][j] +3)*42;
-			}
-		}
-		img.WriteToFile("1output phi.bmp");
+		printf("\nlabel image stored");
 	}
 	else{ //zeroLevelSet
 		for (short i =0; i<HEIGHT; i++){
@@ -228,80 +234,77 @@ void writeFile(BMP img, int id, int iter){
 				img(i,j)->Blue = zeroLevelSet[i][j]; 
 			}
 		}
-		sstm << "zero" << iter <<".bmp";
+		sstm << iter << "zero" <<".bmp";
 		name = sstm.str();
 		img.WriteToFile(name.c_str());
+		printf("\nzero image stored\n");
 	}
 }
 
+bool getAndVerifyInput(int argc, char *argv[]){
+	if(argc != 5){
+		printf("Need four inputs: iterations, threshold, epsilon, alpha \n");
+		return false;
+	}
+	if(sscanf (argv[1], "%i", & iterations)!=1 || iterations<0) {
+		printf("Need four inputs: iterations, threshold, epsilon, alpha \n");
+		return false;
+	}
+	if(sscanf(argv[2], "%f", &threshold)!=1 || threshold >1){
+		printf("Need four inputs: iterations, threshold, epsilon, alpha \n");
+		return false;
+	}
+	if(sscanf(argv[3], "%f", &epsilon)!=1 || epsilon >1){
+		printf("Need four inputs: iterations, threshold, epsilon, alpha \n");
+		return false;
+	}
+	if(sscanf(argv[4], "%f", &alpha)!=1 || alpha>1){
+		printf("Need four inputs: iterations, threshold, epsilon, alpha \n");
+		return false;
+	}
+	return true;
+}
+
 int main(int argc, char *argv[]){
-	int iterations;
-	if(argc != 2){
-		printf("Need one input: number of iterations\n");
+	//verify input
+	if(!getAndVerifyInput(argc, argv)){
 		system("pause");
 		return 0;
 	}
 
-	if (sscanf (argv[1], "%i", &iterations)!=1 || iterations<1) { 
-		printf("first input must be a positive integer: number of iterations\n"); 
-		system("pause");
-		return 0;
-	}
-
-	//read file
+	//read input file
 	BMP img;
-	img.ReadFromFile("img.bmp");
+	img.ReadFromFile("qq.bmp");
 	readFile(img);
 	
-	/*if(fillInit(150, 150, 250, 250) == 0){
-		system("pause");
-		return 0;
-	}*/
-
-	if(fillSphere(50, 50, 10) == 0){
+	//set seed point (can do multiple calls to set multiple seed points)
+	if(fillSphere(250, 250, 10) == 0){
 		system("pause");
 		return 0;
 	}
 	
 	initialization();
+	
 	calculateMu(); //only needed if the Chan Vese speed function is used
 	
 	list<Pixel>::iterator itt;
-
-	treshold = 0.99; epsilon = 0.15; alpha = 0.80;
-
 	printf("starting main loop\n");
-	
-	for(int i=0; i<iterations; i++){
+	start = std::clock();
+	for(int i=1; i<iterations; i++){
 		prepareUpdates();
 		updateLevelSets();
-		/*if(i%100 == 0){
+		if(i%100 == 0){
 			printf("\niteration: %i\n", i);
-			printf("\nwriting to zeroLevelSet");
-			for(itt = lz.begin(); itt != lz.end(); itt++){
-				zeroLevelSet[itt->x][itt->y] = 255;
-			}
-			writeFile(img, 3, i);
-			writeFile(img, 1, i);
-			for(itt = lz.begin(); itt != lz.end(); itt++){
-				zeroLevelSet[itt->x][itt->y] = 0;
-			}
-		}*/
-		if(i == (iterations-1)){ //copy the zero level set pixels to zeroLevelSet
-			printf("\nwriting to zeroLevelSet");
-			for(itt = lz.begin(); itt != lz.end(); itt++){
-				zeroLevelSet[itt->x][itt->y] = 255;
-			}
-			writeFile(img, 3, i);
-			writeFile(img, 1, i);
 		}
 	}
-	printf("\nmain loop finished");
+	duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+	printf("\nmain loop finished\n");
+	printf("\ntime used: %f\n", duration);
 	
-	//writeFile(img, 3, iterations);
-	//writeFile(img, 1, iterations);
-	printf("\noutput successfully stored\n");
-
+	for(itt = lz.begin(); itt != lz.end(); itt++){
+		zeroLevelSet[itt->x][itt->y] = 255;
+	}
+	writeFile(img, 1, iterations);
+	writeFile(img, 2, iterations);
 	system("pause");
-	
 }

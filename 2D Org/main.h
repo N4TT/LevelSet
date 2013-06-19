@@ -10,9 +10,8 @@ using namespace std;
 
 struct Pixel{
 	short x, y;
-	float f;
 	Pixel(short k, short g):x(k), y(g){};
 };
 
-bool checkMaskNeighbours(int i, int j, int id, short res);
+bool checkMaskNeighbours(short i, short j, int id, short res);
 

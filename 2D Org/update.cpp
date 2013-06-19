@@ -8,54 +8,48 @@
 #include "update.h"
 using namespace std;
 
-float muOutside;
+/*average values of back- and foreground,
+only used if the Chan-Vese speedfunciton is used*/
+float muOutside; 
 float muInside;
 
-list<float> minMaxList;
-float minMaxRes;
+float fResult;
 //Returns either max or min (based on greaterOrLess) of the neighbours, with values less or greater than checkAgainst
-float minMax(Pixel p, short greaterOrLess, short checkAgainst){
-	minMaxList.push_back(checkAgainst); //because max_element and min_element returns 0 if the list is empty
+float follow(Pixel p, short greaterOrLess, short checkAgainst){
+	fResult = checkAgainst;
 	if(greaterOrLess == 1){
-		if(label[p.x+1][p.y] >= checkAgainst){
-			minMaxList.push_back(phi[p.x+1][p.y]);
+		if(label[p.x+1][p.y] >= fResult){
+			fResult = phi[p.x+1][p.y];
 		}
-		if(label[p.x][p.y+1] >= checkAgainst){
-			minMaxList.push_back(phi[p.x][p.y+1]);
+		if(label[p.x][p.y+1] >= fResult){
+			fResult = phi[p.x][p.y+1];
 		}
-		if(label[p.x-1][p.y] >= checkAgainst){
-			minMaxList.push_back(phi[p.x-1][p.y]);
+		if(label[p.x-1][p.y] >= fResult){
+			fResult = phi[p.x-1][p.y];
 		}
-		if(label[p.x][p.y-1] >= checkAgainst){
-			minMaxList.push_back(phi[p.x][p.y-1]);
+		if(label[p.x][p.y-1] >= fResult){
+			fResult = phi[p.x][p.y-1];
 		}
-		if(minMaxList.size() == 0){
-			printf("minMaxList is empty");
-		}
-		minMaxRes = *max_element(minMaxList.begin(), minMaxList.end());
 	}
 	else if(greaterOrLess == -1){
-		if(label[p.x+1][p.y] <= checkAgainst){
-			minMaxList.push_back(phi[p.x+1][p.y]);
+		if(label[p.x+1][p.y] <= fResult){
+			fResult = phi[p.x+1][p.y];
 		}
-		if(label[p.x][p.y+1] <= checkAgainst){
-			minMaxList.push_back(phi[p.x][p.y+1]);
+		if(label[p.x][p.y+1] <= fResult){
+			fResult = phi[p.x][p.y+1];
 		}
-		if(label[p.x-1][p.y] <= checkAgainst){
-			minMaxList.push_back(phi[p.x-1][p.y]);
+		if(label[p.x-1][p.y] <= fResult){
+			fResult = phi[p.x-1][p.y];
 		}
-		if(label[p.x][p.y-1] <= checkAgainst){
-			minMaxList.push_back(phi[p.x][p.y-1]);
+		if(label[p.x][p.y-1] <= fResult){
+			fResult = phi[p.x][p.y-1];
 		}
-		if(minMaxList.size() == 0){
-			printf("minMaxList is empty");
-		}
-		minMaxRes = *min_element(minMaxList.begin(), minMaxList.end());
 	}
-	minMaxList.clear();
-	return minMaxRes;
+	return fResult;
 }
 
+/*calculates the average back- and foreground values
+only used if the Chan-Vese speedfunciton is used*/
 void calculateMu(){
 	float muTempInside = 0;
 	int numInside = 0;
@@ -90,7 +84,7 @@ float speedFunctionChanVese(int x, int y){
 
 float curvature;
 float speedFunction(short i, short j){
-	float data = epsilon - abs(image[i][j] - treshold); //the data term (based on pixel intensity)
+	float data = epsilon - abs(image[i][j] - threshold); //the data term (based on pixel intensity)
 	D1 d1 = D1(i, j); //calculates the first order derivatives
 	D2 d2 = D2(i, j); //calculates the second order derivatives
 	Normal n = Normal(d1, d2); //calculates the normals
@@ -108,11 +102,8 @@ float speedFunction(short i, short j){
 list<Pixel>::iterator it;
 float M = 0;
 void prepareUpdates(){
-	for(it = lz.begin(); it != lz.end(); it++){
-		it->f = speedFunction(it->x, it->y);
-	}
-	for(it = lz.begin(); it != lz.end();){//find pixels that are moving out of lz
-		phi[it->x][it->y] += it->f;
+	for(it = lz.begin(); it != lz.end();){ //Lz
+		phi[it->x][it->y] += speedFunction(it->x, it->y);
 		if(phi[it->x][it->y] >= 0.5){
 			sp1.push_back(*it);
 			it = lz.erase(it);
@@ -126,13 +117,14 @@ void prepareUpdates(){
 		}
 	}
 	
-	for(it = ln1.begin(); it != ln1.end();){//find pixels that are moving out of ln1
-		if(checkMaskNeighbours(it->x,it->y, 2, 0) == false){//if Ln1[i][j] has no neighbors q with label(q) == 0
+	for(it = ln1.begin(); it != ln1.end();){ //pixels moving out of Ln1
+		if(checkMaskNeighbours(it->x,it->y, 2, 0) == false){
+		//if none of the neighbors are in Lz
 			sn2.push_back(*it);
 			it = ln1.erase(it);
 		}
 		else{
-			M = minMax(*it, 1, 0);
+			M = follow(*it, 1, 0);
 			phi[it->x][it->y] = M-1;
 			if(phi[it->x][it->y] >= -0.5){ //moving from ln1 to sz
 				sz.push_back(*it);
@@ -147,13 +139,14 @@ void prepareUpdates(){
 			}
 		}
 	}
-	for(it = lp1.begin(); it != lp1.end();){//find pixels that are moving out of lp1
+	for(it = lp1.begin(); it != lp1.end();){ //pixels moving out of Lp1
 		if(checkMaskNeighbours(it->x,it->y, 2, 0) == false){
+		//if none of the neighbors are in Lz
 			sp2.push_back(*it);
 			it = lp1.erase(it);
 		}
 		else{
-			M = minMax(*it, -1, 0);
+			M = follow(*it, -1, 0);
 			phi[it->x][it->y] = M+1;
 			if(phi[it->x][it->y] < 0.5){ 
 				sz.push_back(*it);
@@ -170,12 +163,13 @@ void prepareUpdates(){
 	}
 	for(it = ln2.begin(); it != ln2.end();){
 		if(checkMaskNeighbours(it->x,it->y, 2, -1) == false){
+		//if none of the neighbors are in Ln1
 			label[it->x][it->y] = -3;
 			phi[it->x][it->y] = -3;
 			it = ln2.erase(it);
 		}
 		else{
-			M = minMax(*it, 1, -1);
+			M = follow(*it, 1, -1);
 			phi[it->x][it->y] = M-1;
 			if(phi[it->x][it->y] >= -1.5){ 
 				sn1.push_back(*it);
@@ -193,12 +187,13 @@ void prepareUpdates(){
 	}
 	for(it = lp2.begin(); it != lp2.end();){
 		if(checkMaskNeighbours(it->x,it->y, 2, 1) == false){
+		//if none of the neighbors are in Lp1
 			label[it->x][it->y] = 3;
 			phi[it->x][it->y] = 3;
 			it = lp2.erase(it);
 		}
 		else{
-			M = minMax(*it, -1, 1);
+			M = follow(*it, -1, 1);
 			phi[it->x][it->y] = M+1;
 			if(phi[it->x][it->y] < 1.5){
 				sp1.push_back(*it);
