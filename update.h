@@ -66,9 +66,9 @@ struct Normal{ //normals
 	Normal(D1 d1, D2 d2){
 		nPlusX = d1.dxPlus / sqrt(d1.dxPlus * d1.dxPlus + pow((d2.dyPlusX + d1.dy) / 2, 2) + pow((d2.dzPlusX + d1.dz) / 2, 2));
 		nPlusY = d1.dyPlus / sqrt(d1.dyPlus * d1.dyPlus + pow((d2.dxPlusY + d1.dx) / 2, 2) + pow((d2.dzPlusY + d1.dz) / 2, 2));
-		nPlusZ = d1.dzPlus / sqrt(d1.dzPlus * d1.dzPlus + pow((d2.dxPlusZ + d1.dx) / 2, 2) + pow((d2.dyPlusZ + d1.dy) / 2, 2));
+		nPlusZ = d1.dzPlus / sqrt(d1.dzPlus * d1.dzPlus + pow((d2.dyPlusZ + d1.dx) / 2, 2) + pow((d2.dyPlusZ + d1.dy) / 2, 2));
 		nMinusX = d1.dxMinus / sqrt(d1.dxMinus * d1.dxMinus + pow((d2.dyMinusX + d1.dy) / 2, 2) + pow((d2.dzMinusX + d1.dz) / 2, 2));
 		nMinusY = d1.dyMinus / sqrt(d1.dyMinus * d1.dyMinus + pow((d2.dxMinusY + d1.dx) / 2, 2) + pow((d2.dzMinusY + d1.dz) / 2, 2));
-		nMinusZ = d1.dzMinus / sqrt(d1.dzMinus * d1.dzMinus + pow((d2.dxMinusZ + d1.dx) / 2, 2) + pow((d2.dyMinusZ + d1.dy) / 2, 2));
+		nMinusZ = d1.dzMinus / sqrt(d1.dzMinus * d1.dzMinus + pow((d2.dyMinusZ + d1.dx) / 2, 2) + pow((d2.dyMinusZ + d1.dy) / 2, 2));
 	}	
 };

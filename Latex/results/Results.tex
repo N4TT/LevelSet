@@ -140,16 +140,28 @@ As explained in chapter \ref{levelSetChap}, $\alpha$ restricts how much the inte
 \end{figure}
 
 \section{3D}
-%\begin{figure}[h!]
-%\centering
-%\includegraphics[width=.9\textwidth]{results/3D/} \\
-First volume to be segmented  was a volume of an aneurism in a semi segmented brain volume. 
-The goal was to segment the aneurism itself as well as adjacent arteries (veins?) without expanding into insignificant parts of the volume. In figure (insert figure of aneurism raw før segmentering) we can see a MIP(trengs forklaring på mip?) of the unsegmented volume. The part we want to segment is the aneurism (utposningen) on the blood vessel which is located inside the brain (not shown in the picture) and adjacent arteries(hva er egentig terminologien her?). Not only is the segmentation here used to extract the important features of the aneurism in order to help surgeons make decisions as to how to operate on it. By also adding sections of the connecting veins, registration can be performed by tryin to find a one to one correspondence between the model and samples of the patient on the table, which is then used as a reference frame during computer aided surgery. 
+First volume to be segmented  was a volume of an aneurism in a "semi segmented brain volume". 
+\begin{figure}[h!]
+\centering
+\includegraphics[width=.9\textwidth]{results/3D/3D-aneurism-unsegmented/aneurism_original_mip}
+\label{aneurism_original}
+\caption{Maximum intensity projection of the volume to be segmented}
+\end{figure}
+The goal was to segment the aneurism itself as well as adjacent arteries without expanding into insignificant parts of the volume. In figure \ref{aneurism_original} we can see the maximum intensity projection of the unsegmented volume. The part we want to segment is an aneurism on the arterie located inside the brain (not shown in the picture) and adjacent arteries. Not only is the segmentation used to extract important features of the aneurism in order to help surgeons make decisions as to how to operate on it. By also adding sections of the connecting veins, registration can be performed by trying to find a one to one correspondence between the model and samples of the patient on the table, which is then used as a reference frame during computer aided surgery. 
 
-Figure 2 shows how segmentation of the image looks like after 500 iterations. The values of T, $\epsilon$, and $\alpha$ used is T = 1.0, $\epsilon$ = 0.3 and $\alpha$ = 0.75. The aneurism volume has dimensions 512x512x235. In theory this would mean that we only need about half the number of iterations as the biggest image dimension (assuming the seed point is located near the center of the volume) to achieve a full segmentation, given that the speed is close to 1. Since this is not the case in a volume with a range of values and because the curvature term slows down expansions in narrow regions (which is abundant in a volume of blood vessels) the expansion is infact much more slow. It turns out that to achieve a satisfying result given the input parameters stated above, about 3000 iterations is needed. Figure 3 shows the segmentated volume after 500, 1000 and 1500 iterations of the volume. The white part of the structure is the volume segmented after 500 iterations. The light blue colored part shows the segmentation after 1000 iterations and the darker blue shows the segmented volume after 1500 iterations. The figure shows how stable the algorithm is throughout the run. The area along the walls of the arteries covered after 500 iterations is not retracting at a later point, nor is it expanding further. This is shown by observing how well the 500 iterations volume and the 1500 iterations volume overlap.
+
+Figure \ref{aneurism_500_iterations} shows how segmentation of the image looks like after 500 iterations. The values of T, $\epsilon$, and $\alpha$ used is T = 1.0, $\epsilon$ = 0.3 and $\alpha$ = 0.75. 
+\begin{figure}[h!]
+\centering
+\includegraphics[width=.9\textwidth]{results/3D/aneurism_500_iterations}
+\label{aneurism_500_iterations}
+\caption{Aneurism segmentation after 500 iterations.}
+\end{figure}
+The aneurism volume has dimensions 256x256x256 and the maximal speed the interface can have using sparse field is 1. In theory this would mean that we only need about half the number of iterations as the biggest image dimension (assuming the seed point is located near the center of the volume) in order to achieve convergence. In practice the speed is reduced by both the curcature and the . It turns out that to achieve a satisfying result given the input parameters stated above, about 3000 iterations is needed. Figure 3 shows the segmentated volume after 500, 1000 and 1500 iterations of the volume. The white part of the structure is the volume segmented after 500 iterations. The light blue colored part shows the segmentation after 1000 iterations and the darker blue shows the segmented volume after 1500 iterations. The figure shows how stable the algorithm is throughout the run. The area along the walls of the arteries covered after 500 iterations is not retracting at a later point, nor is it expanding further. This is shown by observing how well the 500 iterations volume and the 1500 iterations volume overlap.
 
 Next we have the segmented volume after 2000 and 3000 iterations in figure 4, which has colors red and green respectively. The overlapping areas are indicated in yellow. As we can see the last 1000 iterations is not a huge improvement, but the volume is definitely not at equilibrium after 2000 iterations. 
-
+\\
+We also tested the data on a CT volume of an abdomen to extract the volume of the liver. This is somewhat tricky because the liver has greyscale values very similar to the organs surrounding it and so it is difficult to prevent the interface from leaking into the surroundings. And altho the curvature term will prevent pixel sized leaks and small holes, it will not prevent a broad part of the interface to move out of the liver volume unless the curvatures is weighted heavily. In addition, the internal structures of the liver migh vary even more than the liver and its surroundings. So the parameters has to be chosen wisely to get a good segmentation. Figure CT z axis shows a slice in the z axis of the volume. The liver is the big semi-uniform area that stretches from the left and over the middle of the stomach. As we can see the difference in the pixel values between the liver area and its surroundings are small. The dimensions of the image are 320x220x72. Next we see the segmented volume (figure ct with poor threshold) using values (insert values for liver CT) and (insert iterations) iterations. The threshold in this image (reference figure ct with poor threshold) is too high and so the 
 
 \section{Performance}
 TODO 
