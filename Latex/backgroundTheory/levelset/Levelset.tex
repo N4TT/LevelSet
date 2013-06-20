@@ -61,10 +61,17 @@ where \(\nabla \cdot (\nabla \phi / |\nabla \phi|)\) is the normal vector that r
 A simple data function for any point (pixel, voxel) based solely on the input intensity I at that point\cite{cates03,lefohn04} is:
 \begin{equation}
 D(I) = \epsilon - |I - T|
+\label{dataTermFunc}
 \end{equation} 
-Here \(T\) is the central intensity value of the region to be segmented, and \(\epsilon\) is the deviation around \(T\) that should also considered to be inside the region. This makes the model expand if the intensity of the points are within the region \(T \pm \epsilon\), and contract otherwise. The data function is gradual, thus the effects of \(D(I)\) diminish as the model approaches the boundaries of regions with gray-scale levels within the \(T \pm \epsilon\) range \cite{lefohn04}. This results in the model expanding faster with higher values of \(\epsilon\) and slower with lower values. 
+Here \(T\) is the central intensity value of the region to be segmented, and \(\epsilon\) is the deviation around \(T\) that should also considered to be inside the region. This makes the model expand if the intensity of the points are within the region \(T \pm \epsilon\), and contract otherwise. The data function, plotted in \ref{dataTermPlot}, is gradual, thus the effects of \(D(I)\) diminish as the model approaches the boundaries of regions with gray-scale levels within the \(T \pm \epsilon\) range \cite{lefohn04}. This results in the model expanding faster with higher values of \(\epsilon\) and slower with lower values. 
 
 The level set algorithm is initialized by placing a set of seed points that represents a part inside the region to be segmented. These seed points are represented by a binary mask of the same size as the image to be segmented. This mask is used to compute the signed distance function which \(\phi\) will be initialized to. 
+\begin{figure}[H]
+\centering
+\includegraphics[width=.65\textwidth]{backgroundTheory/levelset/dataTerm}
+\caption{The data function, from \cite{cates03}.}
+\label{dataTermPlot}
+\end{figure}
 
 \subsection{Signed Distance Transform}
 A distance function \(D: \mathbb{R}^3 \rightarrow \mathbb{R}\) for a set S is defined as 
@@ -214,3 +221,17 @@ Finally, the level set equation is updated as
 \begin{equation}
 \phi(t + \Delta t) = \phi(t) + \Delta tF|\nabla \phi|.
 \end{equation}
+
+\subsection{Chan-Vese engergy function}
+The speed function of the the level set discussed so far is one of the most popular speed functions used, along with many modifications and improvements of it based on the problems at hand. But this far from the only speed function out there. The Chan-Vese energy funtion is another function that is used as speed function to evolve the level set. The Chan-Vese model is a powerful and flexible method which is able to segment many types of images, and is used widely in the medical imaging field, especially for the segmentation of the brain, heart and trachea.
+
+In this project a simplified version of the Chan-Vese function is used. This simplified version of the Chan-Vese energy function ($E^{CV}$) is defined as: 
+\begin{equation}
+E^{CV}(c_1,c_2,C) = \int_{inside(C)} (\mu (x,y) - c_1)^2 \, dx \, dy \, + \, \int_{outside(C)} (\mu (x,y) - c_2)^2 \, dx \, dy \, \cite{wang10} %\, = whitespace
+\end{equation}
+where $\mu$ is the image, and $C$ is a closed segmentation curve. In the context of the level set function $C$ is the curve defined by the zero level set. The constants $c_1$ and $c_2$ are the average greyscale intensity values inside and outside of C, respectively. Discretizing this energy function and writing it as a pixelwise function gives
+\begin{equation}
+E^{CV}(x,y) = (\mu (x,y) - c_1)^2 - (\mu (x,y) - c_2)^2.
+\end{equation}
+
+The average values $c_1$ and $c_2$ can chosen by sampling intensity values both outside and inside of the object to be segmented and averaging them. When the algorithm is calculating the speed of a point in the interface (determining whether its going to expand or retract) it looks at its pixel value and compares it to the measured mean values of the foreground and background. The speed, either positive, negative, or zero, depends on which of the two mean values it resembles the most. This simplified version of the Chan-Vese function acts much like a simple region grow method without any consideration for curvature and smoothness of the zero level set.

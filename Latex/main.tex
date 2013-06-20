@@ -12,6 +12,25 @@
 \usepackage{algpseudocode} %pseudocode
 \usepackage{listings} %source code
 
+\lstset{ %
+language=C++,                % choose the language of the code
+basicstyle=\footnotesize,       % the size of the fonts that are used for the code
+numbers=left,                   % where to put the line-numbers
+numberstyle=\footnotesize,      % the size of the fonts that are used for the line-numbers
+stepnumber=1,                   % the step between two line-numbers. If it is 1 each line will be numbered
+numbersep=5pt,                  % how far the line-numbers are from the code
+%backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
+showspaces=false,               % show spaces adding particular underscores
+showstringspaces=false,         % underline spaces within strings
+showtabs=false,                 % show tabs within strings adding particular underscores
+frame=single,           % adds a frame around the code
+tabsize=2,          % sets default tabsize to 2 spaces
+captionpos=b,           % sets the caption-position to bottom
+breaklines=true,        % sets automatic line breaking
+breakatwhitespace=false,    % sets if automatic breaks should only happen at whitespace
+%escapeinside={\%*}{*)}          % if you want to add a comment within your code
+}
+
 \newcommand{\indentitem}{\setlength\itemindent{25pt}} 
 %instead of writing {\setlength\itemindent{25pt} to indent an item inside the itemize envirnment, {\indentitem} can now be used..see last section in the chapter about level set method
 
@@ -51,8 +70,8 @@
 \input{references/references}
 
 \appendix
-\input{appendix/Pseudocode}
-\input{appendix/Code}
+\input{appendix/2DCode}
+\input{appendix/2DCudaCode}
 
 \end{document}
 \end

@@ -1,2 +1,12 @@
-\chapter{Results}
-TODO
+\chapter{Discussion and future work}
+\label{discussionChap}
+\section{Modification of the speed function}
+As mentioned in the when discussing the speed function in chapter \ref{implementedChap} the data function was modified a little. The reason for this modification is that the zero level set evolved very little from iteration to iteration using the originally defined speed function. This is true especially when using a low $\epsilon$ value is used, because the maximum value the data function can have (before the modification) is $\epsilon$. So with a low value of $\epsilon$ and the data term weighted high (high $\alpha$ value) the resulting speed function would have a low value, even if the curvature function gives good result for expandation (high $\alpha$ means low weighting on curvature).
+
+alpha har endret seg mye, fordi før måtte alpha vektes veldig høy for å få speed funksjonen for å utvikle seg, men nå som data termen er blit sterkere i seg selv, så trenger ikke alpha å vektes så mye. denne nye modifiserte speed funksjonen vekter dermed 
+
+scaling of the curvature
+
+clamping of the speed function result
+
+ikke noe skikkelig program for å visualisere volumer skikkelig
