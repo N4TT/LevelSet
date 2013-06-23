@@ -1,0 +1,11 @@
+ObjectType = Image 
+NDims = 3 
+BinaryData = True 
+BinaryDataByteOrderMSB = False 
+ElementSpacing = 1.000 1.000 1.000 
+DimSize = 256 256 192 
+ElementType = MET_USHORT 
+TransformMatrix =  0.042924 0.998897 0.019019 0.002901 0.018912 -0.999817 -0.999074 0.0429713 -0.00208602
+Offset =  88.916 -137.261 99.233
+ElementDataFile = t1_kontrast.raw 
+Creator = DICOMtoMetadataFilter
